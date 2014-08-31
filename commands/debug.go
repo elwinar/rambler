@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"rambler/config"
+	"rambler/lib"
 )
 
 var (
@@ -19,7 +19,8 @@ func init() {
 }
 
 func debug (cmd *cobra.Command, args []string) {
-	config.Init(cmd.Flags().Lookup("configuration"))
+	lib.Init(cmd.Flags().Lookup("configuration"))
+	
 	cmd.DebugFlags()
 	viper.Debug()
 }

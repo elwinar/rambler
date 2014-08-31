@@ -1,10 +1,10 @@
-package config
+package lib
 
 import (
+	"errors"
 	"github.com/elwinar/cast"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"rambler/lib"
 )
 
 var (
@@ -15,7 +15,7 @@ func init() {
 	pflags = make(map[string]*pflag.Flag)
 }
 
-func Init(configuration *pflag.Flag) {
+func Init(configuration *pflag.Flag) error {
 	if configuration != nil {
 		viper.SetConfigFile(configuration.Value.String())
 	}
@@ -35,7 +35,25 @@ func Init(configuration *pflag.Flag) {
 		}
 	}
 	
-	lib.SetQuiet(viper.GetBool("quiet"))
+	SetQuiet(viper.GetBool("quiet"))
+	
+	if !viper.IsSet("database") || viper.GetString("database") == "" {
+		return errors.New("No database selected")
+	}
+	
+	err := Connect()
+	if err != nil {
+		return err
+	}
+	
+	if !HasMigrationTable() {
+		err := CreateMigrationTable()
+		if err != nil {
+			return err
+		}
+	}
+	
+	return nil
 }
 
 func BindPFlag(key string, flag *pflag.Flag) {

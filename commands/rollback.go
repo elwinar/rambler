@@ -1,9 +1,8 @@
 package commands
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
-	"rambler/config"
+	"log"
 	"rambler/lib"
 )
 
@@ -20,13 +19,11 @@ func init() {
 }
 
 func rollback (cmd *cobra.Command, args []string) {
-	config.Init(cmd.Flags().Lookup("configuration"))
-	
-	err := lib.Connect()
+	err := lib.Init(cmd.Flags().Lookup("configuration"))
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	
-	fmt.Println("Done")
+	log.Println("Done")
 }

@@ -3,7 +3,6 @@ package commands
 import (
 	"log"
 	"github.com/spf13/cobra"
-	"rambler/config"
 	"rambler/lib"
 )
 
@@ -20,27 +19,19 @@ func init() {
 }
 
 func migrate (cmd *cobra.Command, args []string) {
-	config.Init(cmd.Flags().Lookup("configuration"))
-	
-	err := lib.Connect()
+	err := lib.Init(cmd.Flags().Lookup("configuration"))
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	
-	if !lib.HasMigrationTable() {
-		err := lib.CreateMigrationTable()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-	}
-	
-	_, err = lib.GetMigrationsFiles()
+	files, err := lib.GetMigrationsFiles()
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	
+	log.Println(files)
 	
 	log.Println("Done")
 }

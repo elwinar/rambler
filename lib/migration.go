@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/spf13/viper"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -23,16 +24,17 @@ func NewMigration (path string) (Migration, error) {
 		return m, errors.New("the specified path isn't a migration file")
 	}
 	
-	chunks := strings.SplitN(path, "_", 1)
+	chunks := strings.SplitN(path, "_", 2)
 	m.Version, _ = strconv.ParseUint(chunks[0], 10, 64)
-	m.Description = strings.Replace(chunks[1], "_", " ", -1)
+	m.Date = time.Now()
+	m.Description = strings.Replace(strings.TrimSuffix(chunks[1], ".sql"), "_", " ", -1)
 	m.File = path
 	
 	return m, nil
 }
 
 func IsMigrationFile (path string) bool {
-	match, err := filepath.Match(`([0-9]+)_([a-zA-Z0-9_-]+).sql`, path)
+	match, err := regexp.MatchString(`([0-9]+)_([a-zA-Z0-9_-]+).sql`, path)
 	if err != nil {
 		panic(err)
 	}
@@ -54,7 +56,7 @@ func GetMigrationsFiles () ([]Migration, error) {
 	
 	var migrations []Migration
 	for _, file := range files {
-		migration, err := NewMigration(file)
+		migration, err := NewMigration(filepath.Base(file))
 		if err != nil {
 			continue
 		}
