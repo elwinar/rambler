@@ -1,13 +1,20 @@
 package lib
 
 import (
+	"bufio"
 	"errors"
 	"github.com/spf13/viper"
+	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+)
+
+const (
+	prefix = `-- rambler`
 )
 
 type Migration struct {
@@ -64,4 +71,63 @@ func GetMigrationsFiles () ([]Migration, error) {
 	}
 	
 	return migrations, nil
+}
+
+func GetMigrationsRows () ([]Migration, error) {
+	var rows []Migration = nil
+	err := db.Select(&rows, `SELECT * FROM migrations`)
+	return rows, err
+}
+
+// scan open the migration file and parse it line by line, keeping only lines in the
+// section passed as parameter.
+func (m Migration) Scan(section string) ([]string, error) {
+	file, err := os.Open(path.Join(viper.GetString("migrations"), m.File))
+	if err != nil {
+		return nil, err
+	}
+	var scanner = bufio.NewScanner(file)
+	var statements []string
+	var buffer string
+	recording := false
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, prefix) {
+			if len(strings.TrimSpace(buffer)) != 0 {
+				statements = append(statements, strings.TrimSpace(buffer))
+			}
+			buffer = ""
+			cmd := strings.TrimSpace(line[len(prefix):])
+			switch cmd {
+				case section:
+					recording = true
+				default:
+					recording = false
+			}
+			continue
+		}
+		if recording {
+			buffer = buffer + "\n" + line
+		}
+	}
+	if len(strings.TrimSpace(buffer)) != 0 {
+		statements = append(statements, strings.TrimSpace(buffer))
+	}
+	return statements, nil
+}
+
+func (m Migration) Up () ([]string, error) {
+	return m.Scan("up")
+}
+
+func (m Migration) Down () ([]string, error) {
+	sections, err := m.Scan("down")
+	if err != nil {
+		return sections, err
+	}
+	var reversed []string = make([]string, len(sections))
+	for i := 0; i < len(sections); i++ {
+		reversed[len(sections) - i - 1] = sections[i]
+	}
+	return reversed, nil
 }

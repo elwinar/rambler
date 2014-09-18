@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"log"
 	"github.com/spf13/cobra"
+	jww "github.com/spf13/jwalterweatherman"
 	"rambler/lib"
 )
 
@@ -21,17 +21,35 @@ func init() {
 func migrate (cmd *cobra.Command, args []string) {
 	err := lib.Init(cmd.Flags().Lookup("configuration"))
 	if err != nil {
-		log.Println(err)
+		jww.ERROR.Println(err)
 		return
 	}
 	
 	files, err := lib.GetMigrationsFiles()
 	if err != nil {
-		log.Println(err)
+		jww.ERROR.Println(err)
 		return
 	}
 	
-	log.Println(files)
+// 	rows, err := lib.GetMigrationsRows()
+// 	if err != nil {
+// 		jww.ERROR.Println(err)
+// 		return
+// 	}
 	
-	log.Println("Done")
+	for _, file := range files {
+		jww.TRACE.Println(file.File)
+		sections, err := file.Up()
+		if err != nil {
+			jww.ERROR.Println(err)
+			return
+		}
+		err = lib.Execute(sections)
+		if err != nil {
+			jww.ERROR.Println(err)
+			return
+		}
+	}
+	
+	jww.INFO.Println("Done")
 }

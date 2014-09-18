@@ -25,5 +25,16 @@ func rollback (cmd *cobra.Command, args []string) {
 		return
 	}
 	
+	files, err := lib.GetMigrationsFiles()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	
+	for _, file := range files {
+		sections, err := file.Down()
+		log.Println(sections, err)
+	}
+	
 	log.Println("Done")
 }
