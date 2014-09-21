@@ -3,7 +3,7 @@ package lib
 import (
 	"bufio"
 	"errors"
-	"github.com/spf13/viper"
+	"github.com/elwinar/viper"
 	"os"
 	"path"
 	"path/filepath"
@@ -17,6 +17,7 @@ const (
 	prefix = `-- rambler`
 )
 
+// Migration represent a schema migration file, composed of up and down queries
 type Migration struct {
 	Version     uint64    `db:"version"`
 	Date        time.Time `db:"date"`
@@ -24,6 +25,7 @@ type Migration struct {
 	File        string    `db:"file"`
 }
 
+// NewMigration create a migration struct with the given path
 func NewMigration (path string) (Migration, error) {
 	m := Migration{}
 	
@@ -40,6 +42,7 @@ func NewMigration (path string) (Migration, error) {
 	return m, nil
 }
 
+// IsMigrationFile check whether the given path follow the migration file naming convention
 func IsMigrationFile (path string) bool {
 	match, err := regexp.MatchString(`([0-9]+)_([a-zA-Z0-9_-]+).sql`, path)
 	if err != nil {
@@ -51,35 +54,12 @@ func IsMigrationFile (path string) bool {
 	return true
 }
 
+// GetMigrationsDir returns the path to the migration directory
 func GetMigrationsDir () string {
 	return filepath.Join(filepath.Dir(viper.ConfigFileUsed()), viper.GetString("migrations"))
 }
 
-func GetMigrationsFiles () ([]Migration, error) {
-	files, err := filepath.Glob(GetMigrationsDir() + "/*.sql")
-	if err != nil {
-		return nil, err
-	}
-	
-	var migrations []Migration
-	for _, file := range files {
-		migration, err := NewMigration(filepath.Base(file))
-		if err != nil {
-			continue
-		}
-		migrations = append(migrations, migration)
-	}
-	
-	return migrations, nil
-}
-
-func GetMigrationsRows () ([]Migration, error) {
-	var rows []Migration = nil
-	err := db.Select(&rows, `SELECT * FROM migrations`)
-	return rows, err
-}
-
-// scan open the migration file and parse it line by line, keeping only lines in the
+// Scan open the migration file and parse it line by line, keeping only lines in the
 // section passed as parameter.
 func (m Migration) Scan(section string) ([]string, error) {
 	file, err := os.Open(path.Join(viper.GetString("migrations"), m.File))
@@ -116,18 +96,7 @@ func (m Migration) Scan(section string) ([]string, error) {
 	return statements, nil
 }
 
-func (m Migration) Up () ([]string, error) {
-	return m.Scan("up")
-}
-
-func (m Migration) Down () ([]string, error) {
-	sections, err := m.Scan("down")
-	if err != nil {
-		return sections, err
-	}
-	var reversed []string = make([]string, len(sections))
-	for i := 0; i < len(sections); i++ {
-		reversed[len(sections) - i - 1] = sections[i]
-	}
-	return reversed, nil
+func (m Migration) IsAvailable () bool {
+	_, err := os.Stat(m.File)
+	return os.IsNotExist(err)
 }

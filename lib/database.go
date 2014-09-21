@@ -2,69 +2,40 @@ package lib
 
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	jww "github.com/spf13/jwalterweatherman"
-	"github.com/spf13/viper"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/elwinar/viper"
 )
 
-const Schema = `CREATE TABLE migrations (
-	version BIGINT UNSIGNED NOT NULL PRIMARY KEY,
-	date DATETIME NOT NULL,
-	description CHAR(255) NOT NULL,
-	file CHAR(255) NOT NULL
-) DEFAULT CHARSET=utf8;`
 
-var (
-	db *sqlx.DB
-)
-
-func Connect () error {
+// GetDB initialize the database object used by the application
+// TODO Implement compatibility with more database vendors
+func GetDB () (*sqlx.DB, error) {
+	var db *sqlx.DB
 	var err error
-	var dsn string
 	
 	switch viper.GetString("driver") {
 		case "mysql":
-			dsn = fmt.Sprintf(`%s:%s@%s(%s:%d)/%s?parseTime=true`, viper.GetString("user"), viper.GetString("password"), viper.GetString("protocol"), viper.GetString("host"), viper.GetInt("port"), viper.GetString("database"))
+			db, err = sqlx.Connect("mysql", fmt.Sprintf("%s:%s@%s(%s:%d)/%s", viper.GetString("user"), viper.GetString("password"), viper.GetString("protocol"), viper.GetString("host"), viper.GetInt("port"), viper.GetString("database")))
 	}
 	
-	jww.INFO.Println("Connecting to", viper.GetString("driver"), ":", dsn)
-	db, err = sqlx.Connect(viper.GetString("driver"), dsn)
-	
-	return err
+	return db, err
 }
 
-func Connected () bool {
-	return db != nil
-}
-
-func HasMigrationTable () bool {
-	jww.INFO.Println("Looking for migration table")
-	err := db.Get(new(struct{ TableName string `db:"table_name"` }), fmt.Sprintf(`SELECT table_name
-FROM information_schema.tables 
-WHERE table_schema = '%s' 
-AND table_name = 'migrations'`, viper.GetString("database")))
-	return err == nil
-}
-
-func CreateMigrationTable () error {
-	jww.INFO.Println("Creating migration table")
-	_, err := db.Exec(Schema)
-	return err
-}
-
-func Execute (statements []string) error {
-	tx, _ := db.Beginx()
-	
-	for _, statement := range statements {
-		jww.TRACE.Println(statement)
-		_, err := tx.Exec(statement)
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
+// HasMigrationTable check whether the given database has a migration table
+// TODO Implement compatibility with more database vendors
+func HasMigrationTable (db *sqlx.DB) bool {
+	switch viper.GetString("driver") {
+		case "mysql":
+			err := db.Get(new(struct{ TableName string `db:"table_name"` }), fmt.Sprintf(`SELECT table_name FROM information_schema.tables WHERE table_schema = '%s' AND table_name = 'migrations'`, viper.GetString("database")))
+			return err == nil
 	}
 	
-	_ = tx.Commit()
-	return nil
+	return false
+}
+
+// CreateMigrationTable create the migration table in the given database
+func CreateMigrationTable (db *sqlx.DB) error {
+	_, err := db.Exec(`CREATE TABLE migrations ( version BIGINT UNSIGNED NOT NULL PRIMARY KEY, date DATETIME NOT NULL, description CHAR(255) NOT NULL, file CHAR(255) NOT NULL ) DEFAULT CHARSET=utf8;`)
+	return err
 }
