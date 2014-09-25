@@ -19,7 +19,7 @@ func init() {
 	Apply.Flags().BoolP("all", "a", false, "apply all migrations")
 	
 	// Set overrides from the command-line to viper
-	override("all", Apply.Flags().Lookup("all"))
+	override("apply-all", Apply.Flags().Lookup("all"))
 }
 
 var Apply = &cobra.Command{
@@ -71,7 +71,7 @@ var Apply = &cobra.Command{
 		sort.Sort(available)
 		
 		// Iterate over both array until we have reached the end of both arrays.
-		// Then, there is 5 cases:
+		// There is 5 cases:
 		// 1. After the end of applied, but not of available, this is a new
 		//    migration in available. Apply it.
 		// 2. After the end of available but not of applied, this is a missing
@@ -82,6 +82,7 @@ var Apply = &cobra.Command{
 		//    is missing in the available array. Report error then stop.
 		// 5. Both versions are equal, the applied version is found, nothing
 		//    to do. Log in the trace and continue.
+		// TODO Add an option to apply out-of-order migrations
 		jww.TRACE.Println("Analyzing migrations")
 		var i int
 		for i = 0; i < len(applied) || i < len(available); i++ {
@@ -135,7 +136,7 @@ var Apply = &cobra.Command{
 					return
 				}
 				
-				if viper.GetBool("all") == false {
+				if viper.GetBool("apply-all") == false {
 					break
 				}
 			} else if i >= len(available) && i < len(applied) {
@@ -150,11 +151,6 @@ var Apply = &cobra.Command{
 			} else {
 				jww.TRACE.Println("Found already applied migration:", available[i].File)
 			}
-		}
-		
-		if i == len(applied) && i == len(available) {
-			jww.INFO.Println("Nothing to do")
-			return
 		}
 		
 		// Announce it's done
