@@ -16,7 +16,7 @@ func GetDB () (*sqlx.DB, error) {
 	
 	switch viper.GetString("driver") {
 		case "mysql":
-			db, err = sqlx.Connect("mysql", fmt.Sprintf("%s:%s@%s(%s:%d)/%s", viper.GetString("user"), viper.GetString("password"), viper.GetString("protocol"), viper.GetString("host"), viper.GetInt("port"), viper.GetString("database")))
+			db, err = sqlx.Connect("mysql", fmt.Sprintf("%s:%s@%s(%s:%d)/%s?parseTime=true", viper.GetString("user"), viper.GetString("password"), viper.GetString("protocol"), viper.GetString("host"), viper.GetInt("port"), viper.GetString("database")))
 	}
 	
 	return db, err
