@@ -1,7 +1,7 @@
 package main
 
 import (
-	"rambler/commands"
+	"github.com/elwinar/rambler/commands"
 )
 
 func main() {

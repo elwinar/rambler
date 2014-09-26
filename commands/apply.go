@@ -4,7 +4,7 @@ import (
 	"github.com/elwinar/cobra"
 	"github.com/elwinar/viper"
 	jww "github.com/spf13/jwalterweatherman"
-	"rambler/lib"
+	"github.com/elwinar/rambler/lib"
 	"sort"
 )
 
