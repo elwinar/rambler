@@ -12,36 +12,87 @@ go install github.com/elwinar/rambler
 
 Others will have to wait for me to have time to cross-compile the executables… nothing really fancy (thank to golang), but not done yet.
 
-## Man
+## Usage
 
-Rambler provide a very succinct interface composed of 2 commands: `apply` and `reverse`.
+### Migrations
 
-Both commands share the same set of flags:
+In rambler, migrations are kept in the simplest form possible: a migration is a list of sections (`up` and `down`, each section being *chunks* of sql. Example:
 
-* `driver` to choose the driver to use. Available values: "mysql".
-* `protocol` to set the communication protocol. Defaults to "tcp". Available values: "tcp".
-* `host,h` to set the database server hostname. Defaults to "localhost".
-* `port` to set the database server listening port. Defaults to 3306.
-* `user,u` to set the database server connection user. Defaults to "root".
-* `password,p` to set the database server password. Defaults to "".
-* `database,d` to set the database name.
-* `migrations,m` to set the migrations directory. Defaults to ".".
-* `quiet,q` to suppress non-error output.
-* `verbose,v` to display additional informations while running.
-* `help` to display help about the current command.
+```sql
+-- rambler up
 
-### `Apply`
+CREATE TABLE foo (
+	id INTEGER UNSIGNED AUTO_INCREMENT,
+	bar VARCHAR(60),
+	PRIMARY KEY (id)
+);
 
-Apply will execute the first available and not already applied migration's `up` sections.
+-- rambler down
 
-Options:
+DROP TABLE foo;
+```
 
-* `all,a` to apply all available and not applied migrations in version order
+Sections are delimited by SQL comments prefixed by the rambler marker (currently sensitive to white-spaces). While applying a migration, rambler will execute each `up` section in order, and while reversing it it will execute each `down` section in reverse order.
 
-### `Reverse`
+Migrations filename must be of the form `version_comment.sql`, version being an integer value, and comment an underscored string. Examples:
 
-Reverse will execute the last applied migration's `down` sections.
+* `201409272258_Added_table_foo.sql`
+* `01_First_migration.sql`
 
-Options:
+### Configuration
 
-* `all,a` to reverse all applied migrations in version order
+Rambler configuration is lightweight: just dump the credentials of your database and the path to your migrations' directory into a JSON (or YAML or TOML) file, and you're done. Here is an example or JSON configuration file with the default values of rambler:
+
+```json
+{
+	"driver": "mysql",
+	"protocol": "tcp",
+	"host": "localhost",
+	"port": 3306,
+	"user": "root",
+	"password": "",
+	"database": "",
+	"migrations": "."
+}
+```
+
+When running, rambler will try to find a configuration file in the working directory and use its values to connect to the managed database. Every option can be overriden at runtime by the matching command-line option (`rambler help` to get the shorthands).
+
+### Applying a migration
+
+To apply a migration, use the `apply` command.
+
+```
+rambler apply
+```
+
+Rambler will compare the migrations already applied and the available migrations in increasing version order to find the next migration to apply, then execute all its `up` sections' statements in order. 
+
+### Reversing a migration
+
+To reverse a migration, use the `reverse` command.
+
+```
+rambler reverse
+```
+
+Rambler will compare the migrations already applied and the available migrations in decreasing version order to find the last applied migrations, then execute all its `down` sections' statements in reverse order.
+
+### Options
+
+You can tell rambler to repeat the process while there is a migration to apply with the `all` flag (or its shorthand, `a`).
+
+### Errors
+
+To ensure database schema consistency, rambler will complain and stop when encountering a new migration in the middle of the already existing ones or if it can't find a migration already applied.
+
+## TODO
+
+* Add a `refresh` command that will reverse the last migration then apply it again
+* Add a `number` option to choose the number of migrations to apply, reverse, or refresh
+* Add a `ignore-missing` option to ignore missing migrations and continue
+* Add a `ignore-out-of-order` option to ignore out-of-order migrations and apply, reverse or refresh them anyway
+
+## Feedback and contributions
+
+Feel free to give feedback, make pull requests or simply open issues if you find a bug or have an idea.
