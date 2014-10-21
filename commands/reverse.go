@@ -133,7 +133,7 @@ var Reverse = &cobra.Command{
 					return
 				}
 
-				jww.TRACE.Println("Commiting")
+				jww.TRACE.Println("Committing")
 				err = tx.Commit()
 				if err != nil {
 					jww.ERROR.Println("Unable to commit the transaction:", err)

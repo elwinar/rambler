@@ -30,7 +30,7 @@ var Apply = &cobra.Command{
 		// Start by opening the database connection and looking for the migration
 		// table. If not found, we have to create it.
 		// TODO Add an option to create/not create the table (default to be determined)
-		jww.TRACE.Println("Openning database connection")
+		jww.TRACE.Println("Opening database connection")
 		db, err := lib.GetDB()
 		if err != nil {
 			jww.ERROR.Println("Unable to open database connection:", err)
@@ -131,7 +131,7 @@ var Apply = &cobra.Command{
 					return
 				}
 
-				jww.TRACE.Println("Commiting")
+				jww.TRACE.Println("Committing")
 				err = tx.Commit()
 				if err != nil {
 					jww.ERROR.Println("Unable to commit the transaction:", err)
