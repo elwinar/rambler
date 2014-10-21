@@ -62,7 +62,7 @@ func GetMigrationsDir() string {
 // Scan open the migration file and parse it line by line, keeping only lines in the
 // section passed as parameter.
 func (m Migration) Scan(section string) ([]string, error) {
-	file, err := os.Open(path.Join(viper.GetString("migrations"), m.File))
+	file, err := os.Open(path.Join(GetMigrationsDir(), m.File))
 	if err != nil {
 		return nil, err
 	}
