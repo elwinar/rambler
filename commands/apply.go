@@ -32,11 +32,11 @@ var Apply = &cobra.Command{
 		// TODO Add an option to create/not create the table (default to be determined)
 		jww.TRACE.Println("Opening database connection")
 		db, err := lib.GetDB()
+		defer db.Close()
 		if err != nil {
 			jww.ERROR.Println("Unable to open database connection:", err)
 			return
 		}
-		defer db.Close()
 
 		jww.TRACE.Println("Looking for the migration table")
 		if !lib.HasMigrationTable(db) {
