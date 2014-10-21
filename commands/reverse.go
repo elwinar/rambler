@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"github.com/elwinar/cobra"
 	"github.com/elwinar/rambler/lib"
 	"github.com/elwinar/viper"
@@ -28,7 +29,7 @@ var Reverse = &cobra.Command{
 	Run: do(func(cmd *cobra.Command, args []string) {
 		// Start by opening the database connection and looking for the migration
 		// table. If not found, we stop here.
-		jww.TRACE.Println("Openning database connection")
+		jww.TRACE.Println("Opening database connection")
 		db, err := lib.GetDB()
 		defer db.Close()
 		if err != nil {
@@ -121,7 +122,8 @@ var Reverse = &cobra.Command{
 				}
 
 				jww.TRACE.Println("Removing entry in the migration table")
-				_, err = tx.Exec("DELETE FROM migrations WHERE version = ?", applied[i].Version)
+				sqlStr := fmt.Sprintf("DELETE FROM migrations WHERE version = '%d'", applied[i].Version)
+				_, err = tx.Exec(sqlStr)
 				if err != nil {
 					jww.ERROR.Println("Unable to remove entry in the migrations table:", err)
 					jww.INFO.Println("Rollbacking")
