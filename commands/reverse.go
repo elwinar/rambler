@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"github.com/elwinar/cobra"
 	"github.com/elwinar/rambler/lib"
 	"github.com/elwinar/viper"
@@ -111,7 +110,7 @@ var Reverse = &cobra.Command{
 					_, err := tx.Exec(statement)
 					if err != nil {
 						jww.ERROR.Println(err)
-						jww.INFO.Println("Rollbacking")
+						jww.INFO.Println("Rolling back")
 						err := tx.Rollback()
 						if err != nil {
 							jww.ERROR.Println("Unable to rollback:", err)
@@ -122,11 +121,10 @@ var Reverse = &cobra.Command{
 				}
 
 				jww.TRACE.Println("Removing entry in the migration table")
-				sqlStr := fmt.Sprintf("DELETE FROM migrations WHERE version = '%d'", applied[i].Version)
-				_, err = tx.Exec(sqlStr)
+				_, err = tx.Exec(db.Rebind("DELETE FROM migrations WHERE version = ?"), applied[i].Version)
 				if err != nil {
 					jww.ERROR.Println("Unable to remove entry in the migrations table:", err)
-					jww.INFO.Println("Rollbacking")
+					jww.INFO.Println("Rolling back")
 					err := tx.Rollback()
 					if err != nil {
 						jww.ERROR.Println("Unable to rollback:", err)
