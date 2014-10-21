@@ -15,6 +15,8 @@ func GetDB() (*sqlx.DB, error) {
 	var err error
 
 	switch viper.GetString("driver") {
+	default:
+		fallthrough
 	case "mysql":
 		db, err = sqlx.Connect("mysql", fmt.Sprintf("%s:%s@%s(%s:%d)/%s?parseTime=true", viper.GetString("user"), viper.GetString("password"), viper.GetString("protocol"), viper.GetString("host"), viper.GetInt("port"), viper.GetString("database")))
 	case "postgres":
@@ -28,6 +30,8 @@ func GetDB() (*sqlx.DB, error) {
 // TODO Implement compatibility with more database vendors
 func HasMigrationTable(db *sqlx.DB) bool {
 	switch viper.GetString("driver") {
+	default:
+		fallthrough
 	case "mysql":
 		err := db.Get(new(struct {
 			TableName string `db:"table_name"`
@@ -47,10 +51,12 @@ func HasMigrationTable(db *sqlx.DB) bool {
 func CreateMigrationTable(db *sqlx.DB) error {
 	var err error
 	switch viper.GetString("driver") {
+	default:
+		fallthrough
 	case "mysql":
 		_, err = db.Exec(`CREATE TABLE migrations ( version BIGINT UNSIGNED NOT NULL PRIMARY KEY, date DATETIME NOT NULL, description CHAR(255) NOT NULL, file CHAR(255) NOT NULL ) DEFAULT CHARSET=utf8;`)
 	case "postgres":
-		_, err = db.Exec(`CREATE TABLE migrations ( version NUMERIC(20) NOT NULL PRIMARY KEY, date TIMESTAMP NOT NULL, description CHAR(255) NOT NULL, file CHAR(255) NOT NULL );`)
+		_, err = db.Exec(`CREATE TABLE migrations ( version NUMERIC(20) NOT NULL PRIMARY KEY, date TIMESTAMP NOT NULL, description TEXT NOT NULL, file TEXT NOT NULL );`)
 	}
 	return err
 }
