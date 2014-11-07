@@ -41,16 +41,16 @@ func init() {
 	
 	// Set overrides from the command-line to viper
 	
-	override("quiet", Rambler.PersistentFlags().Lookup("quiet"))
-	override("verbose", Rambler.PersistentFlags().Lookup("verbose"))
-	override("driver", Rambler.PersistentFlags().Lookup("driver"))
-	override("protocol", Rambler.PersistentFlags().Lookup("protocol"))
-	override("host", Rambler.PersistentFlags().Lookup("host"))
-	override("host", Rambler.PersistentFlags().Lookup("host"))
-	override("user", Rambler.PersistentFlags().Lookup("user"))
-	override("password", Rambler.PersistentFlags().Lookup("password"))
-	override("database", Rambler.PersistentFlags().Lookup("database"))
-	override("migrations", Rambler.PersistentFlags().Lookup("migrations"))
+	viper.BindPFlag("quiet", Rambler.PersistentFlags().Lookup("quiet"))
+	viper.BindPFlag("verbose", Rambler.PersistentFlags().Lookup("verbose"))
+	viper.BindPFlag("driver", Rambler.PersistentFlags().Lookup("driver"))
+	viper.BindPFlag("protocol", Rambler.PersistentFlags().Lookup("protocol"))
+	viper.BindPFlag("host", Rambler.PersistentFlags().Lookup("host"))
+	viper.BindPFlag("host", Rambler.PersistentFlags().Lookup("host"))
+	viper.BindPFlag("user", Rambler.PersistentFlags().Lookup("user"))
+	viper.BindPFlag("password", Rambler.PersistentFlags().Lookup("password"))
+	viper.BindPFlag("database", Rambler.PersistentFlags().Lookup("database"))
+	viper.BindPFlag("migrations", Rambler.PersistentFlags().Lookup("migrations"))
 }
 
 var Rambler = &cobra.Command{

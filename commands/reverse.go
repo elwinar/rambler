@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/elwinar/cobra"
 	"github.com/elwinar/viper"
-	jww "github.com/spf13/jwalterweatherman"
+	jww "github.com/elwinar/jwalterweatherman"
 	"github.com/elwinar/rambler/lib"
 	"sort"
 )
@@ -19,7 +19,7 @@ func init() {
 	Reverse.Flags().BoolP("all", "a", false, "reverse all migrations")
 	
 	// Set overrides from the command-line to viper
-	override("reverse-all", Reverse.Flags().Lookup("all"))
+	viper.BindPFlag("reverse-all", Reverse.Flags().Lookup("all"))
 }
 
 var Reverse = &cobra.Command{
@@ -106,7 +106,7 @@ var Reverse = &cobra.Command{
 				
 				for i := len(statements) - 1; i >= 0; i-- {
 					statement := statements[i]
-					jww.INFO.Println("Executing statement:", statement)
+					jww.TRACE.Println("Executing statement:", statement)
 					_, err := tx.Exec(statement)
 					if err != nil {
 						jww.ERROR.Println(err)
