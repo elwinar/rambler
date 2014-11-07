@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/elwinar/cobra"
 	"github.com/elwinar/viper"
-	jww "github.com/spf13/jwalterweatherman"
+	jww "github.com/elwinar/jwalterweatherman"
 	"github.com/elwinar/rambler/lib"
 	"sort"
 )
@@ -19,7 +19,7 @@ func init() {
 	Apply.Flags().BoolP("all", "a", false, "apply all migrations")
 	
 	// Set overrides from the command-line to viper
-	override("apply-all", Apply.Flags().Lookup("all"))
+	viper.BindPFlag("apply-all", Apply.Flags().Lookup("all"))
 }
 
 var Apply = &cobra.Command{
@@ -99,10 +99,11 @@ var Apply = &cobra.Command{
 				tx, err := db.Beginx()
 				if err != nil {
 					jww.ERROR.Println("Unable to start transaction:", err)
+					return
 				}
 				
 				for _, statement := range statements {
-					jww.INFO.Println("Executing statement:", statement)
+					jww.TRACE.Println("Executing statement:", statement)
 					_, err := tx.Exec(statement)
 					if err != nil {
 						jww.ERROR.Println(err)
