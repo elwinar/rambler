@@ -2,22 +2,22 @@ package commands
 
 import (
 	"github.com/elwinar/cobra"
-	"github.com/elwinar/viper"
 	jww "github.com/elwinar/jwalterweatherman"
 	"github.com/elwinar/rambler/lib"
+	"github.com/elwinar/viper"
 	"sort"
 )
 
 func init() {
 	// Add the command to the main command
 	Rambler.AddCommand(Apply)
-	
+
 	// Set the default configuration
 	viper.SetDefault("all", false)
-	
+
 	// Add ubiquitous flags to the main command
 	Apply.Flags().BoolP("all", "a", false, "apply all migrations")
-	
+
 	// Set overrides from the command-line to viper
 	viper.BindPFlag("apply-all", Apply.Flags().Lookup("all"))
 }
@@ -25,7 +25,7 @@ func init() {
 var Apply = &cobra.Command{
 	Use:   "apply",
 	Short: "Apply the next migration",
-	Run:   do(func (cmd *cobra.Command, args []string) {
+	Run: do(func(cmd *cobra.Command, args []string) {
 		// Start by opening the database connection and looking for the migration
 		// table. If not found, we have to create it.
 		// TODO Add an option to create/not create the table (default to be determined)
@@ -36,7 +36,7 @@ var Apply = &cobra.Command{
 			jww.ERROR.Println("Unable to open database connection:", err)
 			return
 		}
-		
+
 		jww.TRACE.Println("Looking for the migration table")
 		if !lib.HasMigrationTable(db) {
 			jww.INFO.Println("Migration table not found, creating it")
@@ -46,10 +46,10 @@ var Apply = &cobra.Command{
 				return
 			}
 		}
-		
+
 		// Initialize 2 migrations arrays:
 		// 1. The already applied migrations, as stated by the migrations table
-		// 2. The available migrations, by looking into the directory given in 
+		// 2. The available migrations, by looking into the directory given in
 		//    the configuration file
 		// Then, sort both by migration version, to help the action loop that
 		// come after.
@@ -59,17 +59,17 @@ var Apply = &cobra.Command{
 			jww.ERROR.Println("Unable to get applied migrations:", err)
 			return
 		}
-		
+
 		jww.TRACE.Println("Looking for available migrations")
 		available, err := lib.GetAvailableMigrations()
 		if err != nil {
 			jww.ERROR.Println("Unable to get available migrations:", err)
 			return
 		}
-		
+
 		sort.Sort(applied)
 		sort.Sort(available)
-		
+
 		// Iterate over both array until we have reached the end of both arrays.
 		// There is 5 cases:
 		// 1. After the end of applied, but not of available, this is a new
@@ -87,21 +87,21 @@ var Apply = &cobra.Command{
 		var i int
 		for i = 0; i < len(applied) || i < len(available); i++ {
 			if i >= len(applied) && i < len(available) {
-				// Apply the migration. 
+				// Apply the migration.
 				jww.INFO.Println("Applying", available[i].File)
 				statements, err := available[i].Scan("up")
 				if err != nil {
 					jww.ERROR.Println("Unable get up sections:", err)
 					return
 				}
-				
+
 				jww.TRACE.Println("Starting transaction")
 				tx, err := db.Beginx()
 				if err != nil {
 					jww.ERROR.Println("Unable to start transaction:", err)
 					return
 				}
-				
+
 				for _, statement := range statements {
 					jww.TRACE.Println("Executing statement:", statement)
 					_, err := tx.Exec(statement)
@@ -116,7 +116,7 @@ var Apply = &cobra.Command{
 						return
 					}
 				}
-				
+
 				jww.TRACE.Println("Adding entry in the migration table")
 				_, err = tx.Exec("INSERT INTO migrations (version, date, description, file) VALUES (?,?,?,?)", available[i].Version, available[i].Date.Format("2006-01-02 15:04:05"), available[i].Description, available[i].File)
 				if err != nil {
@@ -129,14 +129,14 @@ var Apply = &cobra.Command{
 					}
 					return
 				}
-				
+
 				jww.TRACE.Println("Commiting")
 				err = tx.Commit()
 				if err != nil {
 					jww.ERROR.Println("Unable to commit the transaction:", err)
 					return
 				}
-				
+
 				if viper.GetBool("apply-all") == false {
 					break
 				}
@@ -153,7 +153,7 @@ var Apply = &cobra.Command{
 				jww.TRACE.Println("Found already applied migration:", available[i].File)
 			}
 		}
-		
+
 		// Announce it's done
 		jww.INFO.Println("Done")
 	}),

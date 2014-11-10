@@ -11,10 +11,10 @@ func init() {
 	viper.AddConfigPath("/etc/rambler")
 	viper.AddConfigPath("$HOME/.rambler")
 	viper.AddConfigPath(".")
-	
+
 	// Add the configuration flag to choose the configuration on the command line
 	Rambler.PersistentFlags().StringP("configuration", "c", "", "read the configuration from the given file")
-	
+
 	// Set the default configuration
 	viper.SetDefault("quiet", false)
 	viper.SetDefault("verbose", false)
@@ -26,7 +26,7 @@ func init() {
 	viper.SetDefault("password", "")
 	viper.SetDefault("database", "")
 	viper.SetDefault("migrations", ".")
-	
+
 	// Add ubiquitous flags to the main command
 	Rambler.PersistentFlags().BoolP("quiet", "q", false, "supress all output")
 	Rambler.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
@@ -38,9 +38,9 @@ func init() {
 	Rambler.PersistentFlags().StringP("password", "p", "", "password to connect with")
 	Rambler.PersistentFlags().StringP("database", "d", "", "database to use")
 	Rambler.PersistentFlags().StringP("migrations", "m", ".", "migrations directory")
-	
+
 	// Set overrides from the command-line to viper
-	
+
 	viper.BindPFlag("quiet", Rambler.PersistentFlags().Lookup("quiet"))
 	viper.BindPFlag("verbose", Rambler.PersistentFlags().Lookup("verbose"))
 	viper.BindPFlag("driver", Rambler.PersistentFlags().Lookup("driver"))
