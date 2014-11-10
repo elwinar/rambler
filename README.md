@@ -93,6 +93,15 @@ To ensure database schema consistency, rambler will complain and stop when encou
 * Add a `ignore-missing` option to ignore missing migrations and continue
 * Add a `ignore-out-of-order` option to ignore out-of-order migrations and apply, reverse or refresh them anyway
 
+## CHANGELOG
+
+- **1.0.2**
+    - Fixed a bug about the migration paths building whilte scanning
+    - Made a real documentation
+    - Fixed misconceptions about viper & cobra (thanks @spf13 for the pointers)
+- **1.0.1**
+    - Fixed imports paths of the internal packages
+
 ## Feedback and contributions
 
 Feel free to give feedback, make pull requests or simply open issues if you find a bug or have an idea.
