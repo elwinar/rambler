@@ -37,6 +37,16 @@ func init() {
 	viper.SetDefault("port", 3306)
 	viper.SetDefault("protocol", "tcp")
 	viper.SetDefault("user", "root")
+	
+	// Set the environment overrides
+	Rambler.PersistentFlags().StringP("database", "d", "", "database to use")
+	Rambler.PersistentFlags().String("driver", "mysql", "database driver to use")
+	Rambler.PersistentFlags().StringP("host", "h", "localhost", "host to connect to")
+	Rambler.PersistentFlags().StringP("migrations", "m", ".", "migrations directory")
+	Rambler.PersistentFlags().StringP("password", "p", "", "password to connect with")
+	Rambler.PersistentFlags().Int("port", 3306, "host to connect to")
+	Rambler.PersistentFlags().String("protocol", "tcp", "host to connect to")
+	Rambler.PersistentFlags().StringP("user", "u", "root", "user to connect as")
 }
 
 var Rambler = &cobra.Command{

@@ -41,7 +41,7 @@ func do(f command) command {
 		
 		// Load the working environment configuration
 		jww.TRACE.Println("Loading configuration")
-		err = lib.LoadEnvironment()
+		err = lib.LoadEnvironment(cmd)
 		if err != nil {
 			jww.ERROR.Println("Error while loading configuration:", err)
 			return

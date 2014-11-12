@@ -2,8 +2,10 @@ package lib
 
 import (
 	"errors"
+	"github.com/elwinar/cobra"
 	"github.com/elwinar/viper"
 	"path/filepath"
+	"strconv"
 )
 
 var (
@@ -22,7 +24,6 @@ type RawEnvironment struct {
 	Password *string
 	Database *string
 	Migrations *string
-	Seeds *string
 }
 
 // Environment is the complete and valid environment issued by the GetEnvironment
@@ -36,12 +37,11 @@ type Environment struct {
 	Password string
 	Database string
 	Migrations string
-	Seeds string
 }
 
 // GetEnvironment parse the configuration to extract a full environment configuration,
 // and check whether it is valid or not.
-func LoadEnvironment() (error) {
+func LoadEnvironment(cmd *cobra.Command) (error) {
 	var env = viper.GetString("environment")
 	var err error
 	var rawEnvs map[string]RawEnvironment = make(map[string]RawEnvironment)
@@ -52,56 +52,92 @@ func LoadEnvironment() (error) {
 		return err
 	}
 	
-	// Fill the environment with the default values (taken from the configuration)
-	Env.Driver = viper.GetString("driver")
-	Env.Protocol = viper.GetString("protocol")
-	Env.Host = viper.GetString("host")
-	Env.Port = viper.GetInt("port")
-	Env.User = viper.GetString("user")
-	Env.Password = viper.GetString("password")
-	Env.Database = viper.GetString("database")
-	Env.Migrations = viper.GetString("migrations")
-	Env.Seeds = viper.GetString("seeds")
-	
-	// If requesting the default environment, return now
-	if env == "default" {
-		return nil
+	// Get the default environment value
+	var globalEnv RawEnvironment
+	err = viper.Marshal(&globalEnv)
+	if err != nil {
+		return err
 	}
 	
-	// Check if the requested environment is in the map
+	// Set the default environment value
+	rawEnvs["default"] = globalEnv
+	
+	// Look for the requested environment
 	raw, found := rawEnvs[env]
-	if !found  {
+	if !found {
 		return errors.New("unknown environment " + env)
 	}
 	
-	// Override default environment with non-null values from the raw environment
-	// TODO Find or write a lib to do it for me, preventing this ugly if-medley
-	if raw.Driver != nil {
+	// Set the driver value
+	if cmd.Flag("driver") != nil && cmd.Flag("driver").Changed {
+		Env.Driver = cmd.Flag("driver").Value.String()
+	} else if raw.Driver != nil {
 		Env.Driver = *raw.Driver
+	} else {
+		Env.Driver = *globalEnv.Driver
 	}
-	if raw.Protocol != nil {
+	
+	// Set the protocol value
+	if cmd.Flag("protocol") != nil && cmd.Flag("protocol").Changed {
+		Env.Protocol = cmd.Flag("protocol").Value.String()
+	} else if raw.Protocol != nil {
 		Env.Protocol = *raw.Protocol
+	} else {
+		Env.Protocol = *globalEnv.Protocol
 	}
-	if raw.Host != nil {
+	
+	// Set the host value
+	if cmd.Flag("host") != nil && cmd.Flag("host").Changed {
+		Env.Host = cmd.Flag("host").Value.String()
+	} else if raw.Host != nil {
 		Env.Host = *raw.Host
+	} else {
+		Env.Host = *globalEnv.Host
 	}
-	if raw.Port != nil {
+	
+	// Set the port value
+	if cmd.Flag("port") != nil && cmd.Flag("port").Changed {
+		Env.Port, _ = strconv.Atoi(cmd.Flag("port").Value.String())
+	} else if raw.Port != nil {
 		Env.Port = *raw.Port
+	} else {
+		Env.Port = *globalEnv.Port
 	}
-	if raw.User != nil {
+	
+	// Set the user value
+	if cmd.Flag("user") != nil && cmd.Flag("user").Changed {
+		Env.User = cmd.Flag("user").Value.String()
+	} else if raw.User != nil {
 		Env.User = *raw.User
+	} else {
+		Env.User = *globalEnv.User
 	}
-	if raw.Password != nil {
+	
+	// Set the password value
+	if cmd.Flag("password") != nil && cmd.Flag("password").Changed {
+		Env.Password = cmd.Flag("password").Value.String()
+	} else if raw.Password != nil {
 		Env.Password = *raw.Password
+	} else {
+		Env.Password = *globalEnv.Password
 	}
-	if raw.Database != nil {
+	
+	// Set the database value
+	if cmd.Flag("database") != nil && cmd.Flag("database").Changed {
+		Env.Database = cmd.Flag("database").Value.String()
+	} else if raw.Database != nil {
 		Env.Database = *raw.Database
+	} else {
+		Env.Database = *globalEnv.Database
 	}
-	if raw.Migrations != nil {
+	
+	// Set the migrations value
+	if cmd.Flag("migrations") != nil && cmd.Flag("migrations").Changed {
+		Env.Migrations = cmd.Flag("migrations").Value.String()
+	} else if raw.Migrations != nil {
 		Env.Migrations = *raw.Migrations
-	}
-	if raw.Seeds != nil {
-		Env.Seeds = *raw.Seeds
+	} else {
+		Env.Migrations = *globalEnv.Migrations
 	}
 	
 	return nil
