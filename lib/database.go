@@ -29,7 +29,7 @@ func HasMigrationTable(db *sqlx.DB) (bool, error) {
 	type Table struct {
 		Name string `db:'name'`
 	}
-	
+
 	switch Env.Driver {
 	case "mysql":
 		err := db.Get(new(Table), fmt.Sprintf(`SELECT table_name as name FROM information_schema.tables WHERE table_schema = '%s' AND table_name = 'migrations'`, Env.Database))

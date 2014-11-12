@@ -14,7 +14,7 @@ type command func(*cobra.Command, []string)
 func do(f command) command {
 	return func(cmd *cobra.Command, args []string) {
 		var err error
-		
+
 		var configuration = cmd.Flags().Lookup("configuration")
 		if configuration != nil {
 			viper.SetConfigFile(configuration.Value.String())
@@ -38,7 +38,7 @@ func do(f command) command {
 			jww.SetStdoutThreshold(jww.LevelTrace)
 			jww.SetLogThreshold(jww.LevelTrace)
 		}
-		
+
 		// Load the working environment configuration
 		jww.TRACE.Println("Loading configuration")
 		err = lib.LoadEnvironment(cmd)
