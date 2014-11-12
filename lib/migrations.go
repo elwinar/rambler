@@ -35,7 +35,7 @@ func GetAppliedMigrations(db *sqlx.DB) (Migrations, error) {
 func GetAvailableMigrations() (Migrations, error) {
 	var migrations Migrations
 
-	files, err := filepath.Glob(filepath.Join(GetMigrationsDir(), "*.sql"))
+	files, err := filepath.Glob(filepath.Join(Env.MigrationsDir(), "*.sql"))
 	if err != nil {
 		return migrations, err
 	}
