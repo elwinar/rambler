@@ -37,9 +37,18 @@ var Reverse = &cobra.Command{
 		}
 
 		jww.TRACE.Println("Looking for the migration table")
-		if !lib.HasMigrationTable(db) {
-			jww.INFO.Println("No migration table found, exiting.")
+		found, err := lib.HasMigrationTable(db)
+		if err != nil {
+			jww.ERROR.Println("Unable to find migration table:", err)
 			return
+		}
+		if !found {
+			jww.INFO.Println("Migration table not found, creating it")
+			err := lib.CreateMigrationTable(db)
+			if err != nil {
+				jww.ERROR.Println("Unable to create migration table:", err)
+				return
+			}
 		}
 
 		// Initialize 2 migrations arrays:
