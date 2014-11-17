@@ -25,5 +25,11 @@ func TestNewMigration(t *testing.T) {
 			g.Assert(m).Equal(nilMigration)
 			g.Assert(err).Equal(ErrUnknownDirectory)
 		})
+		
+		g.It("Should reject unknown migrations", func() {
+			m, err := NewMigration(knownDirectory, unknownVersion)
+			g.Assert(m).Equal(nilMigration)
+			g.Assert(err).Equal(ErrUnknownVersion)
+		})
 	})
 }
