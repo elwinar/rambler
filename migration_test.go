@@ -2,7 +2,7 @@ package rambler
 
 import (
 	. "github.com/franela/goblin"
-	"strings"
+	"io/ioutil"
 	"testing"
 )
 
@@ -13,22 +13,22 @@ const (
 	knownDirectory = "test/"
 	knownVersion = 42
 	knownDescription = "forty_two"
+	knownContent = `-- rambler up
+CREATE TABLE foo (
+	id INTEGER UNSIGNED AUTO_INCREMENT,
+	PRIMARY KEY (id)
+);
+
+-- rambler down
+DROP TABLE foo;
+`
 	
 	ambiguousVersion = 33
 )
 
 var (
 	nilMigration *Migration
-	knownMigration *Migration
 )
-
-func init() {
-	knownMigration = &Migration{
-		Version: knownVersion,
-		Description: knownDescription,
-		reader: strings.NewReader(""),
-	}
-}
 
 func TestNewMigration(t *testing.T) {
 	g := Goblin(t)
@@ -53,7 +53,14 @@ func TestNewMigration(t *testing.T) {
 		
 		g.It("Should parse filenames to get descriptions", func() {
 			m, err := NewMigration(knownDirectory, knownVersion)
-			g.Assert(m.Description).Equal(knownMigration.Description)
+			g.Assert(m.Description).Equal(knownDescription)
+			g.Assert(err).Equal(nil)
+		})
+		
+		g.It("Should get the right migration based on version number", func() {
+			m, err := NewMigration(knownDirectory, knownVersion)
+			content, err := ioutil.ReadAll(m.reader)
+			g.Assert(content).Equal([]byte(knownContent))
 			g.Assert(err).Equal(nil)
 		})
 	})
