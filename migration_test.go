@@ -119,7 +119,7 @@ func TestScan(t *testing.T) {
 			g.Assert(reader.counter).Equal(len([]byte("rambler")))
 		})
 		
-		g.It("Should find statements", func() {
+		g.It("Should find statements if there is statements to find", func() {
 			m := &Migration{
 				reader: strings.NewReader(`-- rambler up
 one
@@ -131,6 +131,20 @@ three
 			}
 			statements := m.Scan("up")
 			g.Assert(statements).Equal([]string{"one", "three"})
+		})
+		
+		g.It("Should return an empty slice if there is no statements to find", func() {
+			m := &Migration{
+				reader: strings.NewReader(`-- rambler up
+one
+-- rambler down
+two
+-- rambler up
+three
+`),
+			}
+			statements := m.Scan("right")
+			g.Assert(len(statements)).Equal(0)
 		})
 	})
 }
