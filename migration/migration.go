@@ -1,4 +1,4 @@
-package rambler
+package migration
 
 import (
 	"bufio"
@@ -36,10 +36,10 @@ func NewMigration(directory string, version uint64) (*Migration, error) {
 	})
 }
 
-type Glober func(string) ([]string, error)
-type Opener func(string) (io.ReadSeeker, error)
+type glober func(string) ([]string, error)
+type opener func(string) (io.ReadSeeker, error)
 
-func newMigration(directory string, version uint64, glob Glober, open Opener) (*Migration, error) {
+func newMigration(directory string, version uint64, glob glober, open opener) (*Migration, error) {
 	matches, err := glob(path.Join(directory, strconv.FormatUint(version, 10)+"_*.sql"))
 	if err != nil {
 		return nil, ErrUnknownDirectory

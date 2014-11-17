@@ -1,4 +1,4 @@
-package rambler
+package migration
 
 import (
 	"errors"
