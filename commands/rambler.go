@@ -15,19 +15,19 @@ func init() {
 
 	// Add configuration flags to the command-line
 	Rambler.PersistentFlags().StringP("configuration", "c", "", "read the configuration from the given file")
-	
+
 	Rambler.PersistentFlags().StringP("environment", "e", "default", "environment to run on")
 	viper.BindPFlag("environment", Rambler.PersistentFlags().Lookup("environment"))
-	
+
 	Rambler.PersistentFlags().BoolP("quiet", "q", false, "supress all output")
 	viper.BindPFlag("quiet", Rambler.PersistentFlags().Lookup("quiet"))
-	
+
 	Rambler.PersistentFlags().BoolP("verbose", "v", false, "verbose output")
 	viper.BindPFlag("verbose", Rambler.PersistentFlags().Lookup("verbose"))
 
 	// Set the default configuration
 	viper.SetDefault("environments", map[string]lib.RawEnvironment{})
-	
+
 	// Set the default environment
 	viper.SetDefault("database", "")
 	viper.SetDefault("driver", "mysql")
@@ -37,7 +37,7 @@ func init() {
 	viper.SetDefault("port", 3306)
 	viper.SetDefault("protocol", "tcp")
 	viper.SetDefault("user", "root")
-	
+
 	// Set the environment overrides
 	Rambler.PersistentFlags().StringP("database", "d", "", "database to use")
 	Rambler.PersistentFlags().String("driver", "mysql", "database driver to use")

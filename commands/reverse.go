@@ -1,11 +1,12 @@
 package commands
 
 import (
+	"sort"
+
 	"github.com/elwinar/cobra"
 	jww "github.com/elwinar/jwalterweatherman"
 	"github.com/elwinar/rambler/lib"
 	"github.com/elwinar/viper"
-	"sort"
 )
 
 func init() {
@@ -28,7 +29,7 @@ var Reverse = &cobra.Command{
 	Run: do(func(cmd *cobra.Command, args []string) {
 		// Start by opening the database connection and looking for the migration
 		// table. If not found, we stop here.
-		jww.TRACE.Println("Openning database connection")
+		jww.TRACE.Println("Opening database connection")
 		db, err := lib.GetDB()
 		defer db.Close()
 		if err != nil {
@@ -119,7 +120,7 @@ var Reverse = &cobra.Command{
 					_, err := tx.Exec(statement)
 					if err != nil {
 						jww.ERROR.Println(err)
-						jww.INFO.Println("Rollbacking")
+						jww.INFO.Println("Rolling back")
 						err := tx.Rollback()
 						if err != nil {
 							jww.ERROR.Println("Unable to rollback:", err)
@@ -130,10 +131,10 @@ var Reverse = &cobra.Command{
 				}
 
 				jww.TRACE.Println("Removing entry in the migration table")
-				_, err = tx.Exec("DELETE FROM migrations WHERE version = ?", applied[i].Version)
+				_, err = tx.Exec(db.Rebind("DELETE FROM migrations WHERE version = ?"), applied[i].Version)
 				if err != nil {
 					jww.ERROR.Println("Unable to remove entry in the migrations table:", err)
-					jww.INFO.Println("Rollbacking")
+					jww.INFO.Println("Rolling back")
 					err := tx.Rollback()
 					if err != nil {
 						jww.ERROR.Println("Unable to rollback:", err)
@@ -142,7 +143,7 @@ var Reverse = &cobra.Command{
 					return
 				}
 
-				jww.TRACE.Println("Commiting")
+				jww.TRACE.Println("Committing")
 				err = tx.Commit()
 				if err != nil {
 					jww.ERROR.Println("Unable to commit the transaction:", err)

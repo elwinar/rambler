@@ -1,11 +1,12 @@
 package commands
 
 import (
+	"sort"
+
 	"github.com/elwinar/cobra"
 	jww "github.com/elwinar/jwalterweatherman"
 	"github.com/elwinar/rambler/lib"
 	"github.com/elwinar/viper"
-	"sort"
 )
 
 func init() {
@@ -29,7 +30,7 @@ var Apply = &cobra.Command{
 		// Start by opening the database connection and looking for the migration
 		// table. If not found, we have to create it.
 		// TODO Add an option to create/not create the table (default to be determined)
-		jww.TRACE.Println("Openning database connection")
+		jww.TRACE.Println("Opening database connection")
 		db, err := lib.GetDB()
 		defer db.Close()
 		if err != nil {
@@ -96,7 +97,7 @@ var Apply = &cobra.Command{
 				jww.INFO.Println("Applying", available[i].File)
 				statements, err := available[i].Scan("up")
 				if err != nil {
-					jww.ERROR.Println("Unable get up sections:", err)
+					jww.ERROR.Println("Unable to get up sections:", err)
 					return
 				}
 
@@ -112,7 +113,7 @@ var Apply = &cobra.Command{
 					_, err := tx.Exec(statement)
 					if err != nil {
 						jww.ERROR.Println(err)
-						jww.INFO.Println("Rollbacking")
+						jww.INFO.Println("Rolling back")
 						err := tx.Rollback()
 						if err != nil {
 							jww.ERROR.Println("Unable to rollback:", err)
@@ -123,10 +124,10 @@ var Apply = &cobra.Command{
 				}
 
 				jww.TRACE.Println("Adding entry in the migration table")
-				_, err = tx.Exec("INSERT INTO migrations (version, date, description, file) VALUES (?,?,?,?)", available[i].Version, available[i].Date.Format("2006-01-02 15:04:05"), available[i].Description, available[i].File)
+				_, err = tx.Exec(db.Rebind("INSERT INTO migrations (version, date, description, file) VALUES (?,?,?,?)"), available[i].Version, available[i].Date.Format("2006-01-02 15:04:05"), available[i].Description, available[i].File)
 				if err != nil {
 					jww.ERROR.Println("Unable to write entry in the migrations table:", err)
-					jww.INFO.Println("Rollbacking")
+					jww.INFO.Println("Rolling back")
 					err := tx.Rollback()
 					if err != nil {
 						jww.ERROR.Println("Unable to rollback:", err)
@@ -135,7 +136,7 @@ var Apply = &cobra.Command{
 					return
 				}
 
-				jww.TRACE.Println("Commiting")
+				jww.TRACE.Println("Committing")
 				err = tx.Commit()
 				if err != nil {
 					jww.ERROR.Println("Unable to commit the transaction:", err)
