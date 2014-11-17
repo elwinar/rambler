@@ -9,27 +9,6 @@ import (
 	"testing"
 )
 
-const (
-	unknownDirectory = "unknown-dir/"
-	unknownVersion   = 13
-
-	knownPath        = "test/42_forty_two.sql"
-	knownDirectory   = "test/"
-	knownVersion     = 42
-	knownDescription = "forty_two"
-	knownContent     = `-- rambler up
-CREATE TABLE foo (
-	id INTEGER UNSIGNED AUTO_INCREMENT,
-	PRIMARY KEY (id)
-);
-
--- rambler down
-DROP TABLE foo;
-`
-
-	ambiguousVersion = 33
-)
-
 var (
 	nilMigration *Migration
 )
@@ -38,7 +17,7 @@ func TestNewMigration(t *testing.T) {
 	g := Goblin(t)
 	g.Describe("NewMigration", func() {
 		g.It("Should reject unknown directory path", func() {
-			m, err := newMigration(unknownDirectory, knownVersion, func(pattern string) ([]string, error) {
+			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
 				return nil, errors.New("unknown")
 			}, func(path string) (io.ReadSeeker, error) {
 				return nil, nil
@@ -48,7 +27,7 @@ func TestNewMigration(t *testing.T) {
 		})
 
 		g.It("Should reject unknown migrations", func() {
-			m, err := newMigration(knownDirectory, unknownVersion, func(pattern string) ([]string, error) {
+			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
 				return nil, nil
 			}, func(path string) (io.ReadSeeker, error) {
 				return nil, nil
@@ -58,7 +37,7 @@ func TestNewMigration(t *testing.T) {
 		})
 
 		g.It("Should reject ambiguous migrations", func() {
-			m, err := newMigration(knownDirectory, ambiguousVersion, func(pattern string) ([]string, error) {
+			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
 				return []string{"a", "b"}, nil
 			}, func(path string) (io.ReadSeeker, error) {
 				return nil, nil
@@ -68,26 +47,26 @@ func TestNewMigration(t *testing.T) {
 		})
 
 		g.It("Should parse filenames to get descriptions", func() {
-			m, err := newMigration(knownDirectory, knownVersion, func(pattern string) ([]string, error) {
-				return []string{knownPath}, nil
+			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
+				return []string{"42_forty_two.sql"}, nil
 			}, func(path string) (io.ReadSeeker, error) {
 				return nil, nil
 			})
 			g.Assert(err).Equal(nil)
-			g.Assert(m.Description).Equal(knownDescription)
+			g.Assert(m.Description).Equal("forty_two")
 		})
 
 		g.It("Should open a handle for the migration file", func() {
-			m, err := newMigration(knownDirectory, knownVersion, func(pattern string) ([]string, error) {
-				return []string{knownPath}, nil
+			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
+				return []string{"42_forty_two.sql"}, nil
 			}, func(path string) (io.ReadSeeker, error) {
-				return strings.NewReader(knownContent), nil
+				return strings.NewReader("rambler"), nil
 			})
 			g.Assert(err).Equal(nil)
 
 			content, err := ioutil.ReadAll(m.reader)
 			g.Assert(err).Equal(nil)
-			g.Assert(content).Equal([]byte(knownContent))
+			g.Assert(content).Equal([]byte("rambler"))
 		})
 	})
 }
@@ -118,7 +97,7 @@ func TestScan(t *testing.T) {
 	g.Describe("Scan", func() {
 		g.It("Should rewind the reader", func() {
 			seeker := &MockSeeker{
-				Reader:  strings.NewReader(knownContent),
+				Reader:  strings.NewReader("rambler"),
 				counter: 0,
 			}
 			m := &Migration{
@@ -130,14 +109,28 @@ func TestScan(t *testing.T) {
 
 		g.It("Should read the whole file", func() {
 			reader := &MockReader{
-				Reader:  strings.NewReader(knownContent),
+				Reader:  strings.NewReader("rambler"),
 				counter: 0,
 			}
 			m := &Migration{
 				reader: reader,
 			}
 			m.Scan("up")
-			g.Assert(reader.counter).Equal(len([]byte(knownContent)))
+			g.Assert(reader.counter).Equal(len([]byte("rambler")))
+		})
+		
+		g.It("Should find statements", func() {
+			m := &Migration{
+				reader: strings.NewReader(`-- rambler up
+one
+-- rambler down
+two
+-- rambler up
+three
+`),
+			}
+			statements := m.Scan("up")
+			g.Assert(statements).Equal([]string{"one", "three"})
 		})
 	})
 }
