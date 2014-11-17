@@ -1,43 +1,29 @@
 package commands
 
 import (
-	"github.com/elwinar/cast"
 	"github.com/elwinar/cobra"
+	jww "github.com/elwinar/jwalterweatherman"
+	"github.com/elwinar/rambler/lib"
 	"github.com/elwinar/viper"
-	jww "github.com/spf13/jwalterweatherman"
-	"github.com/spf13/pflag"
 )
 
 type command func(*cobra.Command, []string)
 
-var flags = make(map[string]*pflag.Flag)
-
-func override(key string, flag *pflag.Flag) {
-	if flag != nil {
-		flags[key] = flag
-	}
-}
-
+// do is the preparation function that gather all common instruction for commands
+// It should not contain any logic at all, only environment configuration
 func do(f command) command {
 	return func(cmd *cobra.Command, args []string) {
+		var err error
+		
 		var configuration = cmd.Flags().Lookup("configuration")
 		if configuration != nil {
 			viper.SetConfigFile(configuration.Value.String())
 		}
 
-		viper.ReadInConfig()
-
-		for key, flag := range flags {
-			if flag != nil && flag.Changed {
-				switch flag.Value.Type() {
-				case "int", "int8", "int16", "int32", "int64":
-					viper.Set(key, cast.ToInt(flag.Value.String()))
-				case "bool":
-					viper.Set(key, cast.ToBool(flag.Value.String()))
-				default:
-					viper.Set(key, flag.Value.String())
-				}
-			}
+		err = viper.ReadInConfig()
+		if err != nil {
+			jww.ERROR.Println("Unable to load configuration file:", err)
+			return
 		}
 
 		jww.SetStdoutThreshold(jww.LevelInfo)
@@ -51,6 +37,14 @@ func do(f command) command {
 		if viper.GetBool("verbose") {
 			jww.SetStdoutThreshold(jww.LevelTrace)
 			jww.SetLogThreshold(jww.LevelTrace)
+		}
+		
+		// Load the working environment configuration
+		jww.TRACE.Println("Loading configuration")
+		err = lib.LoadEnvironment(cmd)
+		if err != nil {
+			jww.ERROR.Println("Error while loading configuration:", err)
+			return
 		}
 
 		f(cmd, args)

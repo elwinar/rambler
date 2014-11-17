@@ -3,10 +3,8 @@ package lib
 import (
 	"bufio"
 	"errors"
-	"github.com/elwinar/viper"
 	"os"
 	"path"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -54,15 +52,10 @@ func IsMigrationFile(path string) bool {
 	return true
 }
 
-// GetMigrationsDir returns the path to the migration directory
-func GetMigrationsDir() string {
-	return filepath.Join(filepath.Dir(viper.ConfigFileUsed()), viper.GetString("migrations"))
-}
-
 // Scan open the migration file and parse it line by line, keeping only lines in the
 // section passed as parameter.
 func (m Migration) Scan(section string) ([]string, error) {
-	file, err := os.Open(path.Join(GetMigrationsDir(), m.File))
+	file, err := os.Open(path.Join(Env.MigrationsDir(), m.File))
 	if err != nil {
 		return nil, err
 	}

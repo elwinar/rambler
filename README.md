@@ -10,13 +10,13 @@ Go users can simply compile it from source and install it as a go executable usi
 go install github.com/elwinar/rambler
 ```
 
-Others will have to wait for me to have time to cross-compile the executables… nothing really fancy (thank to golang), but not done yet.
+Others will have to wait for me to have time to cross-compile the executables and do a distribution website… nothing really fancy (thank to golang), but not done yet.
 
 ## Usage
 
 ### Migrations
 
-In rambler, migrations are kept in the simplest form possible: a migration is a list of sections (`up` and `down`, each section being *chunks* of sql. Example:
+In rambler, migrations are kept in the simplest form possible: a migration is a list of sections (`up` and `down`), each section being *chunks* of sql. Example:
 
 ```sql
 -- rambler up
@@ -32,7 +32,7 @@ CREATE TABLE foo (
 DROP TABLE foo;
 ```
 
-Sections are delimited by SQL comments prefixed by the rambler marker (currently sensitive to white-spaces). While applying a migration, rambler will execute each `up` section in order, and while reversing it it will execute each `down` section in reverse order.
+Sections are delimited by SQL comments sufixed by the rambler marker (white-spaces sensitive). While applying a migration, rambler will execute each `up` section in order, and while reversing it it will execute each `down` section in reverse order.
 
 Migrations filename must be of the form `version_comment.sql`, version being an integer value, and comment an underscored string. Examples:
 
@@ -80,18 +80,60 @@ Rambler will compare the migrations already applied and the available migrations
 
 ### Options
 
-You can tell rambler to repeat the process while there is a migration to apply with the `all` flag (or its shorthand, `a`).
+You can tell rambler to repeat the process while there is a migration to apply (or reverse) with the `all` flag (or its shorthand, `a`).
 
 ### Errors
 
 To ensure database schema consistency, rambler will complain and stop when encountering a new migration in the middle of the already existing ones or if it can't find a migration already applied.
 
+### Environments
+
+An environment is an additionnal configuration that is given a name, and can be used to create multiple configurations for a single application (for example, to differenciate production, testing, etc).
+
+Environments are defined in the configuration file, under the `environments` item. Each environment is defined as an attribute of this item, the key being the name and the value being the configuration options.
+
+Environments configuration are derived from the default configuration of rambler (at the configuration file's root), so you only need to override the needed options:
+
+```json
+{
+	"driver": "mysql",
+	"protocol": "tcp",
+	"port": 3306,
+	"user": "root",
+	"password": "",
+	"database": "rambler_default",
+	"migrations": "migrations",
+	"environments": {
+		"development": {
+			"database": "rambler_development"
+		},
+		"testing": {
+			"database": "rambler_testing"
+		}
+	}
+}
+```
+
+Here we have three environments defined:
+- `default`, will use the `rambler_default` database,
+- `development`, will use the `rambler_development` database,
+- `testing`, will use the `rambler_testing` database;
+
 ## TODO
 
 * Add a `refresh` command that will reverse the last migration then apply it again
 * Add a `number` option to choose the number of migrations to apply, reverse, or refresh
-* Add a `ignore-missing` option to ignore missing migrations and continue
-* Add a `ignore-out-of-order` option to ignore out-of-order migrations and apply, reverse or refresh them anyway
+
+## CHANGELOG
+
+- **1.1.0**
+    - Added environments handling
+- **1.0.2**
+    - Fixed a bug about the migration paths building whilte scanning
+    - Made a real documentation
+    - Fixed misconceptions about viper & cobra (thanks @spf13 for the pointers)
+- **1.0.1**
+    - Fixed imports paths of the internal packages
 
 ## Feedback and contributions
 

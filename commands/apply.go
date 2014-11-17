@@ -1,11 +1,12 @@
 package commands
 
 import (
+	"sort"
+
 	"github.com/elwinar/cobra"
+	jww "github.com/elwinar/jwalterweatherman"
 	"github.com/elwinar/rambler/lib"
 	"github.com/elwinar/viper"
-	jww "github.com/spf13/jwalterweatherman"
-	"sort"
 )
 
 func init() {
@@ -19,7 +20,7 @@ func init() {
 	Apply.Flags().BoolP("all", "a", false, "apply all migrations")
 
 	// Set overrides from the command-line to viper
-	override("apply-all", Apply.Flags().Lookup("all"))
+	viper.BindPFlag("apply-all", Apply.Flags().Lookup("all"))
 }
 
 var Apply = &cobra.Command{
@@ -38,7 +39,12 @@ var Apply = &cobra.Command{
 		}
 
 		jww.TRACE.Println("Looking for the migration table")
-		if !lib.HasMigrationTable(db) {
+		found, err := lib.HasMigrationTable(db)
+		if err != nil {
+			jww.ERROR.Println("Unable to find migration table:", err)
+			return
+		}
+		if !found {
 			jww.INFO.Println("Migration table not found, creating it")
 			err := lib.CreateMigrationTable(db)
 			if err != nil {
@@ -99,10 +105,11 @@ var Apply = &cobra.Command{
 				tx, err := db.Beginx()
 				if err != nil {
 					jww.ERROR.Println("Unable to start transaction:", err)
+					return
 				}
 
 				for _, statement := range statements {
-					jww.INFO.Println("Executing statement:", statement)
+					jww.TRACE.Println("Executing statement:", statement)
 					_, err := tx.Exec(statement)
 					if err != nil {
 						jww.ERROR.Println(err)
