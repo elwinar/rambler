@@ -1,8 +1,8 @@
 package migration
 
 import (
-	"errors"
 	. "github.com/franela/goblin"
+	"errors"
 	"io"
 	"io/ioutil"
 	"strings"

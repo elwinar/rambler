@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Migration represent a migration file, composed of up and down sections containing
@@ -16,17 +17,19 @@ import (
 type Migration struct {
 	Version     uint64
 	Description string
+	AppliedAt   *time.Time
 	reader      io.ReadSeeker
 }
 
-const (
-	prefix = "-- rambler"
-)
-
+// The various errors returned by the package
 var (
 	ErrUnknownDirectory = errors.New("unknown directory")
 	ErrUnknownVersion   = errors.New("unknwon version")
 	ErrAmbiguousVersion = errors.New("ambiguous version")
+)
+
+const (
+	prefix = "-- rambler"
 )
 
 // NewMigration get a migration given its directory and version number
