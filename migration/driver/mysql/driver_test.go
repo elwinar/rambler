@@ -13,7 +13,7 @@ var (
 func TestNewDriver(t *testing.T) {
 	g := Goblin(t)
 	g.Describe("NewDriver", func() {
-		g.It("Should reject invalid go-sql-driver DSN", func() {
+		g.It("Should reject invalid DSN", func() {
 			d, err := newDriver("invalid", sqlx.Connect)
 			g.Assert(err).Equal(ErrUnknownDatabase)
 			g.Assert(d).Equal(nilDriver)
@@ -26,7 +26,7 @@ func TestNewDriver(t *testing.T) {
 		})
 
 		g.It("Should parse the DSN to get the schema", func() {
-			d, err := newDriver("/schema?parseTime=true", func(driver, dsn string) (*sqlx.DB, error) {
+			d, err := newDriver("root:@tcp(localhost/mysql:3306)/schema?parseTime=true", func(driver, dsn string) (*sqlx.DB, error) {
 				return &sqlx.DB{}, nil
 			})
 			g.Assert(err).Equal(nil)

@@ -16,6 +16,7 @@ func init() {
 
 var (
 	ErrUnknownDatabase      = errors.New("invalid DSN or unreachable database")
+	ErrNoSchema             = errors.New("no database schema")
 	ErrNotInitializedDriver = errors.New("driver not initialized")
 )
 
@@ -39,9 +40,14 @@ func newDriver(dsn string, connect connecter) (*Driver, error) {
 
 	lastSlash := strings.LastIndex(dsn, "/")
 	schema := dsn[lastSlash+1:]
-	firstQuestion := strings.Index(dsn, "?")
+	firstQuestion := strings.Index(schema, "?")
+	
+	if firstQuestion == 0 {
+		return nil, ErrNoSchema
+	}
+	
 	if firstQuestion != -1 {
-		schema = schema[:firstQuestion-1]
+		schema = schema[:firstQuestion]
 	}
 
 	return &Driver{
@@ -61,7 +67,12 @@ func (d Driver) MigrationTableExists() (bool, error) {
 		Name string `db:'name'`
 	}
 	
-	err := d.db.Get(&table, fmt.Sprintf(`SELECT table_name as name FROM information_schema.tables WHERE table_schema = '%s' AND table_name = 'migrations'`, d.schema))
+	err := d.db.Get(&table, fmt.Sprintf(`
+		SELECT table_name as name 
+		FROM information_schema.tables
+		WHERE table_schema = '%s' 
+		AND table_name = 'migrations'
+	`, d.schema))
 
 	if err == sql.ErrNoRows {
 		return false, nil
@@ -75,5 +86,17 @@ func (d Driver) MigrationTableExists() (bool, error) {
 }
 
 func (d Driver) CreateMigrationTable() error {
-	return nil
+	if d.db == nil {
+		return ErrNotInitializedDriver
+	}
+
+	_, err := d.db.Exec(`
+		CREATE TABLE migrations ( 
+			version BIGINT UNSIGNED NOT NULL PRIMARY KEY,
+			description CHAR(255) NOT NULL,
+			applied_at DATETIME NOT NULL
+		) DEFAULT CHARSET=utf8
+	`)
+	
+	return err
 }
