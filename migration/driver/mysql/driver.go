@@ -41,11 +41,11 @@ func newDriver(dsn string, connect connecter) (*Driver, error) {
 	lastSlash := strings.LastIndex(dsn, "/")
 	schema := dsn[lastSlash+1:]
 	firstQuestion := strings.Index(schema, "?")
-	
+
 	if firstQuestion == 0 {
 		return nil, ErrNoSchema
 	}
-	
+
 	if firstQuestion != -1 {
 		schema = schema[:firstQuestion]
 	}
@@ -66,7 +66,7 @@ func (d Driver) MigrationTableExists() (bool, error) {
 	var table struct {
 		Name string `db:'name'`
 	}
-	
+
 	err := d.db.Get(&table, fmt.Sprintf(`
 		SELECT table_name as name 
 		FROM information_schema.tables
@@ -77,11 +77,11 @@ func (d Driver) MigrationTableExists() (bool, error) {
 	if err == sql.ErrNoRows {
 		return false, nil
 	}
-	
+
 	if err != nil {
 		return false, err
 	}
-	
+
 	return true, nil
 }
 
@@ -97,6 +97,6 @@ func (d Driver) CreateMigrationTable() error {
 			applied_at DATETIME NOT NULL
 		) DEFAULT CHARSET=utf8
 	`)
-	
+
 	return err
 }

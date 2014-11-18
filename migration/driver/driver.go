@@ -6,9 +6,9 @@ import (
 
 // Driver is the interface used by the program to interact with the migration
 // table in database
-type Driver interface{
+type Driver interface {
 	MigrationTableExists() (bool, error)
-	CreateMigrationTable() (error)
+	CreateMigrationTable() error
 }
 
 // Constructor is the function type used to create drivers
@@ -17,7 +17,7 @@ type Constructor func(string) (Driver, error)
 // The various errors returned by the package
 var (
 	ErrDriverAlreadyRegistered = errors.New("driver already registered")
-	ErrDriverNotRegistered = errors.New("driver not registered")
+	ErrDriverNotRegistered     = errors.New("driver not registered")
 )
 
 var (
@@ -37,7 +37,7 @@ func register(name string, constructor Constructor, constructors map[string]Cons
 	if _, found := constructors[name]; found {
 		return ErrDriverAlreadyRegistered
 	}
-	
+
 	constructors[name] = constructor
 	return nil
 }
@@ -52,6 +52,6 @@ func get(name, options string, constructors map[string]Constructor) (Driver, err
 	if !found {
 		return nil, ErrDriverNotRegistered
 	}
-	
+
 	return constructor(options)
 }
