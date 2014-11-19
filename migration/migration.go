@@ -2,7 +2,6 @@ package migration
 
 import (
 	"bufio"
-	"errors"
 	"io"
 	"os"
 	"path"
