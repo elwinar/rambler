@@ -1,4 +1,4 @@
-package migration
+package lib
 
 import (
 	. "github.com/franela/goblin"

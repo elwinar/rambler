@@ -1,8 +1,8 @@
-package migration
+package lib
 
 import (
-	drv "github.com/elwinar/rambler/migration/driver"
-	_ "github.com/elwinar/rambler/migration/driver/mysql"
+	drv "github.com/elwinar/rambler/lib/driver"
+	_ "github.com/elwinar/rambler/lib/driver/mysql"
 	"os"
 )
 

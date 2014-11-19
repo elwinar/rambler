@@ -2,7 +2,7 @@ package apply
 
 import (
 	. "github.com/franela/goblin"
-	"github.com/elwinar/rambler/migration"
+	"github.com/elwinar/rambler/lib"
 	"testing"
 )
 
@@ -10,13 +10,13 @@ func TestFilter(t *testing.T) {
 	g := Goblin(t)
 	g.Describe("Filter", func() {
 		g.It("Should complain about missing migrations", func() {
-			available := []*migration.Migration{
+			available := []*lib.Migration{
 				{Version: 1},
 				{Version: 2},
 				{Version: 4},
 				{Version: 5},
 			}
-			applied := []*migration.Migration{
+			applied := []*lib.Migration{
 				{Version: 1},
 				{Version: 2},
 				{Version: 3},
@@ -29,13 +29,13 @@ func TestFilter(t *testing.T) {
 		})
 		
 		g.It("Should complain about out-of-order migrations", func() {
-			available := []*migration.Migration{
+			available := []*lib.Migration{
 				{Version: 1},
 				{Version: 2},
 				{Version: 3},
 				{Version: 4},
 			}
-			applied := []*migration.Migration{
+			applied := []*lib.Migration{
 				{Version: 1},
 				{Version: 2},
 				{Version: 4},
@@ -48,13 +48,13 @@ func TestFilter(t *testing.T) {
 		})
 		
 		g.It("Should return an empty slice when there is nothing to apply", func() {
-			available := []*migration.Migration{
+			available := []*lib.Migration{
 				{Version: 1},
 				{Version: 2},
 				{Version: 3},
 				{Version: 4},
 			}
-			applied := []*migration.Migration{
+			applied := []*lib.Migration{
 				{Version: 1},
 				{Version: 2},
 				{Version: 3},
@@ -67,13 +67,13 @@ func TestFilter(t *testing.T) {
 		})
 		
 		g.It("Should return all remaining migrations where there is migrations to apply", func() {
-			available := []*migration.Migration{
+			available := []*lib.Migration{
 				{Version: 1},
 				{Version: 2},
 				{Version: 3},
 				{Version: 4},
 			}
-			applied := []*migration.Migration{
+			applied := []*lib.Migration{
 				{Version: 1},
 				{Version: 2},
 			}
