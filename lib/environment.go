@@ -18,10 +18,6 @@ type Environment struct {
 }
 
 func GetEnvironment(name string, configuration Configuration, flags *pflag.FlagSet) (*Environment, error) {
-	return getEnvironment(name, configuration, flags)
-}
-
-func getEnvironment(name string, configuration Configuration, flags *pflag.FlagSet) (*Environment, error) {
 	if strings.TrimSpace(name) == "" {
 		return nil, ErrUnknownEnvironment
 	}

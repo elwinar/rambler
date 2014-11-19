@@ -74,19 +74,19 @@ func TestGetEnvironment(t *testing.T) {
 	g := Goblin(t)
 	g.Describe("GetEnvironment", func() {
 		g.It("Should reject empty environment", func() {
-			env, err := getEnvironment("", Configuration{}, emptyFlags)
+			env, err := GetEnvironment("", Configuration{}, emptyFlags)
 			g.Assert(env).Equal(nilEnvironment)
 			g.Assert(err).Equal(ErrUnknownEnvironment)
 		})
 		
 		g.It("Should reject unknown environment", func() {
-			env, err := getEnvironment("error", Configuration{}, emptyFlags)
+			env, err := GetEnvironment("error", Configuration{}, emptyFlags)
 			g.Assert(env).Equal(nilEnvironment)
 			g.Assert(err).Equal(ErrUnknownEnvironment)
 		})
 		
 		g.It("Should use the defaults", func() {
-			env, err := getEnvironment("override", Configuration{
+			env, err := GetEnvironment("override", Configuration{
 				Environment: defaultEnv,
 				Environments: map[string]RawEnvironment{
 					"override": RawEnvironment{},
@@ -107,7 +107,7 @@ func TestGetEnvironment(t *testing.T) {
 		})
 		
 		g.It("Should override defaults with options", func() {
-			env, err := getEnvironment("override", Configuration{
+			env, err := GetEnvironment("override", Configuration{
 				Environment: defaultEnv,
 				Environments: map[string]RawEnvironment{
 					"override": overrideRawEnv,
@@ -128,7 +128,7 @@ func TestGetEnvironment(t *testing.T) {
 		})
 		
 		g.It("Should override options with cli", func() {
-			env, err := getEnvironment("override", Configuration{
+			env, err := GetEnvironment("override", Configuration{
 				Environment: defaultEnv,
 				Environments: map[string]RawEnvironment{
 					"override": overrideRawEnv,
