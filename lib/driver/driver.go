@@ -43,7 +43,7 @@ func register(name string, constructor Constructor, constructors map[string]Cons
 }
 
 // Get initialize a driver from the given name and options
-func Get(name string, options string) (Driver, error) {
+func Get(name, options string) (Driver, error) {
 	return get(name, options, constructors)
 }
 
