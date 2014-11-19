@@ -10,8 +10,8 @@ type Service interface {
 	drv.Driver
 }
 
-type service struct{
-	driver drv.Driver
+type service struct {
+	driver    drv.Driver
 	directory string
 }
 
@@ -26,14 +26,14 @@ func newService(driverName, dsn, directory string, stat stater, newDriver driver
 	if _, err := stat(directory); err != nil {
 		return nil, ErrUnknownDirectory
 	}
-	
+
 	driver, err := newDriver(driverName, dsn)
 	if err != nil {
 		return nil, ErrUnknownDriver
 	}
-	
+
 	return &service{
-		driver: driver,
+		driver:    driver,
 		directory: directory,
 	}, nil
 }

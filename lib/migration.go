@@ -63,7 +63,7 @@ func newMigration(directory string, version uint64, glob glober, open opener) (*
 }
 
 // Scan retrieve all sections of the file with the given section marker.
-func (m *Migration) Scan(section string) ([]string) {
+func (m *Migration) Scan(section string) []string {
 	m.reader.Seek(0, 0)
 
 	var scanner = bufio.NewScanner(m.reader)

@@ -1,9 +1,9 @@
 package lib
 
 import (
-	. "github.com/franela/goblin"
 	"errors"
 	"github.com/elwinar/rambler/lib/driver"
+	. "github.com/franela/goblin"
 	"os"
 	"testing"
 )
@@ -12,7 +12,7 @@ var (
 	nilService *service
 )
 
-type MockDriver struct {}
+type MockDriver struct{}
 
 func (d MockDriver) MigrationTableExists() (bool, error) {
 	return false, nil
@@ -34,7 +34,7 @@ func TestNewService(t *testing.T) {
 			g.Assert(err).Equal(ErrUnknownDirectory)
 			g.Assert(s).Equal(nilService)
 		})
-		
+
 		g.It("Should reject unknown driver", func() {
 			s, err := newService("", "", "", func(dir string) (os.FileInfo, error) {
 				return nil, nil
@@ -44,7 +44,7 @@ func TestNewService(t *testing.T) {
 			g.Assert(err).Equal(ErrUnknownDriver)
 			g.Assert(s).Equal(nilService)
 		})
-		
+
 		g.It("Should return an initialized service", func() {
 			d := &MockDriver{}
 			s, err := newService("mock", "", "dir", func(dir string) (os.FileInfo, error) {

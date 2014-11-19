@@ -1,8 +1,8 @@
 package lib
 
 import (
-	. "github.com/franela/goblin"
 	"errors"
+	. "github.com/franela/goblin"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -118,7 +118,7 @@ func TestScan(t *testing.T) {
 			m.Scan("up")
 			g.Assert(reader.counter).Equal(len([]byte("rambler")))
 		})
-		
+
 		g.It("Should find statements if there is statements to find", func() {
 			m := &Migration{
 				reader: strings.NewReader(`-- rambler up
@@ -132,7 +132,7 @@ three
 			statements := m.Scan("up")
 			g.Assert(statements).Equal([]string{"one", "three"})
 		})
-		
+
 		g.It("Should return an empty slice if there is no statements to find", func() {
 			m := &Migration{
 				reader: strings.NewReader(`-- rambler up

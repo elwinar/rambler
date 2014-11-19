@@ -1,4 +1,4 @@
-package apply 
+package apply
 
 import (
 	"fmt"
@@ -7,23 +7,23 @@ import (
 
 func Filter(available, applied []*lib.Migration) ([]*lib.Migration, error) {
 	var i, j int = 0, 0
-	
+
 	for i < len(available) && j < len(applied) {
 		if available[i].Version < applied[j].Version {
 			return nil, fmt.Errorf("out of order migration %d", available[i].Version)
 		}
-		
+
 		if available[i].Version > applied[j].Version {
 			return nil, fmt.Errorf("missing migration %d", applied[j].Version)
 		}
-		
+
 		i++
 		j++
 	}
-	
+
 	if j != len(applied) {
 		return nil, fmt.Errorf("missing migration %d", applied[j].Version)
 	}
-	
+
 	return available[i:], nil
 }
