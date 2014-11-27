@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"errors"
 	. "github.com/franela/goblin"
 	"github.com/jmoiron/sqlx"
 	"testing"
@@ -13,14 +14,10 @@ var (
 func TestNewDriver(t *testing.T) {
 	g := Goblin(t)
 	g.Describe("NewDriver", func() {
-		g.It("Should reject invalid DSN", func() {
-			d, err := newDriver("invalid", sqlx.Connect)
-			g.Assert(err).Equal(ErrUnknownDatabase)
-			g.Assert(d).Equal(nilDriver)
-		})
-
 		g.It("Should fail on unreachable database", func() {
-			d, err := newDriver("/unreachable", sqlx.Connect)
+			d, err := newDriver("/unreachable", func(driver, dsn string) (*sqlx.DB, error) {
+				return nil, errors.New("unreachable")
+			})
 			g.Assert(err).Equal(ErrUnknownDatabase)
 			g.Assert(d).Equal(nilDriver)
 		})

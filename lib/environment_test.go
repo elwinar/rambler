@@ -8,38 +8,38 @@ import (
 
 var (
 	nilEnvironment *Environment
-	override string = "override"
-	two uint64 = 2
-	
+	override       string = "override"
+	two            uint64 = 2
+
 	overrideRawEnv RawEnvironment = RawEnvironment{
-		Driver: &override,
-		Protocol: &override,
-		Host: &override,
-		Port: &two,
-		User: &override,
-		Password: &override,
-		Database: &override,
+		Driver:     &override,
+		Protocol:   &override,
+		Host:       &override,
+		Port:       &two,
+		User:       &override,
+		Password:   &override,
+		Database:   &override,
 		Migrations: &override,
 	}
-	
+
 	defaultEnv Environment = Environment{
-		Driver: "default",
-		Protocol: "default",
-		Host: "default",
-		Port: 1,
-		User: "default",
-		Password: "default",
-		Database: "default",
+		Driver:     "default",
+		Protocol:   "default",
+		Host:       "default",
+		Port:       1,
+		User:       "default",
+		Password:   "default",
+		Database:   "default",
 		Migrations: "default",
 	}
-	
+
 	emptyFlags *pflag.FlagSet
-	cliFlags *pflag.FlagSet
+	cliFlags   *pflag.FlagSet
 )
 
 func init() {
 	emptyFlags = pflag.NewFlagSet("empty", pflag.ContinueOnError)
-	
+
 	emptyFlags.String("driver", "", "")
 	emptyFlags.String("protocol", "", "")
 	emptyFlags.String("host", "", "")
@@ -48,9 +48,9 @@ func init() {
 	emptyFlags.String("password", "", "")
 	emptyFlags.String("database", "", "")
 	emptyFlags.String("migrations", "", "")
-	
+
 	cliFlags = pflag.NewFlagSet("testing", pflag.ContinueOnError)
-	
+
 	cliFlags.String("driver", "", "")
 	cliFlags.String("protocol", "", "")
 	cliFlags.String("host", "", "")
@@ -59,7 +59,7 @@ func init() {
 	cliFlags.String("password", "", "")
 	cliFlags.String("database", "", "")
 	cliFlags.String("migrations", "", "")
-	
+
 	cliFlags.Set("driver", "cli")
 	cliFlags.Set("protocol", "cli")
 	cliFlags.Set("host", "cli")
@@ -78,13 +78,13 @@ func TestGetEnvironment(t *testing.T) {
 			g.Assert(env).Equal(nilEnvironment)
 			g.Assert(err).Equal(ErrUnknownEnvironment)
 		})
-		
+
 		g.It("Should reject unknown environment", func() {
 			env, err := GetEnvironment("error", Configuration{}, emptyFlags)
 			g.Assert(env).Equal(nilEnvironment)
 			g.Assert(err).Equal(ErrUnknownEnvironment)
 		})
-		
+
 		g.It("Should use the defaults", func() {
 			env, err := GetEnvironment("override", Configuration{
 				Environment: defaultEnv,
@@ -105,7 +105,7 @@ func TestGetEnvironment(t *testing.T) {
 			g.Assert(env.Migrations).Equal("default")
 			g.Assert(err).Equal(nil)
 		})
-		
+
 		g.It("Should override defaults with options", func() {
 			env, err := GetEnvironment("override", Configuration{
 				Environment: defaultEnv,
@@ -126,7 +126,7 @@ func TestGetEnvironment(t *testing.T) {
 			g.Assert(env.Migrations).Equal("override")
 			g.Assert(err).Equal(nil)
 		})
-		
+
 		g.It("Should override options with cli", func() {
 			env, err := GetEnvironment("override", Configuration{
 				Environment: defaultEnv,
