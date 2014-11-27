@@ -35,9 +35,9 @@ func TestApply(t *testing.T) {
 		})
 
 		g.It("Should return an error on nil migration", func() {
-			sqlErr, txErr := apply(nil, MockTxer{})
-			g.Assert(sqlErr).Equal(ErrNilMigration)
-			g.Assert(txErr).Equal(nil)
+			err, sqlerr := apply(nil, MockTxer{})
+			g.Assert(err).Equal(ErrNilMigration)
+			g.Assert(sqlerr).Equal(nil)
 		})
 
 		g.It("Should execute migration's up statements in order", func() {
@@ -62,13 +62,13 @@ func TestApply(t *testing.T) {
 				},
 			}
 
-			sqlErr, txErr := apply(&migration, tx)
+			err, sqlerr := apply(&migration, tx)
 			g.Assert(fail).Equal(false)
 			g.Assert(execs).Equal(2)
 			g.Assert(commits).Equal(1)
 			g.Assert(rollbacks).Equal(0)
-			g.Assert(sqlErr).Equal(nil)
-			g.Assert(txErr).Equal(nil)
+			g.Assert(err).Equal(nil)
+			g.Assert(sqlerr).Equal(nil)
 		})
 
 		g.It("Should rollback on SQL error", func() {
@@ -87,15 +87,15 @@ func TestApply(t *testing.T) {
 				},
 			}
 
-			sqlErr, txErr := apply(&migration, tx)
+			err, sqlerr := apply(&migration, tx)
 			g.Assert(execs).Equal(1)
 			g.Assert(commits).Equal(0)
 			g.Assert(rollbacks).Equal(1)
-			g.Assert(sqlErr).Equal(errors.New("error"))
-			g.Assert(txErr).Equal(nil)
+			g.Assert(err).Equal(nil)
+			g.Assert(sqlerr).Equal(errors.New("error"))
 		})
 		
-		g.It("Should return a transaction error on commit fail", func(){
+		g.It("Should return an error on commit fail", func(){
 			tx := MockTxer{
 				exec: func(query string, args ...interface{}) (sql.Result, error) {
 					execs++
@@ -111,15 +111,15 @@ func TestApply(t *testing.T) {
 				},
 			}
 
-			sqlErr, txErr := apply(&migration, tx)
+			err, sqlerr := apply(&migration, tx)
 			g.Assert(execs).Equal(2)
 			g.Assert(commits).Equal(1)
 			g.Assert(rollbacks).Equal(0)
-			g.Assert(sqlErr).Equal(nil)
-			g.Assert(txErr).Equal(errors.New("error"))
+			g.Assert(err).Equal(errors.New("error"))
+			g.Assert(sqlerr).Equal(nil)
 		})
 		
-		g.It("Should return a transaction error on rollback fail", func(){
+		g.It("Should return an error on rollback fail", func(){
 			tx := MockTxer{
 				exec: func(query string, args ...interface{}) (sql.Result, error) {
 					execs++
@@ -135,14 +135,36 @@ func TestApply(t *testing.T) {
 				},
 			}
 
-			sqlErr, txErr := apply(&migration, tx)
+			err, sqlerr := apply(&migration, tx)
 			g.Assert(execs).Equal(1)
 			g.Assert(commits).Equal(0)
 			g.Assert(rollbacks).Equal(1)
-			g.Assert(sqlErr).Equal(errors.New("error"))
-			g.Assert(txErr).Equal(errors.New("error"))
+			g.Assert(err).Equal(errors.New("error"))
+			g.Assert(sqlerr).Equal(errors.New("error"))
 		})
 		
-		g.It("Should return nil on success")
+		g.It("Should return nil on success", func(){
+			tx := MockTxer{
+				exec: func(query string, args ...interface{}) (sql.Result, error) {
+					execs++
+					return MockResult{}, nil
+				},
+				commit: func() error {
+					commits++
+					return nil
+				},
+				rollback: func() error {
+					rollbacks++
+					return nil
+				},
+			}
+
+			err, sqlerr := apply(&migration, tx)
+			g.Assert(execs).Equal(2)
+			g.Assert(commits).Equal(1)
+			g.Assert(rollbacks).Equal(0)
+			g.Assert(err).Equal(nil)
+			g.Assert(sqlerr).Equal(nil)
+		})
 	})
 }

@@ -8,9 +8,14 @@ import (
 
 var (
 	ErrNilMigration = errors.New("nil migration")
+	ErrNilTransaction = errors.New("nil transaction")
+	ErrNilDatabase = errors.New("nil database")
 )
 
 func Apply(migration *lib.Migration, db *sql.DB) (error, error) {
+	if db == nil {
+		return nil, ErrNilDatabase
+	}
 	tx, err := db.Begin()
 	if err != nil {
 		return nil, err
@@ -29,19 +34,23 @@ type txer interface {
 	Rollback() error
 }
 
-func apply(migration migration, tx txer) (error, error) {
+func apply(migration migration, tx txer) (err error, sqlerr error) {
 	if migration == nil {
 		return ErrNilMigration, nil
 	}
 	
+	if tx == nil {
+		return ErrNilTransaction, nil
+	}
+	
 	for _, statement := range migration.Scan("up") {
-		_, err := tx.Exec(statement)
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			return err, rollbackErr
+		_, sqlerr := tx.Exec(statement)
+		if sqlerr != nil {
+			err := tx.Rollback()
+			return err, sqlerr
 		}
 	}
 	
-	commitErr := tx.Commit()
-	return nil, commitErr
+	err = tx.Commit()
+	return err, nil
 }
