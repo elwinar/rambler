@@ -12,15 +12,7 @@ var (
 	ErrNilDatabase = errors.New("nil database")
 )
 
-func Apply(migration *lib.Migration, db *sql.DB) (error, error) {
-	if db == nil {
-		return nil, ErrNilDatabase
-	}
-	tx, err := db.Begin()
-	if err != nil {
-		return nil, err
-	}
-	
+func Apply(migration *lib.Migration, tx *sql.Tx) (error, error) {
 	return apply(migration, tx)
 }
 
