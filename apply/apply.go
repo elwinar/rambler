@@ -9,7 +9,6 @@ import (
 var (
 	ErrNilMigration = errors.New("nil migration")
 	ErrNilTransaction = errors.New("nil transaction")
-	ErrNilDatabase = errors.New("nil database")
 )
 
 func Apply(migration *lib.Migration, tx *sql.Tx) (error, error) {
