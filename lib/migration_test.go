@@ -15,6 +15,7 @@ var (
 
 func TestNewMigration(t *testing.T) {
 	g := Goblin(t)
+	
 	g.Describe("NewMigration", func() {
 		g.It("Should reject unknown directory path", func() {
 			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
@@ -71,78 +72,63 @@ func TestNewMigration(t *testing.T) {
 	})
 }
 
-type MockSeeker struct {
-	*strings.Reader
-	counter int
-}
-
-func (s *MockSeeker) Seek(offset int64, whence int) (int64, error) {
-	s.counter++
-	return s.Reader.Seek(offset, whence)
-}
-
-type MockReader struct {
-	*strings.Reader
-	counter int
-}
-
-func (r *MockReader) Read(p []byte) (int, error) {
-	n, err := r.Reader.Read(p)
-	r.counter += n
-	return n, err
-}
-
 func TestScan(t *testing.T) {
 	g := Goblin(t)
-	g.Describe("Scan", func() {
-		g.It("Should rewind the reader", func() {
-			seeker := &MockSeeker{
-				Reader:  strings.NewReader("rambler"),
-				counter: 0,
-			}
-			m := &Migration{
-				reader: seeker,
-			}
-			m.Scan("up")
-			g.Assert(seeker.counter).Equal(1)
-		})
-
-		g.It("Should read the whole file", func() {
-			reader := &MockReader{
-				Reader:  strings.NewReader("rambler"),
-				counter: 0,
-			}
-			m := &Migration{
-				reader: reader,
-			}
-			m.Scan("up")
-			g.Assert(reader.counter).Equal(len([]byte("rambler")))
-		})
-
-		g.It("Should find statements if there is statements to find", func() {
-			m := &Migration{
-				reader: strings.NewReader(`-- rambler up
+	
+	var text string = `
+-- rambler up
 one
 -- rambler down
 two
 -- rambler up
 three
-`),
-			}
+-- rambler down
+four
+`
+	r := strings.NewReader(text)
+	
+	var reads int
+	var bytes int
+	var seeks int
+	
+	m := &Migration{
+		reader: &MockReader{
+			seek: func(offset int64, whence int) (int64, error) {
+				seeks++
+				return r.Seek(offset, whence)
+			},
+			read: func(p []byte) (int, error) {
+				reads++
+				b, err := r.Read(p)
+				bytes += b
+				return bytes, err
+			},
+		},
+	}
+	
+	g.Describe("Scan", func() {
+		g.BeforeEach(func() {
+			reads = 0
+			bytes = 0
+			seeks = 0
+		})
+		
+		g.It("Should rewind the reader", func() {
+			m.Scan("up")
+			g.Assert(seeks).Equal(1)
+		})
+		
+		g.It("Should read the whole file", func() {
+			m.Scan("up")
+			g.Assert(bytes).Equal(len(text))
+		})
+
+		g.It("Should find statements if there is statements to find", func() {
 			statements := m.Scan("up")
 			g.Assert(statements).Equal([]string{"one", "three"})
 		})
 
 		g.It("Should return an empty slice if there is no statements to find", func() {
-			m := &Migration{
-				reader: strings.NewReader(`-- rambler up
-one
--- rambler down
-two
--- rambler up
-three
-`),
-			}
 			statements := m.Scan("right")
 			g.Assert(len(statements)).Equal(0)
 		})
