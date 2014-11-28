@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrNilMigration = errors.New("nil migration")
+	ErrNilMigration   = errors.New("nil migration")
 	ErrNilTransaction = errors.New("nil transaction")
 )
 
@@ -29,11 +29,11 @@ func apply(migration migration, tx txer) (err error, sqlerr error) {
 	if migration == nil {
 		return ErrNilMigration, nil
 	}
-	
+
 	if tx == nil {
 		return ErrNilTransaction, nil
 	}
-	
+
 	for _, statement := range migration.Scan("up") {
 		_, sqlerr := tx.Exec(statement)
 		if sqlerr != nil {
@@ -41,7 +41,7 @@ func apply(migration migration, tx txer) (err error, sqlerr error) {
 			return err, sqlerr
 		}
 	}
-	
+
 	err = tx.Commit()
 	return err, nil
 }

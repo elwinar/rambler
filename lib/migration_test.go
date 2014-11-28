@@ -15,7 +15,7 @@ var (
 
 func TestNewMigration(t *testing.T) {
 	g := Goblin(t)
-	
+
 	g.Describe("NewMigration", func() {
 		g.It("Should reject unknown directory path", func() {
 			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
@@ -74,7 +74,7 @@ func TestNewMigration(t *testing.T) {
 
 func TestScan(t *testing.T) {
 	g := Goblin(t)
-	
+
 	var text string = `
 -- rambler up
 one
@@ -86,11 +86,11 @@ three
 four
 `
 	r := strings.NewReader(text)
-	
+
 	var reads int
 	var bytes int
 	var seeks int
-	
+
 	m := &Migration{
 		reader: &MockReader{
 			seek: func(offset int64, whence int) (int64, error) {
@@ -105,19 +105,19 @@ four
 			},
 		},
 	}
-	
+
 	g.Describe("Scan", func() {
 		g.BeforeEach(func() {
 			reads = 0
 			bytes = 0
 			seeks = 0
 		})
-		
+
 		g.It("Should rewind the reader", func() {
 			m.Scan("up")
 			g.Assert(seeks).Equal(1)
 		})
-		
+
 		g.It("Should read the whole file", func() {
 			m.Scan("up")
 			g.Assert(bytes).Equal(len(text))

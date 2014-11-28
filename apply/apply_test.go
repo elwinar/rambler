@@ -9,9 +9,9 @@ import (
 
 func TestApply(t *testing.T) {
 	g := Goblin(t)
-	
-	var migration MockMigration = MockMigration {
-		statements: map[string][]string {
+
+	var migration MockMigration = MockMigration{
+		statements: map[string][]string{
 			"up": []string{
 				"one",
 				"three",
@@ -94,8 +94,8 @@ func TestApply(t *testing.T) {
 			g.Assert(err).Equal(nil)
 			g.Assert(sqlerr).Equal(errors.New("error"))
 		})
-		
-		g.It("Should return an error on commit fail", func(){
+
+		g.It("Should return an error on commit fail", func() {
 			tx := MockTxer{
 				exec: func(query string, args ...interface{}) (sql.Result, error) {
 					execs++
@@ -118,8 +118,8 @@ func TestApply(t *testing.T) {
 			g.Assert(err).Equal(errors.New("error"))
 			g.Assert(sqlerr).Equal(nil)
 		})
-		
-		g.It("Should return an error on rollback fail", func(){
+
+		g.It("Should return an error on rollback fail", func() {
 			tx := MockTxer{
 				exec: func(query string, args ...interface{}) (sql.Result, error) {
 					execs++
@@ -142,8 +142,8 @@ func TestApply(t *testing.T) {
 			g.Assert(err).Equal(errors.New("error"))
 			g.Assert(sqlerr).Equal(errors.New("error"))
 		})
-		
-		g.It("Should return nil on success", func(){
+
+		g.It("Should return nil on success", func() {
 			tx := MockTxer{
 				exec: func(query string, args ...interface{}) (sql.Result, error) {
 					execs++
