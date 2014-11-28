@@ -22,17 +22,6 @@ var (
 		Migrations: &override,
 	}
 
-	defaultEnv Environment = Environment{
-		Driver:     "default",
-		Protocol:   "default",
-		Host:       "default",
-		Port:       1,
-		User:       "default",
-		Password:   "default",
-		Database:   "default",
-		Migrations: "default",
-	}
-
 	emptyFlags *pflag.FlagSet
 	cliFlags   *pflag.FlagSet
 )
@@ -87,7 +76,14 @@ func TestGetEnvironment(t *testing.T) {
 
 		g.It("Should use the defaults", func() {
 			env, err := GetEnvironment("override", Configuration{
-				Environment: defaultEnv,
+				Driver:     "default",
+				Protocol:   "default",
+				Host:       "default",
+				Port:       1,
+				User:       "default",
+				Password:   "default",
+				Database:   "default",
+				Migrations: "default",
 				Environments: map[string]RawEnvironment{
 					"override": RawEnvironment{},
 				},
@@ -108,7 +104,14 @@ func TestGetEnvironment(t *testing.T) {
 
 		g.It("Should override defaults with options", func() {
 			env, err := GetEnvironment("override", Configuration{
-				Environment: defaultEnv,
+				Driver:     "default",
+				Protocol:   "default",
+				Host:       "default",
+				Port:       1,
+				User:       "default",
+				Password:   "default",
+				Database:   "default",
+				Migrations: "default",
 				Environments: map[string]RawEnvironment{
 					"override": overrideRawEnv,
 				},
@@ -129,7 +132,14 @@ func TestGetEnvironment(t *testing.T) {
 
 		g.It("Should override options with cli", func() {
 			env, err := GetEnvironment("override", Configuration{
-				Environment: defaultEnv,
+				Driver:     "default",
+				Protocol:   "default",
+				Host:       "default",
+				Port:       1,
+				User:       "default",
+				Password:   "default",
+				Database:   "default",
+				Migrations: "default",
 				Environments: map[string]RawEnvironment{
 					"override": overrideRawEnv,
 				},
