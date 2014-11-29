@@ -1,35 +1,35 @@
 package migration
 
 import (
-	drv "github.com/elwinar/rambler/driver"
+	"github.com/elwinar/rambler/configuration"
 	"os"
 )
 
 // Service gather operations to manipulate migrations table and migrations on
 // the filesystem.
 type Service interface {
-	drv.Driver
+	Driver
 }
 
 type service struct {
-	driver    drv.Driver
+	driver    Driver
 	directory string
 }
 
 // NewService initialize a new service with the given informations
-func NewService(driver, dsn, directory string) (Service, error) {
-	return newService(driver, dsn, directory, os.Stat, drv.Get)
+func NewService(env configuration.Environment, directory string) (Service, error) {
+	return newService(env, directory, os.Stat, GetDriver)
 }
 
 type stater func(string) (os.FileInfo, error)
-type driverConstructor func(string, string) (drv.Driver, error)
+type driverConstructor func(configuration.Environment) (Driver, error)
 
-func newService(driverName, dsn, directory string, stat stater, newDriver driverConstructor) (*service, error) {
+func newService(env configuration.Environment, directory string, stat stater, newDriver driverConstructor) (*service, error) {
 	if _, err := stat(directory); err != nil {
 		return nil, ErrUnknownDirectory
 	}
 
-	driver, err := newDriver(driverName, dsn)
+	driver, err := newDriver(env)
 	if err != nil {
 		return nil, ErrUnknownDriver
 	}

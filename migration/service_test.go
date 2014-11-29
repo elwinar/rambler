@@ -2,7 +2,7 @@ package migration
 
 import (
 	"errors"
-	"github.com/elwinar/rambler/driver"
+	"github.com/elwinar/rambler/configuration"
 	. "github.com/franela/goblin"
 	"os"
 	"testing"
@@ -12,23 +12,18 @@ var (
 	nilService *service
 )
 
-type MockDriver struct{}
-
-func (d MockDriver) MigrationTableExists() (bool, error) {
-	return false, nil
-}
-
-func (d MockDriver) CreateMigrationTable() error {
-	return nil
-}
-
 func TestNewService(t *testing.T) {
 	g := Goblin(t)
+	
+	mockEnv := configuration.Environment{
+		Driver: "mock",
+	}
+	
 	g.Describe("NewService", func() {
 		g.It("Should reject unknown directory path", func() {
-			s, err := newService("", "", "", func(dir string) (os.FileInfo, error) {
+			s, err := newService(mockEnv, "", func(dir string) (os.FileInfo, error) {
 				return nil, errors.New("error")
-			}, func(string, string) (driver.Driver, error) {
+			}, func(env configuration.Environment) (Driver, error) {
 				return nil, nil
 			})
 			g.Assert(err).Equal(ErrUnknownDirectory)
@@ -36,9 +31,9 @@ func TestNewService(t *testing.T) {
 		})
 
 		g.It("Should reject unknown driver", func() {
-			s, err := newService("", "", "", func(dir string) (os.FileInfo, error) {
+			s, err := newService(mockEnv, "", func(dir string) (os.FileInfo, error) {
 				return nil, nil
-			}, func(string, string) (driver.Driver, error) {
+			}, func(env configuration.Environment) (Driver, error) {
 				return nil, errors.New("error")
 			})
 			g.Assert(err).Equal(ErrUnknownDriver)
@@ -47,9 +42,9 @@ func TestNewService(t *testing.T) {
 
 		g.It("Should return an initialized service", func() {
 			d := &MockDriver{}
-			s, err := newService("mock", "", "dir", func(dir string) (os.FileInfo, error) {
+			s, err := newService(mockEnv, "dir", func(dir string) (os.FileInfo, error) {
 				return nil, nil
-			}, func(string, string) (driver.Driver, error) {
+			}, func(env configuration.Environment) (Driver, error) {
 				return d, nil
 			})
 			g.Assert(err).Equal(nil)
