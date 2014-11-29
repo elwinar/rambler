@@ -1,7 +1,8 @@
-package lib
+package migration
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"os"
 	"path"
@@ -10,6 +11,16 @@ import (
 	"strings"
 	"time"
 )
+
+// The various errors returned by the package
+var (
+	ErrUnknownDirectory   = errors.New("unknown directory")
+	ErrUnknownVersion     = errors.New("unknwon version")
+	ErrUnknownDriver      = errors.New("unknwon driver")
+	ErrUnknownEnvironment = errors.New("unknwon environment")
+	ErrAmbiguousVersion   = errors.New("ambiguous version")
+)
+
 
 // Migration represent a migration file, composed of up and down sections containing
 // one or more statements each.

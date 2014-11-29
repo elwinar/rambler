@@ -1,4 +1,4 @@
-package lib
+package configuration
 
 import (
 	. "github.com/franela/goblin"

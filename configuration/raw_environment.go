@@ -1,4 +1,4 @@
-package lib
+package configuration
 
 type RawEnvironment struct {
 	Driver     *string

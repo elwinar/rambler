@@ -1,10 +1,17 @@
-package lib
+package configuration
 
 import (
+	"errors"
 	"github.com/spf13/pflag"
 	"strconv"
 	"strings"
 )
+
+// The various errors returned by the package
+var (
+	ErrUnknownEnvironment = errors.New("unknwon environment")
+)
+
 
 type Environment struct {
 	Driver     string

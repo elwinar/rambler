@@ -2,10 +2,10 @@ package apply
 
 import (
 	"fmt"
-	"github.com/elwinar/rambler/lib"
+	"github.com/elwinar/rambler/migration"
 )
 
-func Filter(available, applied []*lib.Migration) ([]*lib.Migration, error) {
+func Filter(available, applied []*migration.Migration) ([]*migration.Migration, error) {
 	var i, j int = 0, 0
 
 	for i < len(available) && j < len(applied) {

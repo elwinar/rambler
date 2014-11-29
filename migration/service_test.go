@@ -1,8 +1,8 @@
-package lib
+package migration
 
 import (
 	"errors"
-	"github.com/elwinar/rambler/lib/driver"
+	"github.com/elwinar/rambler/driver"
 	. "github.com/franela/goblin"
 	"os"
 	"testing"

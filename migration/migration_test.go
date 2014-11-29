@@ -1,4 +1,4 @@
-package lib
+package migration
 
 import (
 	"errors"
@@ -12,6 +12,19 @@ import (
 var (
 	nilMigration *Migration
 )
+
+type MockReader struct {
+	seek func(int64, int) (int64, error)
+	read func(p []byte) (int, error)
+}
+
+func (r *MockReader) Seek(offset int64, whence int) (int64, error) {
+	return r.seek(offset, whence)
+}
+
+func (r *MockReader) Read(p []byte) (int, error) {
+	return r.read(p)
+}
 
 func TestNewMigration(t *testing.T) {
 	g := Goblin(t)

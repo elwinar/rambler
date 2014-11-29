@@ -1,4 +1,4 @@
-package lib
+package configuration
 
 type Configuration struct {
 	Driver     string

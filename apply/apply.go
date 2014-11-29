@@ -3,7 +3,7 @@ package apply
 import (
 	"database/sql"
 	"errors"
-	"github.com/elwinar/rambler/lib"
+	"github.com/elwinar/rambler/migration"
 )
 
 var (
@@ -11,11 +11,11 @@ var (
 	ErrNilTransaction = errors.New("nil transaction")
 )
 
-func Apply(migration *lib.Migration, tx *sql.Tx) (error, error) {
+func Apply(migration *migration.Migration, tx *sql.Tx) (error, error) {
 	return apply(migration, tx)
 }
 
-type migration interface {
+type scanner interface {
 	Scan(string) []string
 }
 
@@ -25,7 +25,7 @@ type txer interface {
 	Rollback() error
 }
 
-func apply(migration migration, tx txer) (err error, sqlerr error) {
+func apply(migration scanner, tx txer) (err error, sqlerr error) {
 	if migration == nil {
 		return ErrNilMigration, nil
 	}

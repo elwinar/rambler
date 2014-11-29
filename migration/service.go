@@ -1,11 +1,12 @@
-package lib
+package migration
 
 import (
-	drv "github.com/elwinar/rambler/lib/driver"
-	_ "github.com/elwinar/rambler/lib/driver/mysql"
+	drv "github.com/elwinar/rambler/driver"
 	"os"
 )
 
+// Service gather operations to manipulate migrations table and migrations on
+// the filesystem.
 type Service interface {
 	drv.Driver
 }
@@ -15,6 +16,7 @@ type service struct {
 	directory string
 }
 
+// NewService initialize a new service with the given informations
 func NewService(driver, dsn, directory string) (Service, error) {
 	return newService(driver, dsn, directory, os.Stat, drv.Get)
 }
