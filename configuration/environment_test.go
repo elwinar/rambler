@@ -19,7 +19,7 @@ var (
 		User:       &override,
 		Password:   &override,
 		Database:   &override,
-		Migrations: &override,
+		Directory:  &override,
 	}
 
 	emptyFlags *pflag.FlagSet
@@ -36,7 +36,7 @@ func init() {
 	emptyFlags.String("user", "", "")
 	emptyFlags.String("password", "", "")
 	emptyFlags.String("database", "", "")
-	emptyFlags.String("migrations", "", "")
+	emptyFlags.String("directory", "", "")
 
 	cliFlags = pflag.NewFlagSet("testing", pflag.ContinueOnError)
 
@@ -47,7 +47,7 @@ func init() {
 	cliFlags.String("user", "", "")
 	cliFlags.String("password", "", "")
 	cliFlags.String("database", "", "")
-	cliFlags.String("migrations", "", "")
+	cliFlags.String("directory", "", "")
 
 	cliFlags.Set("driver", "cli")
 	cliFlags.Set("protocol", "cli")
@@ -56,7 +56,7 @@ func init() {
 	cliFlags.Set("user", "cli")
 	cliFlags.Set("password", "cli")
 	cliFlags.Set("database", "cli")
-	cliFlags.Set("migrations", "cli")
+	cliFlags.Set("directory", "cli")
 }
 
 func TestGetEnvironment(t *testing.T) {
@@ -83,7 +83,7 @@ func TestGetEnvironment(t *testing.T) {
 				User:       "default",
 				Password:   "default",
 				Database:   "default",
-				Migrations: "default",
+				Directory: "default",
 				Environments: map[string]RawEnvironment{
 					"override": RawEnvironment{},
 				},
@@ -98,7 +98,7 @@ func TestGetEnvironment(t *testing.T) {
 			g.Assert(env.User).Equal("default")
 			g.Assert(env.Password).Equal("default")
 			g.Assert(env.Database).Equal("default")
-			g.Assert(env.Migrations).Equal("default")
+			g.Assert(env.Directory).Equal("default")
 			g.Assert(err).Equal(nil)
 		})
 
@@ -111,7 +111,7 @@ func TestGetEnvironment(t *testing.T) {
 				User:       "default",
 				Password:   "default",
 				Database:   "default",
-				Migrations: "default",
+				Directory: "default",
 				Environments: map[string]RawEnvironment{
 					"override": overrideRawEnv,
 				},
@@ -126,7 +126,7 @@ func TestGetEnvironment(t *testing.T) {
 			g.Assert(env.User).Equal("override")
 			g.Assert(env.Password).Equal("override")
 			g.Assert(env.Database).Equal("override")
-			g.Assert(env.Migrations).Equal("override")
+			g.Assert(env.Directory).Equal("override")
 			g.Assert(err).Equal(nil)
 		})
 
@@ -139,7 +139,7 @@ func TestGetEnvironment(t *testing.T) {
 				User:       "default",
 				Password:   "default",
 				Database:   "default",
-				Migrations: "default",
+				Directory:  "default",
 				Environments: map[string]RawEnvironment{
 					"override": overrideRawEnv,
 				},
@@ -154,7 +154,7 @@ func TestGetEnvironment(t *testing.T) {
 			g.Assert(env.User).Equal("cli")
 			g.Assert(env.Password).Equal("cli")
 			g.Assert(env.Database).Equal("cli")
-			g.Assert(env.Migrations).Equal("cli")
+			g.Assert(env.Directory).Equal("cli")
 			g.Assert(err).Equal(nil)
 		})
 	})

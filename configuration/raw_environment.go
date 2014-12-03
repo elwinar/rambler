@@ -8,5 +8,5 @@ type RawEnvironment struct {
 	User       *string
 	Password   *string
 	Database   *string
-	Migrations *string
+	Directory  *string
 }

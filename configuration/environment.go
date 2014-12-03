@@ -21,7 +21,7 @@ type Environment struct {
 	User       string
 	Password   string
 	Database   string
-	Migrations string
+	Directory  string
 }
 
 func GetEnvironment(name string, configuration Configuration, flags *pflag.FlagSet) (*Environment, error) {
@@ -92,12 +92,12 @@ func GetEnvironment(name string, configuration Configuration, flags *pflag.FlagS
 		environment.Database = flags.Lookup("database").Value.String()
 	}
 
-	environment.Migrations = configuration.Migrations
-	if override.Migrations != nil {
-		environment.Migrations = *override.Migrations
+	environment.Directory = configuration.Directory
+	if override.Directory != nil {
+		environment.Directory = *override.Directory
 	}
-	if flags.Lookup("migrations").Changed {
-		environment.Migrations = flags.Lookup("migrations").Value.String()
+	if flags.Lookup("directory").Changed {
+		environment.Directory = flags.Lookup("directory").Value.String()
 	}
 
 	return &environment, nil

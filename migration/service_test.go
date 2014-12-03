@@ -17,11 +17,12 @@ func TestNewService(t *testing.T) {
 	
 	mockEnv := configuration.Environment{
 		Driver: "mock",
+		Directory: "dir",
 	}
 	
 	g.Describe("NewService", func() {
 		g.It("Should reject unknown directory path", func() {
-			s, err := newService(mockEnv, "", func(dir string) (os.FileInfo, error) {
+			s, err := newService(mockEnv, func(dir string) (os.FileInfo, error) {
 				return nil, errors.New("error")
 			}, func(env configuration.Environment) (Driver, error) {
 				return nil, nil
@@ -31,7 +32,7 @@ func TestNewService(t *testing.T) {
 		})
 
 		g.It("Should reject unknown driver", func() {
-			s, err := newService(mockEnv, "", func(dir string) (os.FileInfo, error) {
+			s, err := newService(mockEnv, func(dir string) (os.FileInfo, error) {
 				return nil, nil
 			}, func(env configuration.Environment) (Driver, error) {
 				return nil, errors.New("error")
@@ -42,13 +43,13 @@ func TestNewService(t *testing.T) {
 
 		g.It("Should return an initialized service", func() {
 			d := &MockDriver{}
-			s, err := newService(mockEnv, "dir", func(dir string) (os.FileInfo, error) {
+			s, err := newService(mockEnv, func(dir string) (os.FileInfo, error) {
 				return nil, nil
 			}, func(env configuration.Environment) (Driver, error) {
 				return d, nil
 			})
 			g.Assert(err).Equal(nil)
-			g.Assert(s.directory).Equal("dir")
+			g.Assert(s.env).Equal(mockEnv)
 			g.Assert(s.driver).Equal(d)
 		})
 	})
