@@ -6,89 +6,84 @@ import (
 	"testing"
 )
 
-var (
-	nilEnvironment *Environment
-	override       string = "override"
-	two            uint64 = 2
-
-	overrideRawEnv RawEnvironment = RawEnvironment{
-		Driver:     &override,
-		Protocol:   &override,
-		Host:       &override,
-		Port:       &two,
-		User:       &override,
-		Password:   &override,
-		Database:   &override,
-		Directory:  &override,
-	}
-
-	emptyFlags *pflag.FlagSet
-	cliFlags   *pflag.FlagSet
-)
-
-func init() {
-	emptyFlags = pflag.NewFlagSet("empty", pflag.ContinueOnError)
-
-	emptyFlags.String("driver", "", "")
-	emptyFlags.String("protocol", "", "")
-	emptyFlags.String("host", "", "")
-	emptyFlags.Uint("port", 0, "")
-	emptyFlags.String("user", "", "")
-	emptyFlags.String("password", "", "")
-	emptyFlags.String("database", "", "")
-	emptyFlags.String("directory", "", "")
-
-	cliFlags = pflag.NewFlagSet("testing", pflag.ContinueOnError)
-
-	cliFlags.String("driver", "", "")
-	cliFlags.String("protocol", "", "")
-	cliFlags.String("host", "", "")
-	cliFlags.Uint("port", 0, "")
-	cliFlags.String("user", "", "")
-	cliFlags.String("password", "", "")
-	cliFlags.String("database", "", "")
-	cliFlags.String("directory", "", "")
-
-	cliFlags.Set("driver", "cli")
-	cliFlags.Set("protocol", "cli")
-	cliFlags.Set("host", "cli")
-	cliFlags.Set("port", "3")
-	cliFlags.Set("user", "cli")
-	cliFlags.Set("password", "cli")
-	cliFlags.Set("database", "cli")
-	cliFlags.Set("directory", "cli")
-}
-
 func TestGetEnvironment(t *testing.T) {
 	g := Goblin(t)
+	
+	var s string = "override"
+	var i uint64 = 2
+	var n *Environment  
+
+	var override RawEnvironment = RawEnvironment{
+		Driver:     &s,
+		Protocol:   &s,
+		Host:       &s,
+		Port:       &i,
+		User:       &s,
+		Password:   &s,
+		Database:   &s,
+		Directory:  &s,
+	}
+
+	var empty *pflag.FlagSet = pflag.NewFlagSet("empty", pflag.ContinueOnError)
+	empty.String("driver", "", "")
+	empty.String("protocol", "", "")
+	empty.String("host", "", "")
+	empty.Uint("port", 0, "")
+	empty.String("user", "", "")
+	empty.String("password", "", "")
+	empty.String("database", "", "")
+	empty.String("directory", "", "")
+	
+	var cli *pflag.FlagSet = pflag.NewFlagSet("testing", pflag.ContinueOnError)
+	cli.String("driver", "", "")
+	cli.String("protocol", "", "")
+	cli.String("host", "", "")
+	cli.Uint("port", 0, "")
+	cli.String("user", "", "")
+	cli.String("password", "", "")
+	cli.String("database", "", "")
+	cli.String("directory", "", "")
+	cli.Set("driver", "cli")
+	cli.Set("protocol", "cli")
+	cli.Set("host", "cli")
+	cli.Set("port", "3")
+	cli.Set("user", "cli")
+	cli.Set("password", "cli")
+	cli.Set("database", "cli")
+	cli.Set("directory", "cli")
+	
+	var configuration Configuration = Configuration{
+		Driver:     "default",
+		Protocol:   "default",
+		Host:       "default",
+		Port:       1,
+		User:       "default",
+		Password:   "default",
+		Database:   "default",
+		Directory: "default",
+		Environments: map[string]RawEnvironment{
+			"default": RawEnvironment{},
+			"override": override,
+		},
+	}
+	
 	g.Describe("GetEnvironment", func() {
 		g.It("Should reject empty environment", func() {
-			env, err := GetEnvironment("", Configuration{}, emptyFlags)
-			g.Assert(env).Equal(nilEnvironment)
+			env, err := GetEnvironment("", configuration, empty)
 			g.Assert(err).Equal(ErrUnknownEnvironment)
+			g.Assert(env).Equal(n)
 		})
 
 		g.It("Should reject unknown environment", func() {
-			env, err := GetEnvironment("error", Configuration{}, emptyFlags)
-			g.Assert(env).Equal(nilEnvironment)
+			env, err := GetEnvironment("error", configuration, empty)
 			g.Assert(err).Equal(ErrUnknownEnvironment)
+			g.Assert(env).Equal(n)
 		})
 
 		g.It("Should use the defaults", func() {
-			env, err := GetEnvironment("override", Configuration{
-				Driver:     "default",
-				Protocol:   "default",
-				Host:       "default",
-				Port:       1,
-				User:       "default",
-				Password:   "default",
-				Database:   "default",
-				Directory: "default",
-				Environments: map[string]RawEnvironment{
-					"override": RawEnvironment{},
-				},
-			}, emptyFlags)
-			if env == nil {
+			env, err := GetEnvironment("default", configuration, empty)
+			g.Assert(err).Equal(nil)
+			if env == n {
 				g.Fail("env equal <nil>")
 			}
 			g.Assert(env.Driver).Equal("default")
@@ -99,24 +94,12 @@ func TestGetEnvironment(t *testing.T) {
 			g.Assert(env.Password).Equal("default")
 			g.Assert(env.Database).Equal("default")
 			g.Assert(env.Directory).Equal("default")
-			g.Assert(err).Equal(nil)
 		})
 
 		g.It("Should override defaults with options", func() {
-			env, err := GetEnvironment("override", Configuration{
-				Driver:     "default",
-				Protocol:   "default",
-				Host:       "default",
-				Port:       1,
-				User:       "default",
-				Password:   "default",
-				Database:   "default",
-				Directory: "default",
-				Environments: map[string]RawEnvironment{
-					"override": overrideRawEnv,
-				},
-			}, emptyFlags)
-			if env == nil {
+			env, err := GetEnvironment("override", configuration, empty)
+			g.Assert(err).Equal(nil)
+			if env == n {
 				g.Fail("env equal <nil>")
 			}
 			g.Assert(env.Driver).Equal("override")
@@ -127,24 +110,12 @@ func TestGetEnvironment(t *testing.T) {
 			g.Assert(env.Password).Equal("override")
 			g.Assert(env.Database).Equal("override")
 			g.Assert(env.Directory).Equal("override")
-			g.Assert(err).Equal(nil)
 		})
 
 		g.It("Should override options with cli", func() {
-			env, err := GetEnvironment("override", Configuration{
-				Driver:     "default",
-				Protocol:   "default",
-				Host:       "default",
-				Port:       1,
-				User:       "default",
-				Password:   "default",
-				Database:   "default",
-				Directory:  "default",
-				Environments: map[string]RawEnvironment{
-					"override": overrideRawEnv,
-				},
-			}, cliFlags)
-			if env == nil {
+			env, err := GetEnvironment("override", configuration, cli)
+			g.Assert(err).Equal(nil)
+			if env == n {
 				g.Fail("env equal <nil>")
 			}
 			g.Assert(env.Driver).Equal("cli")
@@ -155,7 +126,6 @@ func TestGetEnvironment(t *testing.T) {
 			g.Assert(env.Password).Equal("cli")
 			g.Assert(env.Database).Equal("cli")
 			g.Assert(env.Directory).Equal("cli")
-			g.Assert(err).Equal(nil)
 		})
 	})
 }
