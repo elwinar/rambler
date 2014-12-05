@@ -9,8 +9,8 @@ import (
 func TestRegisterDriver(t *testing.T) {
 	g := Goblin(t)
 
-	var constructor func(configuration.Environment) (Driver, error)
-	var constructors map[string]Constructor
+	var constructor DriverConstructor
+	var constructors map[string]DriverConstructor
 
 	g.Describe("Register", func() {
 		g.BeforeEach(func() {
@@ -18,7 +18,7 @@ func TestRegisterDriver(t *testing.T) {
 				return nil, nil
 			}
 
-			constructors = make(map[string]Constructor)
+			constructors = make(map[string]DriverConstructor)
 		})
 
 		g.It("Should register new drivers", func() {
@@ -41,7 +41,7 @@ func TestGetDriver(t *testing.T) {
 	g := Goblin(t)
 
 	var constructor func(configuration.Environment) (Driver, error)
-	var constructors map[string]Constructor
+	var constructors map[string]DriverConstructor
 	var env configuration.Environment
 	var driver MockDriver
 
@@ -51,7 +51,7 @@ func TestGetDriver(t *testing.T) {
 				return &driver, nil
 			}
 
-			constructors = make(map[string]Constructor)
+			constructors = make(map[string]DriverConstructor)
 
 			env.Driver = "mock"
 		})

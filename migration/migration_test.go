@@ -12,8 +12,8 @@ import (
 func TestNewMigration(t *testing.T) {
 	g := Goblin(t)
 
-	var glob func(string) ([]string, error)
-	var open func(string) (io.ReadSeeker, error)
+	var glob glober
+	var open opener
 
 	var nilmigration *Migration
 

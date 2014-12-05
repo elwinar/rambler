@@ -12,8 +12,8 @@ type Driver interface {
 	CreateMigrationTable() error
 }
 
-// Constructor is the function type used to create drivers
-type Constructor func(configuration.Environment) (Driver, error)
+// DriverConstructor is the function type used to create drivers
+type DriverConstructor func(configuration.Environment) (Driver, error)
 
 // The various errors returned by the package
 var (
@@ -22,19 +22,19 @@ var (
 )
 
 var (
-	constructors map[string]Constructor
+	constructors map[string]DriverConstructor
 )
 
 func init() {
-	constructors = make(map[string]Constructor)
+	constructors = make(map[string]DriverConstructor)
 }
 
 // Register register a constructor for a driver
-func RegisterDriver(name string, constructor Constructor) error {
+func RegisterDriver(name string, constructor DriverConstructor) error {
 	return registerDriver(name, constructor, constructors)
 }
 
-func registerDriver(name string, constructor Constructor, constructors map[string]Constructor) error {
+func registerDriver(name string, constructor DriverConstructor, constructors map[string]DriverConstructor) error {
 	if _, found := constructors[name]; found {
 		return ErrDriverAlreadyRegistered
 	}
@@ -48,7 +48,7 @@ func GetDriver(env configuration.Environment) (Driver, error) {
 	return getDriver(env, constructors)
 }
 
-func getDriver(env configuration.Environment, constructors map[string]Constructor) (Driver, error) {
+func getDriver(env configuration.Environment, constructors map[string]DriverConstructor) (Driver, error) {
 	constructor, found := constructors[env.Driver]
 	if !found {
 		return nil, ErrDriverNotRegistered

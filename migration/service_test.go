@@ -17,8 +17,8 @@ func TestNewService(t *testing.T) {
 		Directory: "dir",
 	}
 
-	var stat func(dir string) (os.FileInfo, error)
-	var driverConstructor func(env configuration.Environment) (Driver, error)
+	var stat stater
+	var newDriver driverConstructor
 
 	g.Describe("NewService", func() {
 		g.BeforeEach(func() {
@@ -26,7 +26,7 @@ func TestNewService(t *testing.T) {
 				return nil, nil
 			}
 
-			driverConstructor = func(env configuration.Environment) (Driver, error) {
+			newDriver = func(env configuration.Environment) (Driver, error) {
 				return nil, nil
 			}
 		})
@@ -34,7 +34,7 @@ func TestNewService(t *testing.T) {
 		g.It("Should reject unknown directory path", func() {
 			s, err := newService(env, func(dir string) (os.FileInfo, error) {
 				return nil, errors.New("error")
-			}, driverConstructor)
+			}, newDriver)
 			g.Assert(err).Equal(ErrUnknownDirectory)
 			g.Assert(s).Equal(nilservice)
 		})
@@ -48,7 +48,7 @@ func TestNewService(t *testing.T) {
 		})
 
 		g.It("Should return an initialized service", func() {
-			s, err := newService(env, stat, driverConstructor)
+			s, err := newService(env, stat, newDriver)
 			g.Assert(err).Equal(nil)
 			g.Assert(s.env).Equal(env)
 			g.Assert(s.driver).Equal(nil)
