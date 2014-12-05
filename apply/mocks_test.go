@@ -4,7 +4,6 @@ import (
 	"database/sql"
 )
 
-
 type MockMigration struct {
 	scan func(string) []string
 }
@@ -12,7 +11,6 @@ type MockMigration struct {
 func (m MockMigration) Scan(section string) []string {
 	return m.scan(section)
 }
-
 
 type MockTransaction struct {
 	exec     func(query string, args ...interface{}) (sql.Result, error)
@@ -32,7 +30,6 @@ func (tx MockTransaction) Rollback() error {
 	return tx.rollback()
 }
 
-
 type MockResult struct{}
 
 func (res MockResult) LastInsertId() (int64, error) {
@@ -41,4 +38,17 @@ func (res MockResult) LastInsertId() (int64, error) {
 
 func (res MockResult) RowsAffected() (int64, error) {
 	return 0, nil
+}
+
+type MockService struct {
+	migrationTableExists func() (bool, error)
+	createMigrationTable func() error
+}
+
+func (s MockService) MigrationTableExists() (bool, error) {
+	return s.migrationTableExists()
+}
+
+func (s MockService) CreateMigrationTable() error {
+	return s.createMigrationTable()
 }

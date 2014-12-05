@@ -9,63 +9,51 @@ import (
 	"testing"
 )
 
-var (
-	nilMigration *Migration
-)
-
-type MockReader struct {
-	seek func(int64, int) (int64, error)
-	read func(p []byte) (int, error)
-}
-
-func (r *MockReader) Seek(offset int64, whence int) (int64, error) {
-	return r.seek(offset, whence)
-}
-
-func (r *MockReader) Read(p []byte) (int, error) {
-	return r.read(p)
-}
-
 func TestNewMigration(t *testing.T) {
 	g := Goblin(t)
 
+	var glob func(string) ([]string, error)
+	var open func(string) (io.ReadSeeker, error)
+
+	var nilmigration *Migration
+
 	g.Describe("NewMigration", func() {
+		g.BeforeEach(func() {
+			glob = func(string) ([]string, error) {
+				return nil, nil
+			}
+
+			open = func(string) (io.ReadSeeker, error) {
+				return nil, nil
+			}
+		})
+
 		g.It("Should reject unknown directory path", func() {
 			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
 				return nil, errors.New("unknown")
-			}, func(path string) (io.ReadSeeker, error) {
-				return nil, nil
-			})
+			}, open)
 			g.Assert(err).Equal(ErrUnknownDirectory)
-			g.Assert(m).Equal(nilMigration)
+			g.Assert(m).Equal(nilmigration)
 		})
 
 		g.It("Should reject unknown migrations", func() {
-			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
-				return nil, nil
-			}, func(path string) (io.ReadSeeker, error) {
-				return nil, nil
-			})
+			m, err := newMigration("", 0, glob, open)
 			g.Assert(err).Equal(ErrUnknownVersion)
-			g.Assert(m).Equal(nilMigration)
+			g.Assert(m).Equal(nilmigration)
 		})
 
 		g.It("Should reject ambiguous migrations", func() {
 			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
 				return []string{"a", "b"}, nil
-			}, func(path string) (io.ReadSeeker, error) {
-				return nil, nil
-			})
+			}, open)
 			g.Assert(err).Equal(ErrAmbiguousVersion)
-			g.Assert(m).Equal(nilMigration)
+			g.Assert(m).Equal(nilmigration)
 		})
 
 		g.It("Should parse filenames to get descriptions", func() {
 			m, err := newMigration("", 0, func(pattern string) ([]string, error) {
 				return []string{"42_forty_two.sql"}, nil
-			}, func(path string) (io.ReadSeeker, error) {
-				return nil, nil
-			})
+			}, open)
 			g.Assert(err).Equal(nil)
 			g.Assert(m.Description).Equal("forty_two")
 		})
@@ -98,51 +86,52 @@ three
 -- rambler down
 four
 `
-	r := strings.NewReader(text)
-
+	var reader MockReader
+	var migration *Migration = &Migration{
+		reader: &reader,
+	}
 	var reads int
 	var bytes int
 	var seeks int
 
-	m := &Migration{
-		reader: &MockReader{
-			seek: func(offset int64, whence int) (int64, error) {
+	g.Describe("Scan", func() {
+		g.BeforeEach(func() {
+			r := strings.NewReader(text)
+
+			reader.seek = func(offset int64, whence int) (int64, error) {
 				seeks++
 				return r.Seek(offset, whence)
-			},
-			read: func(p []byte) (int, error) {
+			}
+
+			reader.read = func(p []byte) (int, error) {
 				reads++
 				b, err := r.Read(p)
 				bytes += b
 				return bytes, err
-			},
-		},
-	}
+			}
 
-	g.Describe("Scan", func() {
-		g.BeforeEach(func() {
 			reads = 0
 			bytes = 0
 			seeks = 0
 		})
 
 		g.It("Should rewind the reader", func() {
-			m.Scan("up")
+			migration.Scan("up")
 			g.Assert(seeks).Equal(1)
 		})
 
 		g.It("Should read the whole file", func() {
-			m.Scan("up")
+			migration.Scan("up")
 			g.Assert(bytes).Equal(len(text))
 		})
 
 		g.It("Should find statements if there is statements to find", func() {
-			statements := m.Scan("up")
+			statements := migration.Scan("up")
 			g.Assert(statements).Equal([]string{"one", "three"})
 		})
 
 		g.It("Should return an empty slice if there is no statements to find", func() {
-			statements := m.Scan("right")
+			statements := migration.Scan("right")
 			g.Assert(len(statements)).Equal(0)
 		})
 	})

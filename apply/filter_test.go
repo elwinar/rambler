@@ -8,32 +8,32 @@ import (
 
 func TestFilter(t *testing.T) {
 	g := Goblin(t)
-	
+
 	var missing []*migration.Migration = []*migration.Migration{
 		{Version: 1},
 		{Version: 4},
 	}
-	
+
 	var outOfOrder []*migration.Migration = []*migration.Migration{
 		{Version: 1},
 		{Version: 2},
 		{Version: 3},
 		{Version: 4},
 	}
-	
+
 	var applied []*migration.Migration = []*migration.Migration{
 		{Version: 1},
 		{Version: 2},
 		{Version: 4},
 	}
-	
+
 	var available []*migration.Migration = []*migration.Migration{
 		{Version: 1},
 		{Version: 2},
 		{Version: 4},
 		{Version: 5},
 	}
-	
+
 	g.Describe("Filter", func() {
 		g.It("Should complain about missing migrations", func() {
 			filtered, err := Filter(missing, applied)

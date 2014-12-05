@@ -7,13 +7,12 @@ import (
 	"testing"
 )
 
-
 func TestApply(t *testing.T) {
 	g := Goblin(t)
 
 	var migration MockMigration
 	var scans int
-	
+
 	var tx MockTransaction
 	var execs int
 	var commits int
@@ -26,25 +25,25 @@ func TestApply(t *testing.T) {
 				scans++
 				return nil
 			}
-			
+
 			scans = 0
-			
+
 			// Re-initialize the transaction mock
 			tx.exec = func(_ string, _ ...interface{}) (sql.Result, error) {
 				execs++
 				return MockResult{}, nil
 			}
-			
+
 			tx.commit = func() error {
 				commits++
 				return nil
 			}
-			
+
 			tx.rollback = func() error {
 				rollbacks++
 				return nil
 			}
-			
+
 			execs = 0
 			commits = 0
 			rollbacks = 0
@@ -63,11 +62,11 @@ func TestApply(t *testing.T) {
 			}
 			var index int = 0
 			var fail bool = false
-			
+
 			migration.scan = func(_ string) []string {
 				return statements
 			}
-			
+
 			tx.exec = func(query string, _ ...interface{}) (sql.Result, error) {
 				if query != statements[index] {
 					fail = true
@@ -88,9 +87,9 @@ func TestApply(t *testing.T) {
 
 		g.It("Should rollback on SQL error", func() {
 			migration.scan = func(_ string) []string {
-				return []string{ "faulty" }
+				return []string{"faulty"}
 			}
-			
+
 			tx.exec = func(_ string, _ ...interface{}) (sql.Result, error) {
 				execs++
 				return MockResult{}, errors.New("error")
@@ -120,14 +119,14 @@ func TestApply(t *testing.T) {
 
 		g.It("Should return an error on rollback fail", func() {
 			migration.scan = func(_ string) []string {
-				return []string{ "faulty" }
+				return []string{"faulty"}
 			}
-			
+
 			tx.exec = func(query string, args ...interface{}) (sql.Result, error) {
 				execs++
 				return MockResult{}, errors.New("error")
 			}
-			
+
 			tx.rollback = func() error {
 				rollbacks++
 				return errors.New("error")

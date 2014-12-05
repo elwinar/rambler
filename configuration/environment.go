@@ -12,16 +12,15 @@ var (
 	ErrUnknownEnvironment = errors.New("unknwon environment")
 )
 
-
 type Environment struct {
-	Driver     string
-	Protocol   string
-	Host       string
-	Port       uint64
-	User       string
-	Password   string
-	Database   string
-	Directory  string
+	Driver    string
+	Protocol  string
+	Host      string
+	Port      uint64
+	User      string
+	Password  string
+	Database  string
+	Directory string
 }
 
 func GetEnvironment(name string, configuration Configuration, flags *pflag.FlagSet) (*Environment, error) {

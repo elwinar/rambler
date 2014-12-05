@@ -21,7 +21,6 @@ var (
 	ErrAmbiguousVersion   = errors.New("ambiguous version")
 )
 
-
 // Migration represent a migration file, composed of up and down sections containing
 // one or more statements each.
 type Migration struct {

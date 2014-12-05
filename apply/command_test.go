@@ -1,16 +1,37 @@
-package apply 
+package apply
 
 import (
 	. "github.com/franela/goblin"
 	"testing"
 )
 
-type MockService struct {}
-
 func TestCommand(t *testing.T) {
 	g := Goblin(t)
-	
+
+	var s MockService
+	var exists int
+	var creates int
+
 	g.Describe("Command", func() {
+
+		g.BeforeEach(func() {
+			s.migrationTableExists = func() (bool, error) {
+				exists++
+				return true, nil
+			}
+
+			s.createMigrationTable = func() error {
+				creates++
+				return nil
+			}
+
+			exists = 0
+			creates = 0
+		})
+
+		g.It("Should initialize a new service", func() {
+
+		})
 		g.It("Should check for the migration table")
 		g.It("Should create the migration table if it does'nt exists")
 		g.It("Should list the already applied migrations")

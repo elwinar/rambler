@@ -6,38 +6,32 @@ import (
 	"testing"
 )
 
-type MockDriver struct{}
-
-func (d MockDriver) MigrationTableExists() (bool, error) {
-	return false, nil
-}
-
-func (d MockDriver) CreateMigrationTable() error {
-	return nil
-}
-
-func MockConstructor(env configuration.Environment) (Driver, error) {
-	return MockDriver{}, nil
-}
-
 func TestRegisterDriver(t *testing.T) {
 	g := Goblin(t)
-	g.Describe("Register", func() {
-		g.It("Should registerDriver new drivers", func() {
-			constructors := make(map[string]Constructor)
 
-			err := registerDriver("mock", MockConstructor, constructors)
+	var constructor func(configuration.Environment) (Driver, error)
+	var constructors map[string]Constructor
+
+	g.Describe("Register", func() {
+		g.BeforeEach(func() {
+			constructor = func(configuration.Environment) (Driver, error) {
+				return nil, nil
+			}
+
+			constructors = make(map[string]Constructor)
+		})
+
+		g.It("Should register new drivers", func() {
+			err := registerDriver("mock", constructor, constructors)
 			g.Assert(err).Equal(nil)
 			g.Assert(len(constructors)).Equal(1)
 		})
 
 		g.It("Shouldn't accept the same driver twice", func() {
-			constructors := make(map[string]Constructor)
-
-			err := registerDriver("mock", MockConstructor, constructors)
+			err := registerDriver("mock", constructor, constructors)
 			g.Assert(err).Equal(nil)
 
-			err = registerDriver("mock", MockConstructor, constructors)
+			err = registerDriver("mock", constructor, constructors)
 			g.Assert(err).Equal(ErrDriverAlreadyRegistered)
 		})
 	})
@@ -45,26 +39,34 @@ func TestRegisterDriver(t *testing.T) {
 
 func TestGetDriver(t *testing.T) {
 	g := Goblin(t)
-	
-	mockEnv := configuration.Environment{
-		Driver: "mock",
-	}
-	
-	g.Describe("Get", func() {
-		g.It("Should retrieve existing drivers", func() {
-			constructors := make(map[string]Constructor)
-			constructors["mock"] = MockConstructor
 
-			driver, err := getDriver(mockEnv, constructors)
+	var constructor func(configuration.Environment) (Driver, error)
+	var constructors map[string]Constructor
+	var env configuration.Environment
+	var driver MockDriver
+
+	g.Describe("Get", func() {
+		g.BeforeEach(func() {
+			constructor = func(configuration.Environment) (Driver, error) {
+				return &driver, nil
+			}
+
+			constructors = make(map[string]Constructor)
+
+			env.Driver = "mock"
+		})
+
+		g.It("Should retrieve existing drivers", func() {
+			constructors["mock"] = constructor
+
+			d, err := getDriver(env, constructors)
 			g.Assert(err).Equal(nil)
-			g.Assert(driver).Equal(MockDriver{})
+			g.Assert(d).Equal(&driver)
 		})
 
 		g.It("Should fail on unknown driver", func() {
-			drivers := make(map[string]Constructor)
-
-			driver, err := getDriver(mockEnv, drivers)
-			g.Assert(driver).Equal(nil)
+			d, err := getDriver(env, constructors)
+			g.Assert(d).Equal(nil)
 			g.Assert(err).Equal(ErrDriverNotRegistered)
 		})
 	})

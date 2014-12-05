@@ -8,20 +8,20 @@ import (
 
 func TestGetEnvironment(t *testing.T) {
 	g := Goblin(t)
-	
+
 	var s string = "override"
 	var i uint64 = 2
-	var n *Environment  
+	var nilenv *Environment
 
 	var override RawEnvironment = RawEnvironment{
-		Driver:     &s,
-		Protocol:   &s,
-		Host:       &s,
-		Port:       &i,
-		User:       &s,
-		Password:   &s,
-		Database:   &s,
-		Directory:  &s,
+		Driver:    &s,
+		Protocol:  &s,
+		Host:      &s,
+		Port:      &i,
+		User:      &s,
+		Password:  &s,
+		Database:  &s,
+		Directory: &s,
 	}
 
 	var empty *pflag.FlagSet = pflag.NewFlagSet("empty", pflag.ContinueOnError)
@@ -33,7 +33,7 @@ func TestGetEnvironment(t *testing.T) {
 	empty.String("password", "", "")
 	empty.String("database", "", "")
 	empty.String("directory", "", "")
-	
+
 	var cli *pflag.FlagSet = pflag.NewFlagSet("testing", pflag.ContinueOnError)
 	cli.String("driver", "", "")
 	cli.String("protocol", "", "")
@@ -51,39 +51,39 @@ func TestGetEnvironment(t *testing.T) {
 	cli.Set("password", "cli")
 	cli.Set("database", "cli")
 	cli.Set("directory", "cli")
-	
+
 	var configuration Configuration = Configuration{
-		Driver:     "default",
-		Protocol:   "default",
-		Host:       "default",
-		Port:       1,
-		User:       "default",
-		Password:   "default",
-		Database:   "default",
+		Driver:    "default",
+		Protocol:  "default",
+		Host:      "default",
+		Port:      1,
+		User:      "default",
+		Password:  "default",
+		Database:  "default",
 		Directory: "default",
 		Environments: map[string]RawEnvironment{
-			"default": RawEnvironment{},
+			"default":  RawEnvironment{},
 			"override": override,
 		},
 	}
-	
+
 	g.Describe("GetEnvironment", func() {
 		g.It("Should reject empty environment", func() {
 			env, err := GetEnvironment("", configuration, empty)
 			g.Assert(err).Equal(ErrUnknownEnvironment)
-			g.Assert(env).Equal(n)
+			g.Assert(env).Equal(nilenv)
 		})
 
 		g.It("Should reject unknown environment", func() {
 			env, err := GetEnvironment("error", configuration, empty)
 			g.Assert(err).Equal(ErrUnknownEnvironment)
-			g.Assert(env).Equal(n)
+			g.Assert(env).Equal(nilenv)
 		})
 
 		g.It("Should use the defaults", func() {
 			env, err := GetEnvironment("default", configuration, empty)
 			g.Assert(err).Equal(nil)
-			if env == n {
+			if env == nilenv {
 				g.Fail("env equal <nil>")
 			}
 			g.Assert(env.Driver).Equal("default")
@@ -99,7 +99,7 @@ func TestGetEnvironment(t *testing.T) {
 		g.It("Should override defaults with options", func() {
 			env, err := GetEnvironment("override", configuration, empty)
 			g.Assert(err).Equal(nil)
-			if env == n {
+			if env == nilenv {
 				g.Fail("env equal <nil>")
 			}
 			g.Assert(env.Driver).Equal("override")
@@ -115,7 +115,7 @@ func TestGetEnvironment(t *testing.T) {
 		g.It("Should override options with cli", func() {
 			env, err := GetEnvironment("override", configuration, cli)
 			g.Assert(err).Equal(nil)
-			if env == n {
+			if env == nilenv {
 				g.Fail("env equal <nil>")
 			}
 			g.Assert(env.Driver).Equal("cli")
