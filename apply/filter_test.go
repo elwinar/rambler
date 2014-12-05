@@ -1,7 +1,6 @@
 package apply
 
 import (
-	"github.com/elwinar/rambler/migration"
 	. "github.com/franela/goblin"
 	"testing"
 )
@@ -9,29 +8,29 @@ import (
 func TestFilter(t *testing.T) {
 	g := Goblin(t)
 
-	var missing []*migration.Migration = []*migration.Migration{
-		{Version: 1},
-		{Version: 4},
+	var missing []int64 = []int64{
+		int64(1),
+		int64(4),
 	}
 
-	var outOfOrder []*migration.Migration = []*migration.Migration{
-		{Version: 1},
-		{Version: 2},
-		{Version: 3},
-		{Version: 4},
+	var outOfOrder []int64 = []int64{
+		int64(1),
+		int64(2),
+		int64(3),
+		int64(4),
 	}
 
-	var applied []*migration.Migration = []*migration.Migration{
-		{Version: 1},
-		{Version: 2},
-		{Version: 4},
+	var applied []int64 = []int64{
+		int64(1),
+		int64(2),
+		int64(4),
 	}
 
-	var available []*migration.Migration = []*migration.Migration{
-		{Version: 1},
-		{Version: 2},
-		{Version: 4},
-		{Version: 5},
+	var available []int64 = []int64{
+		int64(1),
+		int64(2),
+		int64(4),
+		int64(5),
 	}
 
 	g.Describe("Filter", func() {
@@ -57,7 +56,7 @@ func TestFilter(t *testing.T) {
 			filtered, err := Filter(available, applied)
 			g.Assert(err).Equal(nil)
 			g.Assert(len(filtered)).Equal(1)
-			g.Assert(filtered[0].Version).Equal(uint64(5))
+			g.Assert(filtered[0]).Equal(uint64(5))
 		})
 
 	})
