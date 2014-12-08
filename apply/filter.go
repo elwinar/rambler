@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func Filter(available, applied []int64) ([]int64, error) {
+func Filter(available, applied []uint64) ([]uint64, error) {
 	var i, j int = 0, 0
 
 	for i < len(available) && j < len(applied) {

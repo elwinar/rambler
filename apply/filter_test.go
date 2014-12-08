@@ -8,29 +8,29 @@ import (
 func TestFilter(t *testing.T) {
 	g := Goblin(t)
 
-	var missing []int64 = []int64{
-		int64(1),
-		int64(4),
+	var missing []uint64 = []uint64{
+		uint64(1),
+		uint64(4),
 	}
 
-	var outOfOrder []int64 = []int64{
-		int64(1),
-		int64(2),
-		int64(3),
-		int64(4),
+	var outOfOrder []uint64 = []uint64{
+		uint64(1),
+		uint64(2),
+		uint64(3),
+		uint64(4),
 	}
 
-	var applied []int64 = []int64{
-		int64(1),
-		int64(2),
-		int64(4),
+	var applied []uint64 = []uint64{
+		uint64(1),
+		uint64(2),
+		uint64(4),
 	}
 
-	var available []int64 = []int64{
-		int64(1),
-		int64(2),
-		int64(4),
-		int64(5),
+	var available []uint64 = []uint64{
+		uint64(1),
+		uint64(2),
+		uint64(4),
+		uint64(5),
 	}
 
 	g.Describe("Filter", func() {
