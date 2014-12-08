@@ -10,6 +10,8 @@ import (
 type Driver interface {
 	MigrationTableExists() (bool, error)
 	CreateMigrationTable() error
+	ListAppliedMigrations() ([]uint64, error)
+	ListAvailableMigrations() ([]uint64, error)
 }
 
 // DriverConstructor is the function type used to create drivers

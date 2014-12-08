@@ -13,6 +13,14 @@ func (d MockDriver) CreateMigrationTable() error {
 	return d.createMigrationTable()
 }
 
+func (d MockDriver) ListAppliedMigrations() ([]uint64, error) {
+	return d.ListAppliedMigrations()
+}
+
+func (d MockDriver) ListAvailableMigrations() ([]uint64, error) {
+	return d.ListAvailableMigrations()
+}
+
 type MockReader struct {
 	seek func(int64, int) (int64, error)
 	read func(p []byte) (int, error)

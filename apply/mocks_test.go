@@ -43,6 +43,8 @@ func (res MockResult) RowsAffected() (int64, error) {
 type MockService struct {
 	migrationTableExists func() (bool, error)
 	createMigrationTable func() error
+	listAppliedMigrations func() ([]uint64, error)
+	listAvailableMigrations func() ([]uint64, error)
 }
 
 func (s MockService) MigrationTableExists() (bool, error) {
@@ -51,4 +53,12 @@ func (s MockService) MigrationTableExists() (bool, error) {
 
 func (s MockService) CreateMigrationTable() error {
 	return s.createMigrationTable()
+}
+
+func (s MockService) ListAppliedMigrations() ([]uint64, error) {
+	return s.listAppliedMigrations()
+}
+
+func (s MockService) ListAvailableMigrations() ([]uint64, error) {
+	return s.listAvailableMigrations()
 }

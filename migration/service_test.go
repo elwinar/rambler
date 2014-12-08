@@ -11,7 +11,7 @@ import (
 func TestNewService(t *testing.T) {
 	g := Goblin(t)
 
-	var nilservice *service
+	var nilservice *StandardService
 	var env configuration.Environment = configuration.Environment{
 		Driver:    "mock",
 		Directory: "dir",

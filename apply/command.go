@@ -13,11 +13,33 @@ type serviceConstructor func(env configuration.Environment) (migration.Service, 
 
 func command(env configuration.Environment, all bool, newService serviceConstructor) error {
 	service, err := newService(env)
-	
-	if exists, _ := service.MigrationTableExists(); !exists {
-		service.CreateMigrationTable()
+	if err != nil {
+		return err
 	}
 	
-	_ = service
+	exists, err := service.MigrationTableExists()
+	if err != nil {
+		return err
+	}
+	
+	if !exists {
+		err := service.CreateMigrationTable()
+		if err != nil {
+			return err
+		}
+	}
+	
+	applied, err := service.ListAppliedMigrations()
+	if err != nil {
+		return err
+	}
+	
+	availables, err := service.ListAvailableMigrations()
+	if err != nil {
+		return err
+	}
+	
+	_ = applied
+	_ = availables
 	return err
 }
