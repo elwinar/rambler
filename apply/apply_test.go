@@ -50,7 +50,7 @@ func TestApply(t *testing.T) {
 		})
 
 		g.It("Should return an error on nil migration", func() {
-			err, sqlerr := apply(nil, tx)
+			err, sqlerr := Apply(nil, tx)
 			g.Assert(err).Equal(ErrNilMigration)
 			g.Assert(sqlerr).Equal(nil)
 		})
@@ -76,7 +76,7 @@ func TestApply(t *testing.T) {
 				return MockResult{}, nil
 			}
 
-			err, sqlerr := apply(&migration, tx)
+			err, sqlerr := Apply(&migration, tx)
 			g.Assert(fail).Equal(false)
 			g.Assert(execs).Equal(2)
 			g.Assert(commits).Equal(1)
@@ -95,7 +95,7 @@ func TestApply(t *testing.T) {
 				return MockResult{}, errors.New("error")
 			}
 
-			err, sqlerr := apply(&migration, tx)
+			err, sqlerr := Apply(&migration, tx)
 			g.Assert(execs).Equal(1)
 			g.Assert(commits).Equal(0)
 			g.Assert(rollbacks).Equal(1)
@@ -109,7 +109,7 @@ func TestApply(t *testing.T) {
 				return errors.New("error")
 			}
 
-			err, sqlerr := apply(&migration, tx)
+			err, sqlerr := Apply(&migration, tx)
 			g.Assert(execs).Equal(0)
 			g.Assert(commits).Equal(1)
 			g.Assert(rollbacks).Equal(0)
@@ -132,7 +132,7 @@ func TestApply(t *testing.T) {
 				return errors.New("error")
 			}
 
-			err, sqlerr := apply(&migration, tx)
+			err, sqlerr := Apply(&migration, tx)
 			g.Assert(execs).Equal(1)
 			g.Assert(commits).Equal(0)
 			g.Assert(rollbacks).Equal(1)
@@ -141,7 +141,7 @@ func TestApply(t *testing.T) {
 		})
 
 		g.It("Should return nil on success", func() {
-			err, sqlerr := apply(&migration, tx)
+			err, sqlerr := Apply(&migration, tx)
 			g.Assert(execs).Equal(0)
 			g.Assert(commits).Equal(1)
 			g.Assert(rollbacks).Equal(0)

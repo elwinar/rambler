@@ -3,17 +3,12 @@ package apply
 import (
 	"database/sql"
 	"errors"
-	"github.com/elwinar/rambler/migration"
 )
 
 var (
 	ErrNilMigration   = errors.New("nil migration")
 	ErrNilTransaction = errors.New("nil transaction")
 )
-
-func Apply(migration *migration.Migration, tx *sql.Tx) (error, error) {
-	return apply(migration, tx)
-}
 
 type scanner interface {
 	Scan(string) []string
@@ -25,8 +20,8 @@ type txer interface {
 	Rollback() error
 }
 
-func apply(migration scanner, tx txer) (err error, sqlerr error) {
-	if migration == nil {
+func Apply(m scanner, tx txer) (error, error) {
+	if m == nil {
 		return ErrNilMigration, nil
 	}
 
@@ -34,7 +29,7 @@ func apply(migration scanner, tx txer) (err error, sqlerr error) {
 		return ErrNilTransaction, nil
 	}
 
-	for _, statement := range migration.Scan("up") {
+	for _, statement := range m.Scan("up") {
 		_, sqlerr := tx.Exec(statement)
 		if sqlerr != nil {
 			err := tx.Rollback()
@@ -42,6 +37,6 @@ func apply(migration scanner, tx txer) (err error, sqlerr error) {
 		}
 	}
 
-	err = tx.Commit()
+	err := tx.Commit()
 	return err, nil
 }

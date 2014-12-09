@@ -6,12 +6,13 @@ import (
 )
 
 func Command(env configuration.Environment, all bool) error {
-	return command(env, all, migration.NewService)
+	return command(env, all, migration.NewService, Filter)
 }
 
 type serviceConstructor func(env configuration.Environment) (migration.Service, error)
+type filter func([]uint64, []uint64) ([]uint64, error)
 
-func command(env configuration.Environment, all bool, newService serviceConstructor) error {
+func command(env configuration.Environment, all bool, newService serviceConstructor, f filter) error {
 	service, err := newService(env)
 	if err != nil {
 		return err
@@ -39,7 +40,12 @@ func command(env configuration.Environment, all bool, newService serviceConstruc
 		return err
 	}
 	
-	_ = applied
-	_ = availables
+	filtered, err := f(applied, availables)
+	if err != nil {
+		return err
+	}
+	
+	_ = filtered
+	
 	return err
 }
