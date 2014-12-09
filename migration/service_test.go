@@ -11,7 +11,7 @@ import (
 func TestNewService(t *testing.T) {
 	g := Goblin(t)
 
-	var nilservice *StandardService
+	var nilservice *service
 	var env configuration.Environment = configuration.Environment{
 		Driver:    "mock",
 		Directory: "dir",
@@ -51,7 +51,16 @@ func TestNewService(t *testing.T) {
 			s, err := newService(env, stat, newDriver)
 			g.Assert(err).Equal(nil)
 			g.Assert(s.env).Equal(env)
-			g.Assert(s.driver).Equal(nil)
 		})
+	})
+}
+
+func TestServiceListAvailableMigrations(t *testing.T) {
+	g := Goblin(t)
+	
+	g.Describe("service.ListAvailableMigrations", func() {
+		g.It("Should fail on invalid directory")
+		g.It("Should return nil if no file follow the migration naming convention")
+		g.It("Should return an array of distinct versions")
 	})
 }

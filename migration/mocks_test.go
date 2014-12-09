@@ -3,6 +3,8 @@ package migration
 type MockDriver struct {
 	migrationTableExists func() (bool, error)
 	createMigrationTable func() error
+	listAppliedMigrations func() ([]uint64, error)
+	startTransaction func() (Transaction, error)
 }
 
 func (d MockDriver) MigrationTableExists() (bool, error) {
@@ -14,11 +16,11 @@ func (d MockDriver) CreateMigrationTable() error {
 }
 
 func (d MockDriver) ListAppliedMigrations() ([]uint64, error) {
-	return d.ListAppliedMigrations()
+	return d.listAppliedMigrations()
 }
 
-func (d MockDriver) ListAvailableMigrations() ([]uint64, error) {
-	return d.ListAvailableMigrations()
+func (d MockDriver) StartTransaction() (Transaction, error) {
+	return d.startTransaction()
 }
 
 type MockReader struct {

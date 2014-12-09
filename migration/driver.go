@@ -1,9 +1,16 @@
 package migration
 
 import (
+	"database/sql"
 	"errors"
 	"github.com/elwinar/rambler/configuration"
 )
+
+type Transaction interface {
+	Exec(string, ...interface{}) (sql.Result, error)
+	Commit() error
+	Rollback() error
+}
 
 // Driver is the interface used by the program to interact with the migration
 // table in database
@@ -11,7 +18,7 @@ type Driver interface {
 	MigrationTableExists() (bool, error)
 	CreateMigrationTable() error
 	ListAppliedMigrations() ([]uint64, error)
-	ListAvailableMigrations() ([]uint64, error)
+	StartTransaction() (Transaction, error)
 }
 
 // DriverConstructor is the function type used to create drivers

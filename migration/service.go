@@ -9,10 +9,11 @@ import (
 // the filesystem.
 type Service interface {
 	Driver
+	ListAvailableMigrations() ([]uint64, error)
 }
 
-type StandardService struct {
-	driver Driver
+type service struct {
+	Driver
 	env    configuration.Environment
 }
 
@@ -24,7 +25,7 @@ func NewService(env configuration.Environment) (Service, error) {
 type stater func(string) (os.FileInfo, error)
 type driverConstructor func(configuration.Environment) (Driver, error)
 
-func newService(env configuration.Environment, stat stater, newDriver driverConstructor) (*StandardService, error) {
+func newService(env configuration.Environment, stat stater, newDriver driverConstructor) (*service, error) {
 	if _, err := stat(env.Directory); err != nil {
 		return nil, ErrUnknownDirectory
 	}
@@ -34,24 +35,16 @@ func newService(env configuration.Environment, stat stater, newDriver driverCons
 		return nil, ErrUnknownDriver
 	}
 
-	return &StandardService{
-		driver: driver,
+	return &service{
+		Driver: driver,
 		env:    env,
 	}, nil
 }
 
-func (s StandardService) MigrationTableExists() (bool, error) {
-	return s.driver.MigrationTableExists()
+func (s service) ListAvailableMigrations() ([]uint64, error) {
+	return listAvailableMigrations(s.env)
 }
 
-func (s StandardService) CreateMigrationTable() error {
-	return s.driver.CreateMigrationTable()
-}
-
-func (s StandardService) ListAppliedMigrations() ([]uint64, error) {
-	return s.driver.ListAppliedMigrations()
-}
-
-func (s StandardService) ListAvailableMigrations() ([]uint64, error) {
-	return s.driver.ListAvailableMigrations()
+func listAvailableMigrations(env configuration.Environment) ([]uint64, error) {
+	return nil, nil
 }

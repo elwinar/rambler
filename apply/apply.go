@@ -20,6 +20,10 @@ type txer interface {
 	Rollback() error
 }
 
+// Apply tries to apply statements of the given migration on the given transaction.
+// It will try to roolback in case of error, and will return 2 distinct errors:
+// - the SQL error which caused the transaction to fail
+// - the SQL error which caused the rollback/commit to fail
 func Apply(m scanner, tx txer) (error, error) {
 	if m == nil {
 		return ErrNilMigration, nil

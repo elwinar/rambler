@@ -2,6 +2,7 @@ package apply
 
 import (
 	"database/sql"
+	"github.com/elwinar/rambler/migration"
 )
 
 type MockMigration struct {
@@ -45,6 +46,7 @@ type MockService struct {
 	createMigrationTable func() error
 	listAppliedMigrations func() ([]uint64, error)
 	listAvailableMigrations func() ([]uint64, error)
+	startTransaction func() (migration.Transaction, error)
 }
 
 func (s MockService) MigrationTableExists() (bool, error) {
@@ -61,4 +63,8 @@ func (s MockService) ListAppliedMigrations() ([]uint64, error) {
 
 func (s MockService) ListAvailableMigrations() ([]uint64, error) {
 	return s.listAvailableMigrations()
+}
+
+func (s MockService) StartTransaction() (migration.Transaction, error) {
+	return s.startTransaction()
 }
