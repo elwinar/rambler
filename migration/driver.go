@@ -6,6 +6,7 @@ import (
 	"github.com/elwinar/rambler/configuration"
 )
 
+// Transaction is the interface for an SQL transaction as used by rambler.
 type Transaction interface {
 	Exec(string, ...interface{}) (sql.Result, error)
 	Commit() error
@@ -38,7 +39,7 @@ func init() {
 	constructors = make(map[string]DriverConstructor)
 }
 
-// Register register a constructor for a driver
+// RegisterDriver register a constructor for a driver
 func RegisterDriver(name string, constructor DriverConstructor) error {
 	return registerDriver(name, constructor, constructors)
 }
@@ -52,7 +53,7 @@ func registerDriver(name string, constructor DriverConstructor, constructors map
 	return nil
 }
 
-// Get initialize a driver from the given name and options
+// GetDriver initialize a driver from the given name and options
 func GetDriver(env configuration.Environment) (Driver, error) {
 	return getDriver(env, constructors)
 }

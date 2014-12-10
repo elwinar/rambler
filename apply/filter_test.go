@@ -8,25 +8,30 @@ import (
 func TestFilter(t *testing.T) {
 	g := Goblin(t)
 
-	var missing []uint64 = []uint64{
+	var missing = []uint64{
 		uint64(1),
 		uint64(4),
 	}
+	
+	var missingAtEnd = []uint64{
+		uint64(1),
+		uint64(2),
+	}
 
-	var outOfOrder []uint64 = []uint64{
+	var outOfOrder = []uint64{
 		uint64(1),
 		uint64(2),
 		uint64(3),
 		uint64(4),
 	}
 
-	var applied []uint64 = []uint64{
+	var applied = []uint64{
 		uint64(1),
 		uint64(2),
 		uint64(4),
 	}
 
-	var available []uint64 = []uint64{
+	var available = []uint64{
 		uint64(1),
 		uint64(2),
 		uint64(4),
@@ -37,6 +42,10 @@ func TestFilter(t *testing.T) {
 		g.It("Should complain about missing migrations", func() {
 			filtered, err := Filter(missing, applied)
 			g.Assert(err.Error()).Equal("missing migration 2")
+			g.Assert(len(filtered)).Equal(0)
+			
+			filtered, err = Filter(missingAtEnd, applied)
+			g.Assert(err.Error()).Equal("missing migration 4")
 			g.Assert(len(filtered)).Equal(0)
 		})
 

@@ -5,11 +5,6 @@ import (
 	"errors"
 )
 
-var (
-	ErrNilMigration   = errors.New("nil migration")
-	ErrNilTransaction = errors.New("nil transaction")
-)
-
 type scanner interface {
 	Scan(string) []string
 }
@@ -26,11 +21,11 @@ type txer interface {
 // - the SQL error which caused the rollback/commit to fail
 func Apply(m scanner, tx txer) (error, error) {
 	if m == nil {
-		return ErrNilMigration, nil
+		return errors.New("nil migration"), nil
 	}
 
 	if tx == nil {
-		return ErrNilTransaction, nil
+		return errors.New("nil transaction"), nil
 	}
 
 	for _, statement := range m.Scan("up") {

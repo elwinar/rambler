@@ -6,6 +6,7 @@ import (
 	"github.com/elwinar/rambler/migration"
 )
 
+// Command is the `rambler apply` handler
 func Command(env configuration.Environment, all bool) error {
 	return command(env, all, migration.NewService, Filter, func(path string, version uint64) (scanner, error) {
 		return migration.NewMigration(path, version)
@@ -18,29 +19,29 @@ type migrationConstructor func(string, uint64) (scanner, error)
 type applier func(scanner, txer) (error, error)
 
 func command(env configuration.Environment, all bool, newService serviceConstructor, f filter, newMigration migrationConstructor, a applier) error {
-	service, err := newService(env)
+	s, err := newService(env)
 	if err != nil {
 		return err
 	}
 	
-	exists, err := service.MigrationTableExists()
+	exists, err := s.MigrationTableExists()
 	if err != nil {
 		return err
 	}
 	
 	if !exists {
-		err := service.CreateMigrationTable()
+		err := s.CreateMigrationTable()
 		if err != nil {
 			return err
 		}
 	}
 	
-	applied, err := service.ListAppliedMigrations()
+	applied, err := s.ListAppliedMigrations()
 	if err != nil {
 		return err
 	}
 	
-	availables, err := service.ListAvailableMigrations()
+	availables, err := s.ListAvailableMigrations()
 	if err != nil {
 		return err
 	}
@@ -56,7 +57,7 @@ func command(env configuration.Environment, all bool, newService serviceConstruc
 			return err
 		}
 		
-		tx, err := service.StartTransaction()
+		tx, err := s.StartTransaction()
 		if err != nil {
 			return err
 		}

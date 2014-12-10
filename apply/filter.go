@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+// Filter return a slice containing the migrations version to apply (those not applied
+// already)
 func Filter(available, applied []uint64) ([]uint64, error) {
 	var i, j int = 0, 0
 

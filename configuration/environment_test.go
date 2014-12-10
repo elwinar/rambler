@@ -9,11 +9,11 @@ import (
 func TestGetEnvironment(t *testing.T) {
 	g := Goblin(t)
 
-	var s string = "override"
+	var s = "override"
 	var i uint64 = 2
 	var nilenv *Environment
 
-	var override RawEnvironment = RawEnvironment{
+	var override = RawEnvironment{
 		Driver:    &s,
 		Protocol:  &s,
 		Host:      &s,
@@ -24,7 +24,7 @@ func TestGetEnvironment(t *testing.T) {
 		Directory: &s,
 	}
 
-	var empty *pflag.FlagSet = pflag.NewFlagSet("empty", pflag.ContinueOnError)
+	var empty = pflag.NewFlagSet("empty", pflag.ContinueOnError)
 	empty.String("driver", "", "")
 	empty.String("protocol", "", "")
 	empty.String("host", "", "")
@@ -34,7 +34,7 @@ func TestGetEnvironment(t *testing.T) {
 	empty.String("database", "", "")
 	empty.String("directory", "", "")
 
-	var cli *pflag.FlagSet = pflag.NewFlagSet("testing", pflag.ContinueOnError)
+	var cli = pflag.NewFlagSet("testing", pflag.ContinueOnError)
 	cli.String("driver", "", "")
 	cli.String("protocol", "", "")
 	cli.String("host", "", "")
@@ -52,7 +52,7 @@ func TestGetEnvironment(t *testing.T) {
 	cli.Set("database", "cli")
 	cli.Set("directory", "cli")
 
-	var configuration Configuration = Configuration{
+	var configuration = Configuration{
 		Driver:    "default",
 		Protocol:  "default",
 		Host:      "default",

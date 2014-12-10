@@ -10,7 +10,7 @@ import (
 func TestApply(t *testing.T) {
 	g := Goblin(t)
 
-	var migration MockMigration
+	var m MockMigration
 	var scans int
 
 	var tx MockTransaction
@@ -21,7 +21,7 @@ func TestApply(t *testing.T) {
 	g.Describe("Apply", func() {
 		g.BeforeEach(func() {
 			// Re-initialize the migration mock
-			migration.scan = func(_ string) []string {
+			m.scan = func(_ string) []string {
 				scans++
 				return nil
 			}
@@ -51,19 +51,25 @@ func TestApply(t *testing.T) {
 
 		g.It("Should return an error on nil migration", func() {
 			err, sqlerr := Apply(nil, tx)
-			g.Assert(err).Equal(ErrNilMigration)
+			g.Assert(err).Equal(errors.New("nil migration"))
+			g.Assert(sqlerr).Equal(nil)
+		})
+
+		g.It("Should return an error on nil transaction", func() {
+			err, sqlerr := Apply(&m, nil)
+			g.Assert(err).Equal(errors.New("nil transaction"))
 			g.Assert(sqlerr).Equal(nil)
 		})
 
 		g.It("Should execute migration's up statements in order", func() {
-			var statements []string = []string{
+			var statements = []string{
 				"one",
 				"two",
 			}
-			var index int = 0
-			var fail bool = false
+			var index int
+			var fail bool
 
-			migration.scan = func(_ string) []string {
+			m.scan = func(_ string) []string {
 				return statements
 			}
 
@@ -76,7 +82,7 @@ func TestApply(t *testing.T) {
 				return MockResult{}, nil
 			}
 
-			err, sqlerr := Apply(&migration, tx)
+			err, sqlerr := Apply(&m, tx)
 			g.Assert(fail).Equal(false)
 			g.Assert(execs).Equal(2)
 			g.Assert(commits).Equal(1)
@@ -86,7 +92,7 @@ func TestApply(t *testing.T) {
 		})
 
 		g.It("Should rollback on SQL error", func() {
-			migration.scan = func(_ string) []string {
+			m.scan = func(_ string) []string {
 				return []string{"faulty"}
 			}
 
@@ -95,7 +101,7 @@ func TestApply(t *testing.T) {
 				return MockResult{}, errors.New("error")
 			}
 
-			err, sqlerr := Apply(&migration, tx)
+			err, sqlerr := Apply(&m, tx)
 			g.Assert(execs).Equal(1)
 			g.Assert(commits).Equal(0)
 			g.Assert(rollbacks).Equal(1)
@@ -109,7 +115,7 @@ func TestApply(t *testing.T) {
 				return errors.New("error")
 			}
 
-			err, sqlerr := Apply(&migration, tx)
+			err, sqlerr := Apply(&m, tx)
 			g.Assert(execs).Equal(0)
 			g.Assert(commits).Equal(1)
 			g.Assert(rollbacks).Equal(0)
@@ -118,7 +124,7 @@ func TestApply(t *testing.T) {
 		})
 
 		g.It("Should return an error on rollback fail", func() {
-			migration.scan = func(_ string) []string {
+			m.scan = func(_ string) []string {
 				return []string{"faulty"}
 			}
 
@@ -132,7 +138,7 @@ func TestApply(t *testing.T) {
 				return errors.New("error")
 			}
 
-			err, sqlerr := Apply(&migration, tx)
+			err, sqlerr := Apply(&m, tx)
 			g.Assert(execs).Equal(1)
 			g.Assert(commits).Equal(0)
 			g.Assert(rollbacks).Equal(1)
@@ -141,7 +147,7 @@ func TestApply(t *testing.T) {
 		})
 
 		g.It("Should return nil on success", func() {
-			err, sqlerr := Apply(&migration, tx)
+			err, sqlerr := Apply(&m, tx)
 			g.Assert(execs).Equal(0)
 			g.Assert(commits).Equal(1)
 			g.Assert(rollbacks).Equal(0)

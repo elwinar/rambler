@@ -46,5 +46,6 @@ func (s service) ListAvailableMigrations() ([]uint64, error) {
 }
 
 func listAvailableMigrations(env configuration.Environment) ([]uint64, error) {
+	
 	return nil, nil
 }

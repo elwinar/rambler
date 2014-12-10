@@ -12,6 +12,8 @@ var (
 	ErrUnknownEnvironment = errors.New("unknwon environment")
 )
 
+// Environment is the execution environment of a command. It contains every information
+// about the database and migrations to use.
 type Environment struct {
 	Driver    string
 	Protocol  string
@@ -23,6 +25,8 @@ type Environment struct {
 	Directory string
 }
 
+// GetEnvironment return the requested environment from the configuration, with
+// overrides from the given flagset.
 func GetEnvironment(name string, configuration Configuration, flags *pflag.FlagSet) (*Environment, error) {
 	if strings.TrimSpace(name) == "" {
 		return nil, ErrUnknownEnvironment
