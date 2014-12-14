@@ -1,5 +1,6 @@
 package apply
 
+/*
 import (
 	"errors"
 	"github.com/elwinar/rambler/configuration"
@@ -78,3 +79,4 @@ func command(env configuration.Environment, all bool, newService serviceConstruc
 	
 	return nil
 }
+*/

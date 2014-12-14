@@ -1,15 +1,8 @@
 package configuration
 
 import (
-	"errors"
-	"github.com/spf13/pflag"
+	"fmt"
 	"strconv"
-	"strings"
-)
-
-// The various errors returned by the package
-var (
-	ErrUnknownEnvironment = errors.New("unknwon environment")
 )
 
 // Environment is the execution environment of a command. It contains every information
@@ -27,14 +20,10 @@ type Environment struct {
 
 // GetEnvironment return the requested environment from the configuration, with
 // overrides from the given flagset.
-func GetEnvironment(name string, configuration Configuration, flags *pflag.FlagSet) (*Environment, error) {
-	if strings.TrimSpace(name) == "" {
-		return nil, ErrUnknownEnvironment
-	}
-
+func Env(name string, configuration Configuration, flags map[string]string) (*Environment, error) {
 	override, found := configuration.Environments[name]
 	if !found {
-		return nil, ErrUnknownEnvironment
+		return nil, fmt.Errorf(errUnknownEnvironment, name)
 	}
 
 	var environment Environment
@@ -43,64 +32,64 @@ func GetEnvironment(name string, configuration Configuration, flags *pflag.FlagS
 	if override.Driver != nil {
 		environment.Driver = *override.Driver
 	}
-	if flags.Lookup("driver").Changed {
-		environment.Driver = flags.Lookup("driver").Value.String()
+	if v, found := flags["driver"]; found {
+		environment.Driver = v
 	}
 
 	environment.Protocol = configuration.Protocol
 	if override.Protocol != nil {
 		environment.Protocol = *override.Protocol
 	}
-	if flags.Lookup("protocol").Changed {
-		environment.Protocol = flags.Lookup("protocol").Value.String()
+	if v, found := flags["protocol"]; found {
+		environment.Protocol = v
 	}
 
 	environment.Host = configuration.Host
 	if override.Host != nil {
 		environment.Host = *override.Host
 	}
-	if flags.Lookup("host").Changed {
-		environment.Host = flags.Lookup("host").Value.String()
+	if v, found := flags["host"]; found {
+		environment.Host = v
 	}
 
 	environment.Port = configuration.Port
 	if override.Port != nil {
 		environment.Port = *override.Port
 	}
-	if flags.Lookup("port").Changed {
-		environment.Port, _ = strconv.ParseUint(flags.Lookup("port").Value.String(), 10, 64)
+	if v, found := flags["port"]; found {
+		environment.Port, _ = strconv.ParseUint(v, 10, 64)
 	}
 
 	environment.User = configuration.User
 	if override.User != nil {
 		environment.User = *override.User
 	}
-	if flags.Lookup("user").Changed {
-		environment.User = flags.Lookup("user").Value.String()
+	if v, found := flags["user"]; found {
+		environment.User = v
 	}
 
 	environment.Password = configuration.Password
 	if override.Password != nil {
 		environment.Password = *override.Password
 	}
-	if flags.Lookup("password").Changed {
-		environment.Password = flags.Lookup("password").Value.String()
+	if v, found := flags["password"]; found {
+		environment.Password = v
 	}
 
 	environment.Database = configuration.Database
 	if override.Database != nil {
 		environment.Database = *override.Database
 	}
-	if flags.Lookup("database").Changed {
-		environment.Database = flags.Lookup("database").Value.String()
+	if v, found := flags["database"]; found {
+		environment.Database = v
 	}
 
 	environment.Directory = configuration.Directory
 	if override.Directory != nil {
 		environment.Directory = *override.Directory
 	}
-	if flags.Lookup("directory").Changed {
-		environment.Directory = flags.Lookup("directory").Value.String()
+	if v, found := flags["directory"]; found {
+		environment.Directory = v
 	}
 
 	return &environment, nil

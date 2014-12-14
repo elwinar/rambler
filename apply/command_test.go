@@ -1,5 +1,6 @@
 package apply
 
+/*
 import (
 	"errors"
 	"github.com/elwinar/rambler/configuration"
@@ -276,3 +277,4 @@ func TestCommand(t *testing.T) {
 		})
 	})
 }
+*/

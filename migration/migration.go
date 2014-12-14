@@ -2,7 +2,7 @@ package migration
 
 import (
 	"bufio"
-	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -10,15 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-)
-
-// The various errors returned by the package
-var (
-	ErrUnknownDirectory   = errors.New("unknown directory")
-	ErrUnknownVersion     = errors.New("unknwon version")
-	ErrUnknownDriver      = errors.New("unknwon driver")
-	ErrUnknownEnvironment = errors.New("unknwon environment")
-	ErrAmbiguousVersion   = errors.New("ambiguous version")
 )
 
 // Migration represent a migration file, composed of up and down sections containing
@@ -30,10 +21,6 @@ type Migration struct {
 	reader      io.ReadSeeker
 }
 
-const (
-	prefix = "-- rambler"
-)
-
 // NewMigration get a migration given its directory and version number
 func NewMigration(directory string, version uint64) (*Migration, error) {
 	return newMigration(directory, version, filepath.Glob, func(path string) (io.ReadSeeker, error) {
@@ -41,26 +28,23 @@ func NewMigration(directory string, version uint64) (*Migration, error) {
 	})
 }
 
-type glober func(string) ([]string, error)
-type opener func(string) (io.ReadSeeker, error)
-
 func newMigration(directory string, version uint64, glob glober, open opener) (*Migration, error) {
 	matches, err := glob(path.Join(directory, strconv.FormatUint(version, 10)+"_*.sql"))
 	if err != nil {
-		return nil, ErrUnknownDirectory
+		return nil, fmt.Errorf(errUnavailableDirectory, directory, err.Error())
 	}
 
 	if len(matches) == 0 {
-		return nil, ErrUnknownVersion
+		return nil, fmt.Errorf(errUnknownVersion, version)
 	}
 
 	if len(matches) > 1 {
-		return nil, ErrAmbiguousVersion
+		return nil, fmt.Errorf(errAmbiguousVersion, version)
 	}
 
 	reader, err := open(matches[0])
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errUnavailableFile, matches[0], err.Error())
 	}
 
 	m := &Migration{

@@ -1,41 +1,27 @@
 package apply
 
 import (
-	"database/sql"
-	"errors"
+	"fmt"
+	"github.com/elwinar/rambler/migration/driver"
 )
 
-type scanner interface {
-	Scan(string) []string
-}
-
-type txer interface {
-	Exec(string, ...interface{}) (sql.Result, error)
-	Commit() error
-	Rollback() error
-}
-
-// Apply tries to apply statements of the given migration on the given transaction.
+// Apply tries to apply statements on the given transaction.
 // It will try to roolback in case of error, and will return 2 distinct errors:
 // - the SQL error which caused the transaction to fail
 // - the SQL error which caused the rollback/commit to fail
-func Apply(m scanner, tx txer) (error, error) {
-	if m == nil {
-		return errors.New("nil migration"), nil
-	}
-
+func Apply(statements []string, tx driver.Tx) (error, error) {
 	if tx == nil {
-		return errors.New("nil transaction"), nil
+		return nil, fmt.Errorf(errNilTransaction)
 	}
 
-	for _, statement := range m.Scan("up") {
+	for _, statement := range statements {
 		_, sqlerr := tx.Exec(statement)
 		if sqlerr != nil {
-			err := tx.Rollback()
-			return err, sqlerr
+			txerr := tx.Rollback()
+			return sqlerr, txerr
 		}
 	}
 
-	err := tx.Commit()
-	return err, nil
+	txerr := tx.Commit()
+	return nil, txerr
 }

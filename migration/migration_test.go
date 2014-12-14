@@ -2,154 +2,181 @@ package migration
 
 import (
 	"errors"
-	. "github.com/franela/goblin"
 	"io"
 	"io/ioutil"
 	"strings"
 	"testing"
 )
 
-func TestNewMigration(t *testing.T) {
-	g := Goblin(t)
-
-	var glob glober
-	var open opener
-
-	var nilmigration *Migration
-
-	g.Describe("NewMigration", func() {
-		g.BeforeEach(func() {
-			glob = func(string) ([]string, error) {
-				return []string{"1_first.sql"}, nil
-			}
-
-			open = func(string) (io.ReadSeeker, error) {
-				return nil, nil
-			}
-		})
-
-		g.It("reject unknown directory path", func() {
-			glob = func(pattern string) ([]string, error) {
-				return nil, errors.New("unknown")
-			}
-			
-			m, err := newMigration("", 0, glob, open)
-			g.Assert(err).Equal(ErrUnknownDirectory)
-			g.Assert(m).Equal(nilmigration)
-		})
-
-		g.It("reject unknown migrations", func() {
-			glob = func(string) ([]string, error) {
-				return nil, nil
-			}
-
-			m, err := newMigration("", 0, glob, open)
-			g.Assert(err).Equal(ErrUnknownVersion)
-			g.Assert(m).Equal(nilmigration)
-		})
-
-		g.It("reject ambiguous migrations", func() {
-			glob = func(pattern string) ([]string, error) {
-				return []string{"a", "b"}, nil
-			}
-			m, err := newMigration("", 0, glob, open)
-			g.Assert(err).Equal(ErrAmbiguousVersion)
-			g.Assert(m).Equal(nilmigration)
-		})
-
-		g.It("open a handle for the migration file", func() {
-			open = func(path string) (io.ReadSeeker, error) {
-				return strings.NewReader("rambler"), nil
-			}
-			m, err := newMigration("", 0, glob, open)
-			g.Assert(err).Equal(nil)
-
-			content, err := ioutil.ReadAll(m.reader)
-			g.Assert(err).Equal(nil)
-			g.Assert(content).Equal([]byte("rambler"))
-		})
-		
-		g.It("fail on opening error", func() {
-			open = func(_ string) (io.ReadSeeker, error) {
-				return nil, errors.New("open error")
-			}
-			_, err := newMigration("", 0, glob, open)
-			g.Assert(err).Equal(errors.New("open error"))
-		})
-
-		g.It("parse filenames to get descriptions", func() {
-			m, err := newMigration("", 0, glob, open)
-			g.Assert(err).Equal(nil)
-			g.Assert(m.Description).Equal("first")
-		})
+func Test_NewMigration_GlobError(t *testing.T) {
+	_, err := newMigration("test", 0, func(_ string) ([]string, error) {
+		return nil, errors.New("glob error")
+	}, func(_ string) (io.ReadSeeker, error) {
+		return strings.NewReader("ok"), nil
 	})
+	
+	if err == nil {
+		t.Error("didn't failed on glob error")
+	}
+	
+	if err.Error() != "directory test unavailable: glob error" {
+		t.Error("didn't returned expected error:", err)
+	}
 }
 
-func TestScan(t *testing.T) {
-	g := Goblin(t)
+func Test_NewMigration_UnknownVersion(t *testing.T) {
+	_, err := newMigration("", 0, func(_ string) ([]string, error) {
+		return []string{}, nil
+	}, func(_ string) (io.ReadSeeker, error) {
+		return strings.NewReader("ok"), nil
+	})
+	
+	if err == nil {
+		t.Error("didn't failed on unknown version")
+	}
+	
+	if err.Error() != "no migration for version 0" {
+		t.Error("didn't returned expected error:", err)
+	}
+}
 
-	var text = `
+func Test_NewMigration_AmbiguousVersion(t *testing.T) {
+	_, err := newMigration("", 0, func(_ string) ([]string, error) {
+		return []string{"0_first.sql", "0_second.sql"}, nil
+	}, func(_ string) (io.ReadSeeker, error) {
+		return strings.NewReader("ok"), nil
+	})
+	
+	if err == nil {
+		t.Error("didn't failed on ambiguous version")
+	}
+	
+	if err.Error() != "ambiguous version 0" {
+		t.Error("didn't returned expected error:", err)
+	}
+}
+
+func Test_NewMigration_OpenError(t *testing.T) {
+	_, err := newMigration("", 0, func(_ string) ([]string, error) {
+		return []string{"0_first.sql"}, nil
+	}, func(_ string) (io.ReadSeeker, error) {
+		return nil, errors.New("open error")
+	})
+	
+	if err == nil {
+		t.Error("didn't failed on open error")
+	}
+	
+	if err.Error() != "file 0_first.sql unavailable: open error" {
+		t.Error("didn't returned expected error:", err)
+	}
+}
+
+func Test_NewMigration_ParseDescription(t *testing.T) {
+	var cases = []string{
+		"snake_case",
+		"UpperCamelCase",
+		"lowerCamelCase",
+		"Title Case",
+	}
+	
+	for n, c := range cases {
+		m, err := newMigration("", 0, func(_ string) ([]string, error) {
+			return []string{"0_"+c+".sql"}, nil
+		}, func(_ string) (io.ReadSeeker, error) {
+			return nil, nil
+		})
+		
+		if err != nil {
+			t.Error("unexpected error:", err)
+		}
+		
+		if m.Description != c {
+			t.Errorf("uncorrectly parsed description for case %d: got \"%s\"", n, m.Description)
+		}
+	}
+}
+
+func Test_NewMigration_OK(t *testing.T) {
+	m, err := newMigration("", 0, func(_ string) ([]string, error) {
+		return []string{"0_description.sql"}, nil
+	}, func(_ string) (io.ReadSeeker, error) {
+		return strings.NewReader("migration"), nil
+	})
+	
+	if err != nil {
+		t.Error("unexpected error:", err)
+	}
+	
+	if m.Version != 0 {
+		t.Errorf("uncorrectly initialized migration version")
+	}
+	
+	content, err := ioutil.ReadAll(m.reader)
+	if err != nil {
+		t.Error("unexpected error:", err)
+	}
+	
+	if string(content) != "migration" {
+		t.Errorf("uncorrectly initialized migration reader")
+	}
+}
+
+func Test_Scan_ParseStatements(t *testing.T) {
+	type Case struct{
+		Content string
+		Section string
+		Statements []string
+	}
+	var cases = []Case{
+		Case{
+			Content: `-- rambler up
+one
 -- rambler up
+two
+`,
+			Section: "up",
+			Statements: []string{"one", "two"},
+		},
+		Case{
+			Content: `-- rambler up
 one
 -- rambler down
 two
 -- rambler up
 three
+`,
+			Section: "up",
+			Statements: []string{"one", "three"},
+		},
+		Case{
+			Content: `-- rambler up
+one
 -- rambler down
-four
-`
-	var reader MockReader
-	var migration = &Migration{
-		reader: &reader,
+two
+-- rambler up
+three
+`,
+			Section: "down",
+			Statements: []string{"two"},
+		},
 	}
-	var reads int
-	var bytes int
-	var seeks int
-
-	g.Describe("Scan", func() {
-		g.BeforeEach(func() {
-			r := strings.NewReader(text)
-
-			reader.seek = func(offset int64, whence int) (int64, error) {
-				seeks++
-				return r.Seek(offset, whence)
-			}
-
-			reader.read = func(p []byte) (int, error) {
-				reads++
-				b, err := r.Read(p)
-				bytes += b
-				return bytes, err
-			}
-
-			reads = 0
-			bytes = 0
-			seeks = 0
-		})
-
-		g.It("Should rewind the reader", func() {
-			migration.Scan("up")
-			g.Assert(seeks).Equal(1)
-		})
-
-		g.It("Should read the whole file", func() {
-			migration.Scan("up")
-			g.Assert(bytes).Equal(len(text))
-		})
-
-		g.It("Should find statements if there is statements to find", func() {
-			statements := migration.Scan("up")
-			g.Assert(statements).Equal([]string{"one", "three"})
-		})
-
-		g.It("Should return an empty slice if there is no statements to find", func() {
-			statements := migration.Scan("right")
-			g.Assert(len(statements)).Equal(0)
-		})
+	
+	for n, c := range cases {
+		m := &Migration{
+			reader: strings.NewReader(c.Content),
+		}
+		statements := m.Scan(c.Section)
 		
-		g.It("Read the last statement until the end", func() {
-			statements := migration.Scan("down")
-			g.Assert(len(statements)).Equal(2)
-		})
-	})
+		if len(statements) != len(c.Statements) {
+			t.Error("found incorrect number of statements for case %d: got", n, len(statements))
+			continue
+		}
+		
+		for i := 0; i < len(statements); i++ {
+			if statements[i] != c.Statements[i] {
+				t.Error("didn't parsed correctly statement %d of case %d", i, n)
+			}
+		}
+	}
 }

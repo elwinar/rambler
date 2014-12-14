@@ -2,32 +2,23 @@ package apply
 
 import (
 	"database/sql"
-	"github.com/elwinar/rambler/migration"
 )
 
-type MockMigration struct {
-	scan func(string) []string
-}
-
-func (m MockMigration) Scan(section string) []string {
-	return m.scan(section)
-}
-
-type MockTransaction struct {
-	exec     func(query string, args ...interface{}) (sql.Result, error)
+type MockTx struct {
+	exec     func(string, ...interface{}) (sql.Result, error)
 	commit   func() error
 	rollback func() error
 }
 
-func (tx MockTransaction) Exec(query string, args ...interface{}) (sql.Result, error) {
-	return tx.exec(query, args)
+func (tx MockTx) Exec(query string, args ...interface{}) (sql.Result, error) {
+	return tx.exec(query, args...)
 }
 
-func (tx MockTransaction) Commit() error {
+func (tx MockTx) Commit() error {
 	return tx.commit()
 }
 
-func (tx MockTransaction) Rollback() error {
+func (tx MockTx) Rollback() error {
 	return tx.rollback()
 }
 
@@ -39,6 +30,20 @@ func (res MockResult) LastInsertId() (int64, error) {
 
 func (res MockResult) RowsAffected() (int64, error) {
 	return 0, nil
+}
+
+/*
+import (
+	"database/sql"
+	"github.com/elwinar/rambler/migration"
+)
+
+type MockMigration struct {
+	scan func(string) []string
+}
+
+func (m MockMigration) Scan(section string) []string {
+	return m.scan(section)
 }
 
 type MockService struct {
@@ -68,3 +73,4 @@ func (s MockService) ListAvailableMigrations() ([]uint64, error) {
 func (s MockService) StartTransaction() (migration.Transaction, error) {
 	return s.startTransaction()
 }
+*/
