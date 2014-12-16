@@ -1,25 +1,17 @@
 package apply
 
-/*
 import (
-	"errors"
+// 	"errors"
 	"github.com/elwinar/rambler/configuration"
 	"github.com/elwinar/rambler/migration"
 )
 
 // Command is the `rambler apply` handler
 func Command(env configuration.Environment, all bool) error {
-	return command(env, all, migration.NewService, Filter, func(path string, version uint64) (scanner, error) {
-		return migration.NewMigration(path, version)
-	}, Apply)
+	return command(env, all, migration.NewService, migration.NewMigration, Filter, Apply)
 }
 
-type serviceConstructor func(configuration.Environment) (migration.Service, error)
-type filter func([]uint64, []uint64) ([]uint64, error)
-type migrationConstructor func(string, uint64) (scanner, error)
-type applier func(scanner, txer) (error, error)
-
-func command(env configuration.Environment, all bool, newService serviceConstructor, f filter, newMigration migrationConstructor, a applier) error {
+func command(env configuration.Environment, all bool, newService serviceConstructor, newMigration migrationConstructor, filter filterer, apply applyer) error {
 	s, err := newService(env)
 	if err != nil {
 		return err
@@ -47,7 +39,7 @@ func command(env configuration.Environment, all bool, newService serviceConstruc
 		return err
 	}
 	
-	filtered, err := f(applied, availables)
+	filtered, err := filter(applied, availables)
 	if err != nil {
 		return err
 	}
@@ -63,7 +55,7 @@ func command(env configuration.Environment, all bool, newService serviceConstruc
 			return err
 		}
 		
-		sqlerr, txerr := a(m, tx)
+		sqlerr, txerr := apply(m, tx)
 		if sqlerr != nil && txerr != nil { // Rollback error
 			return errors.New(sqlerr.Error() + "; " + txerr.Error())
 		} else if sqlerr != nil { // Rollback success
@@ -79,4 +71,3 @@ func command(env configuration.Environment, all bool, newService serviceConstruc
 	
 	return nil
 }
-*/

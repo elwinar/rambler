@@ -27,7 +27,7 @@ func NewService(env configuration.Environment) (Service, error) {
 	return newService(env, os.Stat, driver.Get)
 }
 
-func newService(env configuration.Environment, stat stater, get getter) (*service, error) {
+func newService(env configuration.Environment, stat stater, get driverConstructor) (*service, error) {
 	if _, err := stat(env.Directory); err != nil {
 		return nil, fmt.Errorf(errUnavailableDirectory, env.Directory, err.Error())
 	}

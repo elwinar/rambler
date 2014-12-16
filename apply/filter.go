@@ -11,11 +11,11 @@ func Filter(available, applied []uint64) ([]uint64, error) {
 
 	for i < len(available) && j < len(applied) {
 		if available[i] < applied[j] {
-			return nil, fmt.Errorf("out of order migration %d", available[i])
+			return nil, fmt.Errorf(errOutOfOrder, available[i])
 		}
 
 		if available[i] > applied[j] {
-			return nil, fmt.Errorf("missing migration %d", applied[j])
+			return nil, fmt.Errorf(errMissingMigration, applied[j])
 		}
 
 		i++
@@ -23,7 +23,7 @@ func Filter(available, applied []uint64) ([]uint64, error) {
 	}
 
 	if j != len(applied) {
-		return nil, fmt.Errorf("missing migration %d", applied[j])
+		return nil, fmt.Errorf(errMissingMigration, applied[j])
 	}
 
 	return available[i:], nil
