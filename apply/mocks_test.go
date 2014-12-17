@@ -2,6 +2,7 @@ package apply
 
 import (
 	"database/sql"
+	"github.com/elwinar/rambler/migration/driver"
 )
 
 type MockTx struct {
@@ -32,26 +33,12 @@ func (res MockResult) RowsAffected() (int64, error) {
 	return 0, nil
 }
 
-/*
-import (
-	"database/sql"
-	"github.com/elwinar/rambler/migration"
-)
-
-type MockMigration struct {
-	scan func(string) []string
-}
-
-func (m MockMigration) Scan(section string) []string {
-	return m.scan(section)
-}
-
 type MockService struct {
-	migrationTableExists func() (bool, error)
-	createMigrationTable func() error
-	listAppliedMigrations func() ([]uint64, error)
+	migrationTableExists    func() (bool, error)
+	createMigrationTable    func() error
+	listAppliedMigrations   func() ([]uint64, error)
 	listAvailableMigrations func() ([]uint64, error)
-	startTransaction func() (migration.Transaction, error)
+	startTransaction        func() (driver.Tx, error)
 }
 
 func (s MockService) MigrationTableExists() (bool, error) {
@@ -70,7 +57,23 @@ func (s MockService) ListAvailableMigrations() ([]uint64, error) {
 	return s.listAvailableMigrations()
 }
 
-func (s MockService) StartTransaction() (migration.Transaction, error) {
+func (s MockService) StartTransaction() (driver.Tx, error) {
 	return s.startTransaction()
 }
+
+/*
+import (
+	"database/sql"
+	"github.com/elwinar/rambler/migration"
+)
+
+type MockMigration struct {
+	scan func(string) []string
+}
+
+func (m MockMigration) Scan(section string) []string {
+	return m.scan(section)
+}
+
+
 */

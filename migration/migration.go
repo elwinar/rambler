@@ -18,7 +18,7 @@ type Migration struct {
 	Version     uint64
 	Description string
 	AppliedAt   *time.Time
-	reader      io.ReadSeeker
+	Reader      io.ReadSeeker
 }
 
 // NewMigration get a migration given its directory and version number
@@ -50,7 +50,7 @@ func newMigration(directory string, version uint64, glob glober, open opener) (*
 	m := &Migration{
 		Version:     version,
 		Description: strings.Split(strings.SplitN(matches[0], "_", 2)[1], ".")[0],
-		reader:      reader,
+		Reader:      reader,
 	}
 
 	return m, nil
@@ -58,9 +58,9 @@ func newMigration(directory string, version uint64, glob glober, open opener) (*
 
 // Scan retrieve all sections of the file with the given section marker.
 func (m *Migration) Scan(section string) []string {
-	m.reader.Seek(0, 0)
+	m.Reader.Seek(0, 0)
 
-	var scanner = bufio.NewScanner(m.reader)
+	var scanner = bufio.NewScanner(m.Reader)
 	var statements []string
 	var buffer string
 

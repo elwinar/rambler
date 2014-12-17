@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	errInvalid = "not a valid driver"
+	errInvalid           = "not a valid driver"
 	errAlreadyRegistered = "driver %s already registered"
-	errNotRegistered = "driver %s not registered"
+	errNotRegistered     = "driver %s not registered"
 )
 
 // Tx is the interface for an SQL transaction as used by rambler.
@@ -26,6 +26,7 @@ type Driver interface {
 	MigrationTableExists() (bool, error)
 	CreateMigrationTable() error
 	ListAppliedMigrations() ([]uint64, error)
+	SetMigrationApplied(version uint64, description string) error
 	StartTransaction() (Tx, error)
 }
 
@@ -40,7 +41,7 @@ func register(name string, driver Driver, drivers map[string]Driver) error {
 	if _, found := drivers[name]; found {
 		return fmt.Errorf(errAlreadyRegistered, name)
 	}
-	
+
 	if driver == nil {
 		return fmt.Errorf(errInvalid)
 	}
@@ -59,11 +60,11 @@ func get(env configuration.Environment, drivers map[string]Driver) (Driver, erro
 	if !found {
 		return nil, fmt.Errorf(errNotRegistered, env.Driver)
 	}
-	
+
 	err := driver.Initialize(env)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return driver, nil
 }
