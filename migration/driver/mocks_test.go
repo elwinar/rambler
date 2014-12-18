@@ -5,7 +5,14 @@ import (
 )
 
 type MockDriver struct {
-	initialize            func(configuration.Environment) error
+	new func(configuration.Environment) (Conn, error)
+}
+
+func (d *MockDriver) New(env configuration.Environment) (Conn, error) {
+	return d.new(env)
+}
+
+type MockConn struct {
 	migrationTableExists  func() (bool, error)
 	createMigrationTable  func() error
 	listAppliedMigrations func() ([]uint64, error)
@@ -13,26 +20,22 @@ type MockDriver struct {
 	startTransaction      func() (Tx, error)
 }
 
-func (d *MockDriver) Initialize(env configuration.Environment) error {
-	return d.initialize(env)
+func (c *MockConn) MigrationTableExists() (bool, error) {
+	return c.migrationTableExists()
 }
 
-func (d *MockDriver) MigrationTableExists() (bool, error) {
-	return d.migrationTableExists()
+func (c *MockConn) CreateMigrationTable() error {
+	return c.createMigrationTable()
 }
 
-func (d *MockDriver) CreateMigrationTable() error {
-	return d.createMigrationTable()
+func (c *MockConn) ListAppliedMigrations() ([]uint64, error) {
+	return c.listAppliedMigrations()
 }
 
-func (d *MockDriver) ListAppliedMigrations() ([]uint64, error) {
-	return d.listAppliedMigrations()
+func (c *MockConn) SetMigrationApplied(version uint64, description string) error {
+	return c.setMigrationApplied(version, description)
 }
 
-func (d *MockDriver) SetMigrationApplied(version uint64, description string) error {
-	return d.setMigrationApplied(version, description)
-}
-
-func (d *MockDriver) StartTransaction() (Tx, error) {
-	return d.startTransaction()
+func (c *MockConn) StartTransaction() (Tx, error) {
+	return c.startTransaction()
 }

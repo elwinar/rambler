@@ -22,4 +22,4 @@ var (
 type glober func(string) ([]string, error)
 type opener func(string) (io.ReadSeeker, error)
 type stater func(string) (os.FileInfo, error)
-type driverConstructor func(configuration.Environment) (driver.Driver, error)
+type getter func(configuration.Environment) (driver.Conn, error)

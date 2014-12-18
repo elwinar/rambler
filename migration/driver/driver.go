@@ -19,18 +19,21 @@ type Tx interface {
 	Rollback() error
 }
 
-// Driver is the interface used by the program to interact with the migration
-// table in database
+// Driver is the interface used by the program to initialize the database connection.
 type Driver interface {
-	Initialize(configuration.Environment) error
+	New(configuration.Environment) (Conn, error)
+}
+
+var drivers = make(map[string]Driver)
+
+// Conn is the interface used by the program to manipulate the migration table.
+type Conn interface {
 	MigrationTableExists() (bool, error)
 	CreateMigrationTable() error
 	ListAppliedMigrations() ([]uint64, error)
 	SetMigrationApplied(version uint64, description string) error
 	StartTransaction() (Tx, error)
 }
-
-var drivers = make(map[string]Driver)
 
 // Register register a driver
 func Register(name string, driver Driver) error {
@@ -51,20 +54,20 @@ func register(name string, driver Driver, drivers map[string]Driver) error {
 }
 
 // Get initialize a driver from the given environment
-func Get(env configuration.Environment) (Driver, error) {
+func Get(env configuration.Environment) (Conn, error) {
 	return get(env, drivers)
 }
 
-func get(env configuration.Environment, drivers map[string]Driver) (Driver, error) {
+func get(env configuration.Environment, drivers map[string]Driver) (Conn, error) {
 	driver, found := drivers[env.Driver]
 	if !found {
 		return nil, fmt.Errorf(errNotRegistered, env.Driver)
 	}
 
-	err := driver.Initialize(env)
+	conn, err := driver.New(env)
 	if err != nil {
 		return nil, err
 	}
 
-	return driver, nil
+	return conn, nil
 }

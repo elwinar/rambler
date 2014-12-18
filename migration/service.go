@@ -13,12 +13,12 @@ import (
 // Service gather operations to manipulate migrations table and migrations on
 // the filesystem.
 type Service interface {
-	driver.Driver
+	driver.Conn
 	ListAvailableMigrations() ([]uint64, error)
 }
 
 type service struct {
-	driver.Driver
+	driver.Conn
 	env configuration.Environment
 }
 
@@ -27,7 +27,7 @@ func NewService(env configuration.Environment) (Service, error) {
 	return newService(env, os.Stat, driver.Get)
 }
 
-func newService(env configuration.Environment, stat stater, get driverConstructor) (*service, error) {
+func newService(env configuration.Environment, stat stater, get getter) (*service, error) {
 	if _, err := stat(env.Directory); err != nil {
 		return nil, fmt.Errorf(errUnavailableDirectory, env.Directory, err.Error())
 	}
@@ -38,7 +38,7 @@ func newService(env configuration.Environment, stat stater, get driverConstructo
 	}
 
 	return &service{
-		Driver: driver,
+		Conn: driver,
 		env:    env,
 	}, nil
 }

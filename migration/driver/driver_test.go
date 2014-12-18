@@ -71,11 +71,11 @@ func Test_Get_NotRegistered(t *testing.T) {
 
 func Test_Get_InitializeError(t *testing.T) {
 	drivers := make(map[string]Driver)
-	driver := &MockDriver{
-		initialize: func(env configuration.Environment) error {
-			return errors.New("initialize error")
-		},
+	driver := &MockDriver{}
+	driver.new = func(env configuration.Environment) (Conn, error) {
+		return nil, errors.New("initialize error")
 	}
+	
 	env := configuration.Environment{
 		Driver: "test",
 	}
@@ -97,11 +97,12 @@ func Test_Get_InitializeError(t *testing.T) {
 
 func Test_Get_OK(t *testing.T) {
 	drivers := make(map[string]Driver)
-	driver := &MockDriver{
-		initialize: func(env configuration.Environment) error {
-			return nil
-		},
+	conn := &MockConn{}
+	driver := &MockDriver{}
+	driver.new = func(env configuration.Environment) (Conn, error) {
+		return conn, nil
 	}
+	
 	env := configuration.Environment{
 		Driver: "test",
 	}
@@ -111,12 +112,12 @@ func Test_Get_OK(t *testing.T) {
 		t.Error("unexpected error:", err)
 	}
 
-	d, err := get(env, drivers)
+	c, err := get(env, drivers)
 	if err != nil {
 		t.Error("unexpected error:", err)
 	}
 
-	if d != driver {
+	if c != conn {
 		t.Error("didn't returned expected driver")
 	}
 }
