@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/elwinar/rambler/configuration"
 	"github.com/elwinar/rambler/migration/driver"
+	_ "github.com/elwinar/rambler/migration/driver/mysql"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -39,7 +40,7 @@ func newService(env configuration.Environment, stat stater, get connConstructor)
 
 	return &service{
 		Conn: driver,
-		env:    env,
+		env:  env,
 	}, nil
 }
 

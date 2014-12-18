@@ -15,6 +15,7 @@ import (
 // Migration represent a migration file, composed of up and down sections containing
 // one or more statements each.
 type Migration struct {
+	Name        string
 	Version     uint64
 	Description string
 	AppliedAt   *time.Time
@@ -48,6 +49,7 @@ func newMigration(directory string, version uint64, glob glober, open opener) (*
 	}
 
 	m := &Migration{
+		Name:        matches[0],
 		Version:     version,
 		Description: strings.Split(strings.SplitN(matches[0], "_", 2)[1], ".")[0],
 		Reader:      reader,

@@ -75,7 +75,7 @@ func Test_Get_InitializeError(t *testing.T) {
 	driver.new = func(env configuration.Environment) (Conn, error) {
 		return nil, errors.New("initialize error")
 	}
-	
+
 	env := configuration.Environment{
 		Driver: "test",
 	}
@@ -102,7 +102,7 @@ func Test_Get_OK(t *testing.T) {
 	driver.new = func(env configuration.Environment) (Conn, error) {
 		return conn, nil
 	}
-	
+
 	env := configuration.Environment{
 		Driver: "test",
 	}
