@@ -5,6 +5,7 @@ import (
 	"github.com/elwinar/rambler/configuration"
 	"github.com/elwinar/rambler/migration/driver"
 	_ "github.com/elwinar/rambler/migration/driver/mysql"
+	_ "github.com/elwinar/rambler/migration/driver/postgresql"
 	"os"
 	"path/filepath"
 	"strconv"
