@@ -11,7 +11,7 @@ import (
 
 func bootstrap(c *cli.Context) (*configuration.Environment, *log.Logger, *log.Logger, *log.Logger, error) {
 	var Debug, Info, Error *log.Logger
-	var C configuration.Configuration{
+	var C configuration.Configuration = configuration.Configuration{
 		Driver: "mysql",
 		Protocol: "tcp",
 		Host: "localhost",
