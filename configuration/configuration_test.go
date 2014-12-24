@@ -6,7 +6,8 @@ import (
 )
 
 func Test_Configuration_Env_UnknownEnvironment(t *testing.T) {
-	_, err := Env("test", Configuration{}, map[string]string{})
+	c := Configuration{}
+	_, err := c.Env("test", map[string]string{})
 
 	if err == nil {
 		t.Error("didn't failed on unknown environment")
