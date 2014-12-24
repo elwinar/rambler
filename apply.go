@@ -6,7 +6,7 @@ import (
 )
 
 func Apply(c *cli.Context) {
-	Env, _, Info, Error, err := bootstrap(c)
+	Env, Debug, Info, Error, err := bootstrap(c)
 	if err != nil {
 		Error.Fatalln("unable to load configuration file:", err)
 	}
@@ -72,6 +72,7 @@ func Apply(c *cli.Context) {
 		}
 
 		for _, statement := range m.Scan("up") {
+			Debug.Println(statement)
 			_, sqlerr := tx.Exec(statement)
 			
 			if sqlerr != nil {
