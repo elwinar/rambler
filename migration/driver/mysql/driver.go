@@ -55,7 +55,7 @@ func (c *Conn) CreateMigrationTable() error {
 	_, err := c.db.Exec(`
 		CREATE TABLE migrations ( 
 			version BIGINT UNSIGNED NOT NULL PRIMARY KEY, 
-			description CHAR(255) NOT NULL,
+			description VARCHAR(255) NOT NULL,
 			applied_at DATETIME NOT NULL
 		) DEFAULT CHARSET=utf8
 	`)
