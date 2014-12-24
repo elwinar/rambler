@@ -6,7 +6,7 @@ import (
 )
 
 func Reverse(c *cli.Context) {
-	Env, _, Info, Error, err := bootstrap(c)
+	Env, Debug, Info, Error, err := bootstrap(c)
 	if err != nil {
 		Error.Fatalln("unable to load configuration file:", err)
 	}
@@ -34,10 +34,82 @@ func Reverse(c *cli.Context) {
 	if err != nil {
 		Error.Fatalln("failed to list available migrations:", err)
 	}
+	
+	if len(applied) == 0 {
+		return
+	}
+	
+	var i, j int = len(available) - 1, len(applied) - 1
+	for i >= 0 && available[i] > applied[j]  {
+		i--
+	}
+	
+	for i >= 0 && j >= 0 {
+		if available[i] < applied[j] {
+			Error.Fatalln("missing migration", applied[j])
+		}
 
-	_ = Info
-	_ = applied
-	_ = available
+		if available[i] > applied[j] {
+			Error.Fatalln("out of order migration", available[i])
+		}
+
+		i--
+		j--
+	}
+	
+	if j >= 0 {
+		Error.Fatalln("missing migration", applied[j])
+	}
+	
+	if i >= 0 {
+		Error.Fatalln("out of order migration", available[i])
+	}
+
+	for i := len(applied) - 1; i >= 0; i-- {
+		v := applied[i]
+		
+		m, err := migration.NewMigration(Env.Directory, v)
+		if err != nil {
+			Error.Fatalln("failed to retrieve migration", v, ":", err)
+		}
+		
+		Info.Println("applying", m.Name)
+
+		tx, err := s.StartTransaction()
+		if err != nil {
+			Error.Fatalln("failed to start transaction:", err)
+		}
+
+		for _, statement := range m.Scan("down") {
+			Debug.Println(statement)
+			_, sqlerr := tx.Exec(statement)
+			
+			if sqlerr != nil {
+				Error.Println("migration failed:", sqlerr)
+				txerr := tx.Rollback()
+				
+				if txerr != nil {
+					Error.Fatalln("rollback failed:", txerr)
+				}
+				
+				Error.Fatalln("successfully rolled back")
+			}
+		}
+
+		err = s.UnsetMigrationApplied(m.Version)
+		if err != nil {
+			Error.Fatalln("unable to unset migration as applied:", err)
+		}
+
+		txerr := tx.Commit()
+		if txerr != nil {
+			Error.Fatalln("commit failed:", txerr)
+		}
+
+		if !c.Bool("all") {
+			break
+		}
+	}
 
 	return
 }
