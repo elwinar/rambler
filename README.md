@@ -124,8 +124,14 @@ Here we have three environments defined:
 * Add a `refresh` command that will reverse the last migration then apply it again
 * Add a `number` option to choose the number of migrations to apply, reverse, or refresh
 
+## CONTRIBUTORS
+
+- [cjhubert](https://github.com/cjhubert)
+
 ## CHANGELOG
 
+- **2.1**
+    - Added the postgresql driver from the good work of [cjhubert](https://github.com/cjhubert)
 - **2.0**
     - Complete rewrite to add unit-testing
     - Removed the command-line options to override the configuration
