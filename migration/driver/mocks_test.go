@@ -17,6 +17,7 @@ type MockConn struct {
 	createMigrationTable  func() error
 	listAppliedMigrations func() ([]uint64, error)
 	setMigrationApplied   func(uint64, string) error
+	unsetMigrationApplied   func(uint64) error
 	startTransaction      func() (Tx, error)
 }
 
@@ -34,6 +35,10 @@ func (c *MockConn) ListAppliedMigrations() ([]uint64, error) {
 
 func (c *MockConn) SetMigrationApplied(version uint64, description string) error {
 	return c.setMigrationApplied(version, description)
+}
+
+func (c *MockConn) UnsetMigrationApplied(version uint64) error {
+	return c.unsetMigrationApplied(version)
 }
 
 func (c *MockConn) StartTransaction() (Tx, error) {

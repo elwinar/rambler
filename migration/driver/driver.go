@@ -32,6 +32,7 @@ type Conn interface {
 	CreateMigrationTable() error
 	ListAppliedMigrations() ([]uint64, error)
 	SetMigrationApplied(version uint64, description string) error
+	UnsetMigrationApplied(version uint64) error
 	StartTransaction() (Tx, error)
 }
 

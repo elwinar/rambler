@@ -95,6 +95,14 @@ func (c *Conn) SetMigrationApplied(version uint64, description string) error {
 	return err
 }
 
+func (c *Conn) UnsetMigrationApplied(version uint64) error {
+	_, err := c.db.Exec(`
+		DELETE FROM migrations
+		WHERE version = ?
+	`, version)
+	return err
+}
+
 func (c *Conn) StartTransaction() (driver.Tx, error) {
 	tx, err := c.db.Begin()
 	return tx, err
