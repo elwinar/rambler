@@ -1,0 +1,14 @@
+package configuration
+
+// Environment is the execution environment of a command. It contains every information
+// about the database and migrations to use.
+type Environment struct {
+	Driver    string
+	Protocol  string
+	Host      string
+	Port      uint64
+	User      string
+	Password  string
+	Database  string
+	Directory string
+}
