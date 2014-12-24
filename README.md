@@ -1,4 +1,4 @@
-# rambler
+# rambler [![wercker status](https://app.wercker.com/status/65c8a55b6431d38e0820c0d5f4280417/s/master "wercker status")](https://app.wercker.com/project/bykey/65c8a55b6431d38e0820c0d5f4280417)
 
 A simple and language-independent SQL schema migration tool
 
