@@ -80,7 +80,10 @@ func Reverse(c *cli.Context) {
 			Error.Fatalln("failed to start transaction:", err)
 		}
 
-		for _, statement := range m.Scan("down") {
+		statements := m.Scan("down")
+		for i := len(statements) - 1; i >= 0; i-- {
+			statement := statements[i]
+			
 			Debug.Println(statement)
 			_, sqlerr := tx.Exec(statement)
 			
