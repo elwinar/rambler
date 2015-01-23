@@ -1,16 +1,12 @@
 package migration
 
-import (
-	"github.com/elwinar/rambler/migration/driver"
-)
-
 type MockConn struct {
 	migrationTableExists  func() (bool, error)
 	createMigrationTable  func() error
 	listAppliedMigrations func() ([]uint64, error)
 	setMigrationApplied   func(uint64, string) error
-	unsetMigrationApplied   func(uint64) error
-	startTransaction      func() (driver.Tx, error)
+	unsetMigrationApplied func(uint64) error
+	exec      func(string) error
 }
 
 func (c *MockConn) MigrationTableExists() (bool, error) {
@@ -33,6 +29,6 @@ func (c *MockConn) UnsetMigrationApplied(version uint64) error {
 	return c.unsetMigrationApplied(version)
 }
 
-func (c *MockConn) StartTransaction() (driver.Tx, error) {
-	return c.startTransaction()
+func (c *MockConn) Exec(query string) error {
+	return c.exec(query)
 }

@@ -12,13 +12,13 @@ import (
 func bootstrap(c *cli.Context) (*configuration.Environment, *log.Logger, *log.Logger, *log.Logger, error) {
 	var Debug, Info, Error *log.Logger
 	var C configuration.Configuration = configuration.Configuration{
-		Driver: "mysql",
-		Protocol: "tcp",
-		Host: "localhost",
-		Port: 3306,
-		User: "root",
-		Password: "",
-		Database: "",
+		Driver:    "mysql",
+		Protocol:  "tcp",
+		Host:      "localhost",
+		Port:      3306,
+		User:      "root",
+		Password:  "",
+		Database:  "",
 		Directory: ".",
 	}
 

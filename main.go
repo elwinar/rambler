@@ -7,13 +7,13 @@ import (
 
 func main() {
 	app := cli.NewApp()
-	
+
 	app.Name = "rambler"
 	app.Usage = "Migrate all the things!"
 	app.Version = "2"
 	app.Author = "Romain Baugue"
 	app.Email = "romain.baugue@elwinar.com"
-	
+
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "configuration, c",
@@ -34,7 +34,7 @@ func main() {
 			Usage: "set the working environment",
 		},
 	}
-	
+
 	app.Commands = []cli.Command{
 		{
 			Name:   "apply",
@@ -59,6 +59,6 @@ func main() {
 			},
 		},
 	}
-	
+
 	app.Run(os.Args)
 }

@@ -39,7 +39,7 @@ func Apply(c *cli.Context) {
 	if err != nil {
 		Error.Fatalln("failed to list available migrations:", err)
 	}
-	
+
 	var i, j int = 0, 0
 	for i < len(available) && j < len(applied) {
 		if available[i] < applied[j] {
@@ -63,38 +63,20 @@ func Apply(c *cli.Context) {
 		if err != nil {
 			Error.Fatalln("failed to retrieve migration", v, ":", err)
 		}
-		
-		Info.Println("applying", m.Name)
 
-		tx, err := s.StartTransaction()
-		if err != nil {
-			Error.Fatalln("failed to start transaction:", err)
-		}
+		Info.Println("applying", m.Name)
 
 		for _, statement := range m.Scan("up") {
 			Debug.Println(statement)
-			_, sqlerr := tx.Exec(statement)
-			
-			if sqlerr != nil {
-				Error.Println("migration failed:", sqlerr)
-				txerr := tx.Rollback()
-				
-				if txerr != nil {
-					Error.Fatalln("rollback failed:", txerr)
-				}
-				
-				Error.Fatalln("successfully rolled back")
+			err := s.Exec(statement)
+			if err != nil {
+				Error.Fatalln("migration failed:", err)
 			}
 		}
 
 		err = s.SetMigrationApplied(m.Version, m.Description)
 		if err != nil {
 			Error.Fatalln("unable to set migration as applied:", err)
-		}
-
-		txerr := tx.Commit()
-		if txerr != nil {
-			Error.Fatalln("commit failed:", txerr)
 		}
 
 		if !c.Bool("all") {

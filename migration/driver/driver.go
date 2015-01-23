@@ -1,7 +1,6 @@
 package driver
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/elwinar/rambler/configuration"
 )
@@ -11,13 +10,6 @@ var (
 	errAlreadyRegistered = "driver %s already registered"
 	errNotRegistered     = "driver %s not registered"
 )
-
-// Tx is the interface for an SQL transaction as used by rambler.
-type Tx interface {
-	Exec(string, ...interface{}) (sql.Result, error)
-	Commit() error
-	Rollback() error
-}
 
 // Driver is the interface used by the program to initialize the database connection.
 type Driver interface {
@@ -33,7 +25,7 @@ type Conn interface {
 	ListAppliedMigrations() ([]uint64, error)
 	SetMigrationApplied(version uint64, description string) error
 	UnsetMigrationApplied(version uint64) error
-	StartTransaction() (Tx, error)
+	Exec(query string) error
 }
 
 // Register register a driver
