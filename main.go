@@ -7,16 +7,17 @@ import (
 
 func main() {
 	app := cli.NewApp()
+	
 	app.Name = "rambler"
-	app.Usage = "migrate all the things!"
-	app.Version = "2-dev"
+	app.Usage = "Migrate all the things!"
+	app.Version = "2"
 	app.Author = "Romain Baugue"
 	app.Email = "romain.baugue@elwinar.com"
-	app.HideVersion = true
+	
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "configuration, c",
-			Value: os.Args[0] + ".json",
+			Value: "rambler.json",
 			Usage: "path to the configuration file",
 		},
 		cli.BoolFlag{
@@ -27,16 +28,13 @@ func main() {
 			Name:  "quiet, q",
 			Usage: "suppress info output",
 		},
-		cli.BoolFlag{
-			Name:  "verbose, v",
-			Usage: "verbose output",
-		},
 		cli.StringFlag{
 			Name:  "environment, e",
 			Value: "default",
 			Usage: "set the working environment",
 		},
 	}
+	
 	app.Commands = []cli.Command{
 		{
 			Name:   "apply",
@@ -61,5 +59,6 @@ func main() {
 			},
 		},
 	}
+	
 	app.Run(os.Args)
 }
