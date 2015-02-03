@@ -1,4 +1,4 @@
-package migration
+package main
 
 type MockConn struct {
 	migrationTableExists  func() (bool, error)

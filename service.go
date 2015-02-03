@@ -1,11 +1,11 @@
-package migration
+package main
 
 import (
 	"fmt"
 	"github.com/elwinar/rambler/configuration"
-	"github.com/elwinar/rambler/migration/driver"
-	_ "github.com/elwinar/rambler/migration/driver/mysql"
-	_ "github.com/elwinar/rambler/migration/driver/postgresql"
+	"github.com/elwinar/rambler/driver"
+	_ "github.com/elwinar/rambler/driver/mysql"
+	_ "github.com/elwinar/rambler/driver/postgresql"
 	"os"
 	"path/filepath"
 	"strconv"

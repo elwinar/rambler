@@ -1,9 +1,9 @@
-package migration
+package main
 
 import (
 	"errors"
 	"github.com/elwinar/rambler/configuration"
-	"github.com/elwinar/rambler/migration/driver"
+	"github.com/elwinar/rambler/driver"
 	"os"
 	"testing"
 )

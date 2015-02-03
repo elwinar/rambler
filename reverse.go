@@ -2,37 +2,43 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
-	"github.com/elwinar/rambler/migration"
+	"github.com/elwinar/rambler/configuration"
+	"log"
 )
 
-func Reverse(c *cli.Context) {
-	Env, Debug, Info, Error, err := bootstrap(c)
+func Reverse(ctx *cli.Context) {
+	cfg, err := configuration.Load(ctx.GlobalString("configuration"))
 	if err != nil {
-		Error.Fatalln("unable to load configuration file:", err)
+		log.Fatalln("unable to load configuration file:", err)
+	}
+	
+	env, err := cfg.Env(ctx.GlobalString("environment"))
+	if err != nil {
+		log.Fatalln("unable to load requested environment:", err)
 	}
 
-	s, err := migration.NewService(*Env)
+	s, err := NewService(env)
 	if err != nil {
-		Error.Fatalln("unable to initialize the migration service:", err)
+		log.Fatalln("unable to initialize the migration service:", err)
 	}
 
 	exists, err := s.MigrationTableExists()
 	if err != nil {
-		Error.Fatalln("failed to look for migration table:", err)
+		log.Fatalln("failed to look for migration table:", err)
 	}
 
 	if !exists {
-		Error.Fatalln("no migration table found, nothing to do")
+		log.Fatalln("no migration table found, nothing to do")
 	}
 
 	applied, err := s.ListAppliedMigrations()
 	if err != nil {
-		Error.Fatalln("failed to list applied migrations:", err)
+		log.Fatalln("failed to list applied migrations:", err)
 	}
 
 	available, err := s.ListAvailableMigrations()
 	if err != nil {
-		Error.Fatalln("failed to list available migrations:", err)
+		log.Fatalln("failed to list available migrations:", err)
 	}
 
 	if len(applied) == 0 {
@@ -46,11 +52,11 @@ func Reverse(c *cli.Context) {
 
 	for i >= 0 && j >= 0 {
 		if available[i] < applied[j] {
-			Error.Fatalln("missing migration", applied[j])
+			log.Fatalln("missing migration", applied[j])
 		}
 
 		if available[i] > applied[j] {
-			Error.Fatalln("out of order migration", available[i])
+			log.Fatalln("out of order migration", available[i])
 		}
 
 		i--
@@ -58,39 +64,39 @@ func Reverse(c *cli.Context) {
 	}
 
 	if j >= 0 {
-		Error.Fatalln("missing migration", applied[j])
+		log.Fatalln("missing migration", applied[j])
 	}
 
 	if i >= 0 {
-		Error.Fatalln("out of order migration", available[i])
+		log.Fatalln("out of order migration", available[i])
 	}
 
 	for i := len(applied) - 1; i >= 0; i-- {
 		v := applied[i]
 
-		m, err := migration.NewMigration(Env.Directory, v)
+		m, err := NewMigration(env.Directory, v)
 		if err != nil {
-			Error.Fatalln("failed to retrieve migration", v, ":", err)
+			log.Fatalln("failed to retrieve migration", v, ":", err)
 		}
 
-		Info.Println("applying", m.Name)
+		log.Println("applying", m.Name)
 
 		statements := m.Scan("down")
 		for i := len(statements) - 1; i >= 0; i-- {
 			statement := statements[i]
-			Debug.Println(statement)
+			log.Println(statement)
 			err := s.Exec(statement)
 			if err != nil {
-				Error.Fatalln("migration failed:", err)
+				log.Fatalln("migration failed:", err)
 			}
 		}
 
 		err = s.UnsetMigrationApplied(m.Version)
 		if err != nil {
-			Error.Fatalln("unable to unset migration as applied:", err)
+			log.Fatalln("unable to unset migration as applied:", err)
 		}
 
-		if !c.Bool("all") {
+		if !ctx.Bool("all") {
 			break
 		}
 	}

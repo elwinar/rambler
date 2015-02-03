@@ -20,14 +20,6 @@ func main() {
 			Value: "rambler.json",
 			Usage: "path to the configuration file",
 		},
-		cli.BoolFlag{
-			Name:  "debug, d",
-			Usage: "print debug output",
-		},
-		cli.BoolFlag{
-			Name:  "quiet, q",
-			Usage: "suppress info output",
-		},
 		cli.StringFlag{
 			Name:  "environment, e",
 			Value: "default",

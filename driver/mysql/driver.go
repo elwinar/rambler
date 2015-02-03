@@ -4,19 +4,18 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/elwinar/rambler/configuration"
-	"github.com/elwinar/rambler/migration/driver"
-	_ "github.com/lib/pq"
+	"github.com/elwinar/rambler/driver"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
-	driver.Register("postgresql", Driver{})
+	driver.Register("mysql", Driver{})
 }
 
-type Driver struct {
-}
+type Driver struct {}
 
 func (d Driver) New(env configuration.Environment) (driver.Conn, error) {
-	db, err := sql.Open("postgres", fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable", env.User, env.Password, env.Host, env.Port, env.Database))
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s:%d)/%s", env.User, env.Password, env.Protocol, env.Host, env.Port, env.Database))
 	if err != nil {
 		return nil, err
 	}
@@ -37,9 +36,9 @@ type Conn struct {
 func (c *Conn) MigrationTableExists() (bool, error) {
 	var name string
 	err := c.db.QueryRow(fmt.Sprintf(`
-		SELECT table_name 
+		SELECT table_name as name 
 		FROM information_schema.tables 
-		WHERE table_catalog = '%s' 
+		WHERE table_schema = '%s' 
 		AND table_name = 'migrations'
 	`, c.schema)).Scan(&name)
 	if err != nil && err != sql.ErrNoRows {
@@ -53,11 +52,11 @@ func (c *Conn) MigrationTableExists() (bool, error) {
 
 func (c *Conn) CreateMigrationTable() error {
 	_, err := c.db.Exec(`
-		CREATE TABLE migrations (
-			version NUMERIC(20) NOT NULL PRIMARY KEY,
+		CREATE TABLE migrations ( 
+			version BIGINT UNSIGNED NOT NULL PRIMARY KEY, 
 			description VARCHAR(255) NOT NULL,
-			applied_at TIMESTAMP NOT NULL
-		);
+			applied_at DATETIME NOT NULL
+		) DEFAULT CHARSET=utf8
 	`)
 	return err
 }
@@ -90,7 +89,7 @@ func (c *Conn) ListAppliedMigrations() ([]uint64, error) {
 func (c *Conn) SetMigrationApplied(version uint64, description string) error {
 	_, err := c.db.Exec(`
 		INSERT INTO migrations (version, description, applied_at)
-		VALUES ($1, $2, NOW())
+		VALUES (?, ?, NOW())
 	`, version, description)
 	return err
 }
@@ -98,7 +97,7 @@ func (c *Conn) SetMigrationApplied(version uint64, description string) error {
 func (c *Conn) UnsetMigrationApplied(version uint64) error {
 	_, err := c.db.Exec(`
 		DELETE FROM migrations
-		WHERE version = $1
+		WHERE version = ?
 	`, version)
 	return err
 }
