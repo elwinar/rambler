@@ -1,97 +1,63 @@
 package configuration
 
 import (
+	"encoding/json"
 	"fmt"
-	"strconv"
+	"github.com/imdario/mergo"
+	"io/ioutil"
 )
 
-// Configuration is the rambler configuration type as loaded from the configuration
-// file and extended by the command-line.
-type Configuration struct {
-	Driver       string
-	Protocol     string
-	Host         string
-	Port         uint64
-	User         string
-	Password     string
-	Database     string
-	Directory    string
-	Environments map[string]RawEnvironment
+//go:generate ffjson $GOFILE
+
+// Environment is the execution environment of a command. It contains every information
+// about the database and migrations to use.
+type Environment struct {
+	Driver    string `json:"driver"`
+	Protocol  string `json:"protocol"`
+	Host      string `json:"host"`
+	Port      uint64 `json:"port"`
+	User      string `json:"user"`
+	Password  string `json:"password"`
+	Database  string `json:"database"`
+	Directory string `json:"directory"`
 }
 
-// GetEnvironment return the requested environment from the configuration, with
-// overrides from the given flagset.
-func (c Configuration) Env(name string, flags map[string]string) (*Environment, error) {
-	override, found := c.Environments[name]
-	if !found && name != "default" {
-		return nil, fmt.Errorf(errUnknownEnvironment, name)
+// Configuration is the configuration type
+type Configuration struct {
+	Environment
+	Environments map[string]Environment `json:"environments"`
+}
+
+// Env return the requested environment from the configuration
+func (c Configuration) Env(name string) (Environment, error) {
+	environment := c.Environment
+	
+	if name == "default" {
+		return environment, nil
+	}
+	
+	overrides, found := c.Environments[name]
+	if !found {
+		return Environment{}, fmt.Errorf("unknown environment %s", name)
 	}
 
-	var environment Environment
+	_ = mergo.Merge(&environment, overrides) // No error can possibly occur here
+	return environment, nil
+}
 
-	environment.Driver = c.Driver
-	if override.Driver != nil {
-		environment.Driver = *override.Driver
-	}
-	if v, found := flags["driver"]; found {
-		environment.Driver = v
-	}
+// Load open, read and parse the given configuration file
+func Load(filename string) (Configuration, error) {
+	var c Configuration
 
-	environment.Protocol = c.Protocol
-	if override.Protocol != nil {
-		environment.Protocol = *override.Protocol
-	}
-	if v, found := flags["protocol"]; found {
-		environment.Protocol = v
+	raw, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return c, err
 	}
 
-	environment.Host = c.Host
-	if override.Host != nil {
-		environment.Host = *override.Host
-	}
-	if v, found := flags["host"]; found {
-		environment.Host = v
+	err = json.Unmarshal(raw, &c)
+	if err != nil {
+		return c, err
 	}
 
-	environment.Port = c.Port
-	if override.Port != nil {
-		environment.Port = *override.Port
-	}
-	if v, found := flags["port"]; found {
-		environment.Port, _ = strconv.ParseUint(v, 10, 64)
-	}
-
-	environment.User = c.User
-	if override.User != nil {
-		environment.User = *override.User
-	}
-	if v, found := flags["user"]; found {
-		environment.User = v
-	}
-
-	environment.Password = c.Password
-	if override.Password != nil {
-		environment.Password = *override.Password
-	}
-	if v, found := flags["password"]; found {
-		environment.Password = v
-	}
-
-	environment.Database = c.Database
-	if override.Database != nil {
-		environment.Database = *override.Database
-	}
-	if v, found := flags["database"]; found {
-		environment.Database = v
-	}
-
-	environment.Directory = c.Directory
-	if override.Directory != nil {
-		environment.Directory = *override.Directory
-	}
-	if v, found := flags["directory"]; found {
-		environment.Directory = v
-	}
-
-	return &environment, nil
+	return c, nil
 }

@@ -5,148 +5,100 @@ import (
 	"testing"
 )
 
-func Test_Configuration_Env_UnknownEnvironment(t *testing.T) {
-	c := Configuration{}
-	_, err := c.Env("test", map[string]string{})
-
-	if err == nil {
-		t.Error("didn't failed on unknown environment")
+var (
+	defaults Environment = Environment{
+		Driver: "mysql",
+		Protocol: "tcp",
+		Host: "localhost",
+		Port: 3306,
+		User: "root",
+		Password: "",
+		Database: "rambler_default",
+		Directory: ".",
 	}
+	good Configuration = Configuration{
+		Environment: defaults,
+		Environments: map[string]Environment{
+			"testing": Environment{
+				Database: "rambler_testing",
+			},
+			"development": Environment{
+				Database: "rambler_development",
+			},
+			"production": Environment{
+				Database: "rambler_production",
+			},
+		},
+	}
+)
 
-	if err.Error() != "unkown environment test" {
-		t.Error("didn't returned expected error:", err)
+func Test_Load_NotFound(t *testing.T) {
+	_, err := Load("test/notfound.json")
+	if err == nil {
+		t.Fail()
 	}
 }
 
-func Test_Configuration_Env_Override(t *testing.T) {
-	var sEnv = "env"
-	var iEnv = uint64(1)
-	type Case struct {
-		Name          string
-		Configuration Configuration
-		Flags         map[string]string
-		Env           *Environment
+func Test_Load_InvalidSyntaxd(t *testing.T) {
+	_, err := Load("test/bad.json")
+	if err == nil {
+		t.Fail()
 	}
-	var cases = []Case{
-		Case{
-			Name: "test",
-			Configuration: Configuration{
-				Driver:    "base",
-				Protocol:  "base",
-				Host:      "base",
-				Port:      0,
-				User:      "base",
-				Password:  "base",
-				Database:  "base",
-				Directory: "base",
-				Environments: map[string]RawEnvironment{
-					"test": RawEnvironment{
-						Driver:    &sEnv,
-						Protocol:  &sEnv,
-						Host:      &sEnv,
-						Port:      &iEnv,
-						User:      &sEnv,
-						Password:  &sEnv,
-						Database:  &sEnv,
-						Directory: &sEnv,
-					},
-				},
-			},
-			Flags: map[string]string{
-				"driver":    "flag",
-				"protocol":  "flag",
-				"host":      "flag",
-				"port":      "2",
-				"user":      "flag",
-				"password":  "flag",
-				"database":  "flag",
-				"directory": "flag",
-			},
-			Env: &Environment{
-				Driver:    "flag",
-				Protocol:  "flag",
-				Host:      "flag",
-				Port:      2,
-				User:      "flag",
-				Password:  "flag",
-				Database:  "flag",
-				Directory: "flag",
-			},
-		},
-		Case{
-			Name: "test",
-			Configuration: Configuration{
-				Driver:    "base",
-				Protocol:  "base",
-				Host:      "base",
-				Port:      0,
-				User:      "base",
-				Password:  "base",
-				Database:  "base",
-				Directory: "base",
-				Environments: map[string]RawEnvironment{
-					"test": RawEnvironment{
-						Driver:    &sEnv,
-						Protocol:  &sEnv,
-						Host:      &sEnv,
-						Port:      &iEnv,
-						User:      &sEnv,
-						Password:  &sEnv,
-						Database:  &sEnv,
-						Directory: &sEnv,
-					},
-				},
-			},
-			Flags: map[string]string{},
-			Env: &Environment{
-				Driver:    "env",
-				Protocol:  "env",
-				Host:      "env",
-				Port:      1,
-				User:      "env",
-				Password:  "env",
-				Database:  "env",
-				Directory: "env",
-			},
-		},
-		Case{
-			Name: "test",
-			Configuration: Configuration{
-				Driver:    "base",
-				Protocol:  "base",
-				Host:      "base",
-				Port:      0,
-				User:      "base",
-				Password:  "base",
-				Database:  "base",
-				Directory: "base",
-				Environments: map[string]RawEnvironment{
-					"test": RawEnvironment{},
-				},
-			},
-			Flags: map[string]string{},
-			Env: &Environment{
-				Driver:    "base",
-				Protocol:  "base",
-				Host:      "base",
-				Port:      0,
-				User:      "base",
-				Password:  "base",
-				Database:  "base",
-				Directory: "base",
-			},
-		},
+}
+
+func Test_Load_OK(t *testing.T) {
+	c, err := Load("test/good.json")
+	if err != nil {
+		t.Fail()
 	}
+	
+	if !reflect.DeepEqual(c, good) {
+		t.Fail()
+	}
+}
 
-	for n, c := range cases {
-		e, err := c.Configuration.Env(c.Name, c.Flags)
+func Test_Env_Unknown(t *testing.T) {
+	_, err := good.Env("unknown")
+	if err == nil {
+		t.Fail()
+	}
+}
 
+func Test_Env_DefaultNotOverriden(t *testing.T) {
+	e, err := good.Env("default")
+	if err != nil {
+		t.Fail()
+	}
+	
+	if !reflect.DeepEqual(e, defaults) {
+		t.Fail()
+	}
+}
+
+func Test_Env_DefinedEnvironments(t *testing.T) {
+	for _, name := range []string{
+		"default",
+		"testing",
+		"development",
+		"production",
+	} {
+		_, err := good.Env(name)
 		if err != nil {
-			t.Error("unexpected error")
+			t.Fail()
 		}
+	}
+}
 
-		if !reflect.DeepEqual(e, c.Env) {
-			t.Errorf("uncorrectly overriden environment for case %d", n)
-		}
+func Test_Env_Override(t *testing.T) {
+	testing := defaults
+	testing.Database = "rambler_testing"
+	
+	e, err := good.Env("testing")
+	if err != nil {
+		t.Fail()
+	}
+	
+	if !reflect.DeepEqual(testing, e) {
+		t.Fail()
 	}
 }

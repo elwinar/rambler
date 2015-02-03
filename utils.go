@@ -12,14 +12,16 @@ import (
 func bootstrap(c *cli.Context) (*configuration.Environment, *log.Logger, *log.Logger, *log.Logger, error) {
 	var Debug, Info, Error *log.Logger
 	var C configuration.Configuration = configuration.Configuration{
-		Driver:    "mysql",
-		Protocol:  "tcp",
-		Host:      "localhost",
-		Port:      3306,
-		User:      "root",
-		Password:  "",
-		Database:  "",
-		Directory: ".",
+		Environment: configuration.Environment{
+			Driver:    "mysql",
+			Protocol:  "tcp",
+			Host:      "localhost",
+			Port:      3306,
+			User:      "root",
+			Password:  "",
+			Database:  "",
+			Directory: ".",
+		},
 	}
 
 	var flags int
@@ -53,12 +55,7 @@ func bootstrap(c *cli.Context) (*configuration.Environment, *log.Logger, *log.Lo
 		return nil, Debug, Info, Error, err
 	}
 
-	var options = make(map[string]string)
-	for _, key := range c.FlagNames() {
-		options[key] = c.String(key)
-	}
-
-	Env, err := C.Env(c.GlobalString("environment"), options)
+	Env, err := C.Env(c.GlobalString("environment"))
 	if err != nil {
 		return nil, Debug, Info, Error, err
 	}
