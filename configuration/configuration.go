@@ -13,7 +13,7 @@ import (
 // about the database and migrations to use.
 type Environment struct {
 	Driver    string `json:"driver"`
-	Protocol  string `json:"protocal"`
+	Protocol  string `json:"protocol"`
 	Host      string `json:"host"`
 	Port      uint64 `json:"port"`
 	User      string `json:"user"`
@@ -22,7 +22,6 @@ type Environment struct {
 	Directory string `json:"directory"`
 }
 
-
 // Configuration is the configuration type
 type Configuration struct {
 	Environment
@@ -30,34 +29,35 @@ type Configuration struct {
 }
 
 // Env return the requested environment from the configuration
-func (c Configuration) Env(name string) (*Environment, error) {
-	defaults := c.Environment
-	environment, found := c.Environments[name]
-	if !found && name != "default" {
-		return nil, fmt.Errorf("unknown environment %s", name)
+func (c Configuration) Env(name string) (Environment, error) {
+	environment := c.Environment
+	
+	if name == "default" {
+		return environment, nil
 	}
 	
-	err := mergo.Merge(&environment, defaults)
-	if err != nil {
-		return nil, fmt.Errorf("unable to initialize environment %s", name)
+	overrides, found := c.Environments[name]
+	if !found {
+		return Environment{}, fmt.Errorf("unknown environment %s", name)
 	}
 
-	return &environment, nil
+	_ = mergo.Merge(&environment, overrides) // No error can possibly occur here
+	return environment, nil
 }
 
 // Load open, read and parse the given configuration file
 func Load(filename string) (Configuration, error) {
 	var c Configuration
-	
+
 	raw, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return c, err
 	}
-	
+
 	err = json.Unmarshal(raw, &c)
 	if err != nil {
 		return c, err
 	}
-	
+
 	return c, nil
 }

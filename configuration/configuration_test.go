@@ -64,13 +64,41 @@ func Test_Env_Unknown(t *testing.T) {
 	}
 }
 
-func Test_Env_Override(t *testing.T) {
+func Test_Env_DefaultNotOverriden(t *testing.T) {
 	e, err := good.Env("default")
 	if err != nil {
 		t.Fail()
 	}
 	
 	if !reflect.DeepEqual(e, defaults) {
+		t.Fail()
+	}
+}
+
+func Test_Env_DefinedEnvironments(t *testing.T) {
+	for _, name := range []string{
+		"default",
+		"testing",
+		"development",
+		"production",
+	} {
+		_, err := good.Env(name)
+		if err != nil {
+			t.Fail()
+		}
+	}
+}
+
+func Test_Env_Override(t *testing.T) {
+	testing := defaults
+	testing.Database = "rambler_testing"
+	
+	e, err := good.Env("testing")
+	if err != nil {
+		t.Fail()
+	}
+	
+	if !reflect.DeepEqual(testing, e) {
 		t.Fail()
 	}
 }
