@@ -20,17 +20,17 @@ func (d Driver) New(env configuration.Environment) (driver.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	c := &Conn{
-		db: db,
+		db:     db,
 		schema: env.Database,
 	}
-	
+
 	return c, nil
 }
 
 type Conn struct {
-	db *sql.DB
+	db     *sql.DB
 	schema string
 }
 
@@ -72,7 +72,7 @@ func (c *Conn) ListAppliedMigrations() ([]uint64, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	
+
 	var versions []uint64
 	for rows.Next() {
 		var version uint64
@@ -80,10 +80,10 @@ func (c *Conn) ListAppliedMigrations() ([]uint64, error) {
 		if err != nil {
 			return nil, err
 		}
-		
+
 		versions = append(versions, version)
 	}
-	
+
 	return versions, nil
 }
 
@@ -103,7 +103,7 @@ func (c *Conn) UnsetMigrationApplied(version uint64) error {
 	return err
 }
 
-func (c *Conn) StartTransaction() (driver.Tx, error) {
-	tx, err := c.db.Begin()
-	return tx, err
+func (c *Conn) Exec(query string) error {
+	_, err := c.db.Exec(query)
+	return err
 }
