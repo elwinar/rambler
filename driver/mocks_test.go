@@ -1,15 +1,11 @@
 package driver
 
-import (
-	"github.com/elwinar/rambler/configuration"
-)
-
 type MockDriver struct {
-	new func(configuration.Environment) (Conn, error)
+	new func(string) (Conn, error)
 }
 
-func (d *MockDriver) New(env configuration.Environment) (Conn, error) {
-	return d.new(env)
+func (d *MockDriver) New(dsn string) (Conn, error) {
+	return d.new(dsn)
 }
 
 type MockConn struct {

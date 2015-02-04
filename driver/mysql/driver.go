@@ -2,8 +2,6 @@ package mysql
 
 import (
 	"database/sql"
-	"fmt"
-	"github.com/elwinar/rambler/configuration"
 	"github.com/elwinar/rambler/driver"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -14,59 +12,44 @@ func init() {
 
 type Driver struct {}
 
-func (d Driver) New(env configuration.Environment) (driver.Conn, error) {
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s:%d)/%s", env.User, env.Password, env.Protocol, env.Host, env.Port, env.Database))
+func (d Driver) New(dsn, schema string) (driver.Conn, error) {
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
 
-	c := &Conn{
-		db:     db,
-		schema: env.Database,
-	}
-
-	return c, nil
+	return Conn{
+		db: db,
+		schema: schema,
+	}, nil
 }
 
-type Conn struct {
-	db     *sql.DB
+type Conn struct{
+	db *sql.DB
 	schema string
 }
 
-func (c *Conn) MigrationTableExists() (bool, error) {
-	var name string
-	err := c.db.QueryRow(fmt.Sprintf(`
-		SELECT table_name as name 
-		FROM information_schema.tables 
-		WHERE table_schema = '%s' 
-		AND table_name = 'migrations'
-	`, c.schema)).Scan(&name)
+func (c Conn) MigrationTableExists() (bool, error) {
+	var table string
+	err := c.db.QueryRow(`select table_name from information_schema.tables where table_schema = ? and table_name = ?`, c.schema, "migrations").Scan(&table)
 	if err != nil && err != sql.ErrNoRows {
 		return false, err
 	}
-	if err != nil {
+	
+	if err == sql.ErrNoRows {
 		return false, nil
 	}
+	
 	return true, nil
 }
 
-func (c *Conn) CreateMigrationTable() error {
-	_, err := c.db.Exec(`
-		CREATE TABLE migrations ( 
-			version BIGINT UNSIGNED NOT NULL PRIMARY KEY, 
-			description VARCHAR(255) NOT NULL,
-			applied_at DATETIME NOT NULL
-		) DEFAULT CHARSET=utf8
-	`)
+func (c Conn) CreateMigrationTable() error {
+	_, err := c.db.Exec(`CREATE TABLE migrations ( version BIGINT UNSIGNED NOT NULL PRIMARY KEY, description VARCHAR(255) NOT NULL, applied_at DATETIME NOT NULL ) DEFAULT CHARSET=utf8`)
 	return err
 }
 
-func (c *Conn) ListAppliedMigrations() ([]uint64, error) {
-	rows, err := c.db.Query(`
-		SELECT version
-		FROM migrations
-		ORDER BY version ASC
-	`)
+func (c Conn) ListAppliedMigrations() ([]uint64, error) {
+	rows, err := c.db.Query(`SELECT version FROM migrations ORDER BY version ASC`)
 	if err != nil {
 		return nil, err
 	}
@@ -86,23 +69,17 @@ func (c *Conn) ListAppliedMigrations() ([]uint64, error) {
 	return versions, nil
 }
 
-func (c *Conn) SetMigrationApplied(version uint64, description string) error {
-	_, err := c.db.Exec(`
-		INSERT INTO migrations (version, description, applied_at)
-		VALUES (?, ?, NOW())
-	`, version, description)
+func (c Conn) SetMigrationApplied(version uint64, description string) error {
+	_, err := c.db.Exec(`INSERT INTO migrations (version, description, applied_at) VALUES (?, ?, NOW())`, version, description)
 	return err
 }
 
-func (c *Conn) UnsetMigrationApplied(version uint64) error {
-	_, err := c.db.Exec(`
-		DELETE FROM migrations
-		WHERE version = ?
-	`, version)
+func (c Conn) UnsetMigrationApplied(version uint64) error {
+	_, err := c.db.Exec(`DELETE FROM migrations WHERE version = ?`, version)
 	return err
 }
 
-func (c *Conn) Exec(query string) error {
+func (c Conn) Exec(query string) error {
 	_, err := c.db.Exec(query)
 	return err
 }

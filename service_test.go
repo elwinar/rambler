@@ -2,18 +2,17 @@ package main
 
 import (
 	"errors"
-	"github.com/elwinar/rambler/configuration"
 	"github.com/elwinar/rambler/driver"
 	"os"
 	"testing"
 )
 
 func Test_NewService_InvalidDirectory(t *testing.T) {
-	_, err := newService(configuration.Environment{
+	_, err := newService(Environment{
 		Directory: "test",
 	}, func(_ string) (os.FileInfo, error) {
 		return nil, errors.New("stat error")
-	}, func(_ configuration.Environment) (driver.Conn, error) {
+	}, func(_ Environment) (driver.Conn, error) {
 		return &MockConn{}, nil
 	})
 
@@ -27,11 +26,11 @@ func Test_NewService_InvalidDirectory(t *testing.T) {
 }
 
 func Test_NewService_InvalidDriver(t *testing.T) {
-	_, err := newService(configuration.Environment{
+	_, err := newService(Environment{
 		Driver: "test",
 	}, func(_ string) (os.FileInfo, error) {
 		return nil, nil
-	}, func(_ configuration.Environment) (driver.Conn, error) {
+	}, func(_ Environment) (driver.Conn, error) {
 		return &MockConn{}, errors.New("driver error")
 	})
 
@@ -45,11 +44,11 @@ func Test_NewService_InvalidDriver(t *testing.T) {
 }
 
 func Test_NewService_OK(t *testing.T) {
-	s, err := newService(configuration.Environment{
+	s, err := newService(Environment{
 		Driver: "test",
 	}, func(_ string) (os.FileInfo, error) {
 		return nil, nil
-	}, func(_ configuration.Environment) (driver.Conn, error) {
+	}, func(_ Environment) (driver.Conn, error) {
 		return &MockConn{}, nil
 	})
 
@@ -63,7 +62,7 @@ func Test_NewService_OK(t *testing.T) {
 }
 
 func Test_Service_ListAvailableMigrations_GlobError(t *testing.T) {
-	_, err := listAvailableMigrations(configuration.Environment{
+	_, err := listAvailableMigrations(Environment{
 		Directory: "test",
 	}, func(_ string) ([]string, error) {
 		return nil, errors.New("glob error")
@@ -103,7 +102,7 @@ func Test_Service_ListAvailableMigrations_ParseFilenames(t *testing.T) {
 	}
 
 	for n, c := range cases {
-		versions, err := listAvailableMigrations(configuration.Environment{
+		versions, err := listAvailableMigrations(Environment{
 			Directory: "test",
 		}, func(_ string) ([]string, error) {
 			return c.Files, nil

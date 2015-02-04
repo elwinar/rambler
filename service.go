@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/elwinar/rambler/configuration"
 	"github.com/elwinar/rambler/driver"
 	_ "github.com/elwinar/rambler/driver/mysql"
 	_ "github.com/elwinar/rambler/driver/postgresql"
@@ -12,45 +11,46 @@ import (
 	"strings"
 )
 
-// Service gather operations to manipulate migrations table and migrations on
-// the filesystem.
+// Service is the interface that gather operations to manipulate migrations table
+// and migrations on the filesystem.
 type Service interface {
 	driver.Conn
 	ListAvailableMigrations() ([]uint64, error)
 }
 
-type service struct {
+// CoreService is the basic implementation of the Service interface
+type CoreService struct {
 	driver.Conn
-	env configuration.Environment
+	env Environment
 }
 
 // NewService initialize a new service with the given informations
-func NewService(env configuration.Environment) (Service, error) {
+func NewService(env Environment) (Service, error) {
 	return newService(env, os.Stat, driver.Get)
 }
 
-func newService(env configuration.Environment, stat stater, get connConstructor) (*service, error) {
+func newService(env Environment, stat stater, get connConstructor) (*CoreService, error) {
 	if _, err := stat(env.Directory); err != nil {
 		return nil, fmt.Errorf(errUnavailableDirectory, env.Directory, err.Error())
 	}
 
-	driver, err := get(env)
+	conn, err := get(env.Driver, env.DSN(), env.Database)
 	if err != nil {
 		return nil, fmt.Errorf(errDriverError, env.Driver, err.Error())
 	}
 
-	return &service{
-		Conn: driver,
+	return &CoreService{
+		Conn: conn,
 		env:  env,
 	}, nil
 }
 
 // ListAvailableMigrations return the list migrations in the environment's directory
-func (s service) ListAvailableMigrations() ([]uint64, error) {
+func (s CoreService) ListAvailableMigrations() ([]uint64, error) {
 	return listAvailableMigrations(s.env, filepath.Glob)
 }
 
-func listAvailableMigrations(env configuration.Environment, glob glober) ([]uint64, error) {
+func listAvailableMigrations(env Environment, glob glober) ([]uint64, error) {
 	raw, err := glob(filepath.Join(env.Directory, "*.sql"))
 	if err != nil {
 		return nil, fmt.Errorf(errUnavailableDirectory, env.Directory, err.Error())

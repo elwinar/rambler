@@ -2,7 +2,6 @@ package driver
 
 import (
 	"fmt"
-	"github.com/elwinar/rambler/configuration"
 )
 
 var (
@@ -13,20 +12,10 @@ var (
 
 // Driver is the interface used by the program to initialize the database connection.
 type Driver interface {
-	New(configuration.Environment) (Conn, error)
+	New(dns, schema string) (Conn, error)
 }
 
 var drivers = make(map[string]Driver)
-
-// Conn is the interface used by the program to manipulate the migration table.
-type Conn interface {
-	MigrationTableExists() (bool, error)
-	CreateMigrationTable() error
-	ListAppliedMigrations() ([]uint64, error)
-	SetMigrationApplied(version uint64, description string) error
-	UnsetMigrationApplied(version uint64) error
-	Exec(query string) error
-}
 
 // Register register a driver
 func Register(name string, driver Driver) error {
@@ -47,17 +36,17 @@ func register(name string, driver Driver, drivers map[string]Driver) error {
 }
 
 // Get initialize a driver from the given environment
-func Get(env configuration.Environment) (Conn, error) {
-	return get(env, drivers)
+func Get(drv, dsn, schema string) (Conn, error) {
+	return get(drv, dsn, schema, drivers)
 }
 
-func get(env configuration.Environment, drivers map[string]Driver) (Conn, error) {
-	driver, found := drivers[env.Driver]
+func get(drv, dsn, schema string, drivers map[string]Driver) (Conn, error) {
+	driver, found := drivers[drv]
 	if !found {
-		return nil, fmt.Errorf(errNotRegistered, env.Driver)
+		return nil, fmt.Errorf(errNotRegistered, drv)
 	}
 
-	conn, err := driver.New(env)
+	conn, err := driver.New(dsn, schema)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,6 @@ package driver
 
 import (
 	"errors"
-	"github.com/elwinar/rambler/configuration"
 	"testing"
 )
 
@@ -54,11 +53,8 @@ func Test_Register_OK(t *testing.T) {
 
 func Test_Get_NotRegistered(t *testing.T) {
 	drivers := make(map[string]Driver)
-	env := configuration.Environment{
-		Driver: "test",
-	}
-
-	_, err := get(env, drivers)
+	
+	_, err := get("test", "", drivers)
 	if err == nil {
 		t.Error("didn't failed on unregistered driver")
 		return
@@ -71,13 +67,10 @@ func Test_Get_NotRegistered(t *testing.T) {
 
 func Test_Get_InitializeError(t *testing.T) {
 	drivers := make(map[string]Driver)
+	
 	driver := &MockDriver{}
-	driver.new = func(env configuration.Environment) (Conn, error) {
+	driver.new = func(_ string) (Conn, error) {
 		return nil, errors.New("initialize error")
-	}
-
-	env := configuration.Environment{
-		Driver: "test",
 	}
 
 	err := register("test", driver, drivers)
@@ -85,7 +78,7 @@ func Test_Get_InitializeError(t *testing.T) {
 		t.Error("unexpected error:", err)
 	}
 
-	_, err = get(env, drivers)
+	_, err = get("test", "", drivers)
 	if err == nil {
 		t.Error("didn't failed on initialize error")
 	}
@@ -99,12 +92,8 @@ func Test_Get_OK(t *testing.T) {
 	drivers := make(map[string]Driver)
 	conn := &MockConn{}
 	driver := &MockDriver{}
-	driver.new = func(env configuration.Environment) (Conn, error) {
+	driver.new = func(_ string) (Conn, error) {
 		return conn, nil
-	}
-
-	env := configuration.Environment{
-		Driver: "test",
 	}
 
 	err := register("test", driver, drivers)
@@ -112,7 +101,7 @@ func Test_Get_OK(t *testing.T) {
 		t.Error("unexpected error:", err)
 	}
 
-	c, err := get(env, drivers)
+	c, err := get("test", "", drivers)
 	if err != nil {
 		t.Error("unexpected error:", err)
 	}

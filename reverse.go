@@ -2,12 +2,11 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
-	"github.com/elwinar/rambler/configuration"
 	"log"
 )
 
 func Reverse(ctx *cli.Context) {
-	cfg, err := configuration.Load(ctx.GlobalString("configuration"))
+	cfg, err := Load(ctx.GlobalString("configuration"))
 	if err != nil {
 		log.Fatalln("unable to load configuration file:", err)
 	}
