@@ -24,13 +24,7 @@ type Migration struct {
 
 // NewMigration get a migration given its directory and version number
 func NewMigration(directory string, version uint64) (*Migration, error) {
-	return newMigration(directory, version, filepath.Glob, func(path string) (io.ReadSeeker, error) {
-		return os.Open(path)
-	})
-}
-
-func newMigration(directory string, version uint64, glob glober, open opener) (*Migration, error) {
-	matches, err := glob(path.Join(directory, strconv.FormatUint(version, 10)+"_*.sql"))
+	matches, err := filepath.Glob(path.Join(directory, strconv.FormatUint(version, 10)+"_*.sql"))
 	if err != nil {
 		return nil, fmt.Errorf(errUnavailableDirectory, directory, err.Error())
 	}
@@ -43,7 +37,7 @@ func newMigration(directory string, version uint64, glob glober, open opener) (*
 		return nil, fmt.Errorf(errAmbiguousVersion, version)
 	}
 
-	reader, err := open(matches[0])
+	file, err := os.Open(matches[0])
 	if err != nil {
 		return nil, fmt.Errorf(errUnavailableFile, matches[0], err.Error())
 	}
@@ -52,7 +46,7 @@ func newMigration(directory string, version uint64, glob glober, open opener) (*
 		Name:        matches[0],
 		Version:     version,
 		Description: strings.Split(strings.SplitN(matches[0], "_", 2)[1], ".")[0],
-		Reader:      reader,
+		Reader:      file,
 	}
 
 	return m, nil

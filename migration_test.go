@@ -1,114 +1,82 @@
 package main
 
 import (
-	"errors"
-	"io"
 	"io/ioutil"
 	"strings"
 	"testing"
 )
 
+const (
+	foo = `-- rambler up
+
+create table foo (
+	id integer
+);
+
+-- rambler down
+
+drop table foo;
+`
+)
+
 func Test_NewMigration_GlobError(t *testing.T) {
-	_, err := newMigration("test", 0, func(_ string) ([]string, error) {
-		return nil, errors.New("glob error")
-	}, func(_ string) (io.ReadSeeker, error) {
-		return strings.NewReader("ok"), nil
-	})
+	_, err := NewMigration("unknown_directory", 0)
 
 	if err == nil {
 		t.Error("didn't failed on glob error")
 	}
-
-	if err.Error() != "directory test unavailable: glob error" {
-		t.Error("didn't returned expected error:", err)
-	}
 }
 
 func Test_NewMigration_UnknownVersion(t *testing.T) {
-	_, err := newMigration("", 0, func(_ string) ([]string, error) {
-		return []string{}, nil
-	}, func(_ string) (io.ReadSeeker, error) {
-		return strings.NewReader("ok"), nil
-	})
+	_, err := NewMigration("test", 0)
 
 	if err == nil {
 		t.Error("didn't failed on unknown version")
 	}
-
-	if err.Error() != "no migration for version 0" {
-		t.Error("didn't returned expected error:", err)
-	}
 }
 
 func Test_NewMigration_AmbiguousVersion(t *testing.T) {
-	_, err := newMigration("", 0, func(_ string) ([]string, error) {
-		return []string{"0_first.sql", "0_second.sql"}, nil
-	}, func(_ string) (io.ReadSeeker, error) {
-		return strings.NewReader("ok"), nil
-	})
+	_, err := NewMigration("test", 2)
 
 	if err == nil {
 		t.Error("didn't failed on ambiguous version")
 	}
-
-	if err.Error() != "ambiguous version 0" {
-		t.Error("didn't returned expected error:", err)
-	}
-}
-
-func Test_NewMigration_OpenError(t *testing.T) {
-	_, err := newMigration("", 0, func(_ string) ([]string, error) {
-		return []string{"0_first.sql"}, nil
-	}, func(_ string) (io.ReadSeeker, error) {
-		return nil, errors.New("open error")
-	})
-
-	if err == nil {
-		t.Error("didn't failed on open error")
-	}
-
-	if err.Error() != "file 0_first.sql unavailable: open error" {
-		t.Error("didn't returned expected error:", err)
-	}
 }
 
 func Test_NewMigration_ParseDescription(t *testing.T) {
-	var cases = []string{
-		"snake_case",
-		"UpperCamelCase",
-		"lowerCamelCase",
-		"Title Case",
+	type Case struct{
+		Version uint64
+		Description string
+	}
+	var cases = []Case{
+		Case{3, "snake_case"},
+		Case{4, "UpperCamelCase"},
+		Case{5, "lowerCamelCase"},
+		Case{6, "Title Case"},
+		Case{7, "url-case"},
 	}
 
 	for n, c := range cases {
-		m, err := newMigration("", 0, func(_ string) ([]string, error) {
-			return []string{"0_" + c + ".sql"}, nil
-		}, func(_ string) (io.ReadSeeker, error) {
-			return nil, nil
-		})
+		m, err := NewMigration("test", c.Version)
 
 		if err != nil {
 			t.Error("unexpected error:", err)
 		}
 
-		if m.Description != c {
+		if m.Description != c.Description {
 			t.Errorf("uncorrectly parsed description for case %d: got \"%s\"", n, m.Description)
 		}
 	}
 }
 
 func Test_NewMigration_OK(t *testing.T) {
-	m, err := newMigration("", 0, func(_ string) ([]string, error) {
-		return []string{"0_description.sql"}, nil
-	}, func(_ string) (io.ReadSeeker, error) {
-		return strings.NewReader("migration"), nil
-	})
+	m, err := NewMigration("test", 1)
 
 	if err != nil {
 		t.Error("unexpected error:", err)
 	}
 
-	if m.Version != 0 {
+	if m.Version != 1 {
 		t.Errorf("uncorrectly initialized migration version")
 	}
 
@@ -117,7 +85,7 @@ func Test_NewMigration_OK(t *testing.T) {
 		t.Error("unexpected error:", err)
 	}
 
-	if string(content) != "migration" {
+	if string(content) != foo {
 		t.Errorf("uncorrectly initialized migration reader")
 	}
 }
