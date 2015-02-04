@@ -6,19 +6,6 @@ import (
 	"testing"
 )
 
-const (
-	foo = `-- rambler up
-
-create table foo (
-	id integer
-);
-
--- rambler down
-
-drop table foo;
-`
-)
-
 func Test_NewMigration_GlobError(t *testing.T) {
 	_, err := NewMigration("unknown_directory", 0)
 
@@ -85,7 +72,16 @@ func Test_NewMigration_OK(t *testing.T) {
 		t.Error("unexpected error:", err)
 	}
 
-	if string(content) != foo {
+	if string(content) != `-- rambler up
+
+create table foo (
+	id integer
+);
+
+-- rambler down
+
+drop table foo;
+` {
 		t.Errorf("uncorrectly initialized migration reader")
 	}
 }
