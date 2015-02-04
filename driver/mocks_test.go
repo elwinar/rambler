@@ -1,11 +1,11 @@
 package driver
 
 type MockDriver struct {
-	new func(string) (Conn, error)
+	new func(string, string) (Conn, error)
 }
 
-func (d *MockDriver) New(dsn string) (Conn, error) {
-	return d.new(dsn)
+func (d *MockDriver) New(dsn, schema string) (Conn, error) {
+	return d.new(dsn, schema)
 }
 
 type MockConn struct {

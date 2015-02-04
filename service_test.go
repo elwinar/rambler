@@ -12,7 +12,7 @@ func Test_NewService_InvalidDirectory(t *testing.T) {
 		Directory: "test",
 	}, func(_ string) (os.FileInfo, error) {
 		return nil, errors.New("stat error")
-	}, func(_ Environment) (driver.Conn, error) {
+	}, func(_, _, _ string) (driver.Conn, error) {
 		return &MockConn{}, nil
 	})
 
@@ -30,7 +30,7 @@ func Test_NewService_InvalidDriver(t *testing.T) {
 		Driver: "test",
 	}, func(_ string) (os.FileInfo, error) {
 		return nil, nil
-	}, func(_ Environment) (driver.Conn, error) {
+	}, func(_, _, _ string) (driver.Conn, error) {
 		return &MockConn{}, errors.New("driver error")
 	})
 
@@ -48,7 +48,7 @@ func Test_NewService_OK(t *testing.T) {
 		Driver: "test",
 	}, func(_ string) (os.FileInfo, error) {
 		return nil, nil
-	}, func(_ Environment) (driver.Conn, error) {
+	}, func(_, _, _ string) (driver.Conn, error) {
 		return &MockConn{}, nil
 	})
 

@@ -27,6 +27,6 @@ func (e Environment) DSN() string {
 		case "postgresql":
 			return fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable", e.User, e.Password, e.Host, e.Port, e.Database)
 		default:
-			panic("unknown driver")
+			return ""
 	}
 }

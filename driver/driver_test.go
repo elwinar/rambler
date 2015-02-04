@@ -54,7 +54,7 @@ func Test_Register_OK(t *testing.T) {
 func Test_Get_NotRegistered(t *testing.T) {
 	drivers := make(map[string]Driver)
 	
-	_, err := get("test", "", drivers)
+	_, err := get("test", "", "", drivers)
 	if err == nil {
 		t.Error("didn't failed on unregistered driver")
 		return
@@ -69,7 +69,7 @@ func Test_Get_InitializeError(t *testing.T) {
 	drivers := make(map[string]Driver)
 	
 	driver := &MockDriver{}
-	driver.new = func(_ string) (Conn, error) {
+	driver.new = func(_, _ string) (Conn, error) {
 		return nil, errors.New("initialize error")
 	}
 
@@ -78,7 +78,7 @@ func Test_Get_InitializeError(t *testing.T) {
 		t.Error("unexpected error:", err)
 	}
 
-	_, err = get("test", "", drivers)
+	_, err = get("test", "", "", drivers)
 	if err == nil {
 		t.Error("didn't failed on initialize error")
 	}
@@ -92,7 +92,7 @@ func Test_Get_OK(t *testing.T) {
 	drivers := make(map[string]Driver)
 	conn := &MockConn{}
 	driver := &MockDriver{}
-	driver.new = func(_ string) (Conn, error) {
+	driver.new = func(_, _ string) (Conn, error) {
 		return conn, nil
 	}
 
@@ -101,7 +101,7 @@ func Test_Get_OK(t *testing.T) {
 		t.Error("unexpected error:", err)
 	}
 
-	c, err := get("test", "", drivers)
+	c, err := get("test", "", "", drivers)
 	if err != nil {
 		t.Error("unexpected error:", err)
 	}
