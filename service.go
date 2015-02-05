@@ -27,12 +27,12 @@ type CoreService struct {
 // NewService initialize a new service with the given informations
 func NewService(env Environment) (Service, error) {
 	if _, err := os.Stat(env.Directory); err != nil {
-		return nil, fmt.Errorf("directory %s unavailable: %s", env.Directory, err.Error())
+		return nil, fmt.Errorf(`directory %s unavailable: %s`, env.Directory, err.Error())
 	}
 
 	conn, err := driver.Get(env.Driver, env.DSN(), env.Database)
 	if err != nil {
-		return nil, fmt.Errorf("unable to initialize driver %s: %s", env.Driver, err.Error())
+		return nil, fmt.Errorf(`unable to initialize driver: %s`, err.Error())
 	}
 
 	return &CoreService{
@@ -43,13 +43,13 @@ func NewService(env Environment) (Service, error) {
 
 // ListAvailableMigrations return the list migrations in the environment's directory
 func (s CoreService) ListAvailableMigrations() ([]uint64) {
-	raw, _ := filepath.Glob(filepath.Join(s.env.Directory, "*.sql")) // The only possible error here is a pattern error
+	raw, _ := filepath.Glob(filepath.Join(s.env.Directory, `*.sql`)) // The only possible error here is a pattern error
 
 	versions := make([]uint64, 0)
 	for _, r := range raw {
 		file := filepath.Base(r)
 
-		chunks := strings.SplitN(file, "_", 2)
+		chunks := strings.SplitN(file, `_`, 2)
 
 		if len(chunks) != 2 {
 			continue

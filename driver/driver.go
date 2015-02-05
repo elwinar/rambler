@@ -14,11 +14,11 @@ var drivers = make(map[string]Driver)
 // Register register a driver
 func Register(name string, driver Driver) error {
 	if _, found := drivers[name]; found {
-		return fmt.Errorf("driver %s already registered", name)
+		return fmt.Errorf(`driver "%s" already registered`, name)
 	}
 
 	if driver == nil {
-		return fmt.Errorf("not a valid driver")
+		return fmt.Errorf(`not a valid driver`)
 	}
 
 	drivers[name] = driver
@@ -29,7 +29,7 @@ func Register(name string, driver Driver) error {
 func Get(drv, dsn, schema string) (Conn, error) {
 	driver, found := drivers[drv]
 	if !found {
-		return nil, fmt.Errorf("driver %s not registered", drv)
+		return nil, fmt.Errorf(`driver "%s" not registered`, drv)
 	}
 
 	conn, err := driver.New(dsn, schema)

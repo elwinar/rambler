@@ -6,33 +6,33 @@ import (
 )
 
 func Reverse(ctx *cli.Context) {
-	cfg, err := Load(ctx.GlobalString("configuration"))
+	cfg, err := Load(ctx.GlobalString(`configuration`))
 	if err != nil {
-		log.Fatalln("unable to load configuration file:", err)
+		log.Fatalln(`unable to load configuration file:`, err)
 	}
 	
-	env, err := cfg.Env(ctx.GlobalString("environment"))
+	env, err := cfg.Env(ctx.GlobalString(`environment`))
 	if err != nil {
-		log.Fatalln("unable to load requested environment:", err)
+		log.Fatalln(`unable to load requested environment:`, err)
 	}
 
 	s, err := NewService(env)
 	if err != nil {
-		log.Fatalln("unable to initialize the migration service:", err)
+		log.Fatalln(`unable to initialize the migration service:`, err)
 	}
 
 	exists, err := s.MigrationTableExists()
 	if err != nil {
-		log.Fatalln("failed to look for migration table:", err)
+		log.Fatalln(`failed to look for migration table:`, err)
 	}
 
 	if !exists {
-		log.Fatalln("no migration table found, nothing to do")
+		log.Fatalln(`no migration table found, nothing to do`)
 	}
 
 	applied, err := s.ListAppliedMigrations()
 	if err != nil {
-		log.Fatalln("failed to list applied migrations:", err)
+		log.Fatalln(`failed to list applied migrations:`, err)
 	}
 
 	available := s.ListAvailableMigrations()
@@ -48,11 +48,11 @@ func Reverse(ctx *cli.Context) {
 
 	for i >= 0 && j >= 0 {
 		if available[i] < applied[j] {
-			log.Fatalln("missing migration", applied[j])
+			log.Fatalln(`missing migration`, applied[j])
 		}
 
 		if available[i] > applied[j] {
-			log.Fatalln("out of order migration", available[i])
+			log.Fatalln(`out of order migration`, available[i])
 		}
 
 		i--
@@ -60,11 +60,11 @@ func Reverse(ctx *cli.Context) {
 	}
 
 	if j >= 0 {
-		log.Fatalln("missing migration", applied[j])
+		log.Fatalln(`missing migration`, applied[j])
 	}
 
 	if i >= 0 {
-		log.Fatalln("out of order migration", available[i])
+		log.Fatalln(`out of order migration`, available[i])
 	}
 
 	for i := len(applied) - 1; i >= 0; i-- {
@@ -72,27 +72,27 @@ func Reverse(ctx *cli.Context) {
 
 		m, err := NewMigration(env.Directory, v)
 		if err != nil {
-			log.Fatalln("failed to retrieve migration", v, ":", err)
+			log.Fatalln(`failed to retrieve migration`, v, `:`, err)
 		}
 
-		log.Println("applying", m.Name)
+		log.Println(`applying`, m.Name)
 
-		statements := m.Scan("down")
+		statements := m.Scan(`down`)
 		for i := len(statements) - 1; i >= 0; i-- {
 			statement := statements[i]
 			log.Println(statement)
 			err := s.Exec(statement)
 			if err != nil {
-				log.Fatalln("migration failed:", err)
+				log.Fatalln(`migration failed:`, err)
 			}
 		}
 
 		err = s.UnsetMigrationApplied(m.Version)
 		if err != nil {
-			log.Fatalln("unable to unset migration as applied:", err)
+			log.Fatalln(`unable to unset migration as applied:`, err)
 		}
 
-		if !ctx.Bool("all") {
+		if !ctx.Bool(`all`) {
 			break
 		}
 	}
