@@ -10,7 +10,7 @@ func Apply(ctx *cli.Context) {
 	if err != nil {
 		log.Fatalln(`unable to load configuration file:`, err)
 	}
-	
+
 	env, err := cfg.Env(ctx.GlobalString(`environment`))
 	if err != nil {
 		log.Fatalln(`unable to load requested environment:`, err)

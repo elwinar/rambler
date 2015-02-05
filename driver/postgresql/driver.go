@@ -11,7 +11,7 @@ func init() {
 	driver.Register("postgresql", Driver{})
 }
 
-type Driver struct {}
+type Driver struct{}
 
 func (d Driver) New(dsn, schema string) (driver.Conn, error) {
 	db, err := sql.Open("postgres", dsn)

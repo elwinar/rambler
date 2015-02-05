@@ -51,7 +51,7 @@ func Test_Register_OK(t *testing.T) {
 
 func Test_Get_NotRegistered(t *testing.T) {
 	drivers = make(map[string]Driver)
-	
+
 	_, err := Get("test", "", "")
 	if err == nil {
 		t.Fail()
@@ -60,7 +60,7 @@ func Test_Get_NotRegistered(t *testing.T) {
 
 func Test_Get_InitializeError(t *testing.T) {
 	drivers = make(map[string]Driver)
-	
+
 	driver := &MockDriver{}
 	driver.new = func(_, _ string) (Conn, error) {
 		return nil, errors.New("initialize error")

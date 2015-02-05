@@ -35,11 +35,11 @@ func Load(filename string) (Configuration, error) {
 // Env return the requested environment from the configuration
 func (c Configuration) Env(name string) (Environment, error) {
 	environment := c.Environment
-	
+
 	if name == "default" {
 		return environment, nil
 	}
-	
+
 	overrides, found := c.Environments[name]
 	if !found {
 		return Environment{}, fmt.Errorf("unknown environment %s", name)

@@ -31,8 +31,8 @@ func Test_NewMigration_AmbiguousVersion(t *testing.T) {
 }
 
 func Test_NewMigration_ParseDescription(t *testing.T) {
-	type Case struct{
-		Version uint64
+	type Case struct {
+		Version     uint64
 		Description string
 	}
 	var cases = []Case{

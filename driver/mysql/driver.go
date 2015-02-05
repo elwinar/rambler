@@ -10,7 +10,7 @@ func init() {
 	driver.Register("mysql", Driver{})
 }
 
-type Driver struct {}
+type Driver struct{}
 
 func (d Driver) New(dsn, schema string) (driver.Conn, error) {
 	db, err := sql.Open("mysql", dsn)
@@ -19,13 +19,13 @@ func (d Driver) New(dsn, schema string) (driver.Conn, error) {
 	}
 
 	return Conn{
-		db: db,
+		db:     db,
 		schema: schema,
 	}, nil
 }
 
-type Conn struct{
-	db *sql.DB
+type Conn struct {
+	db     *sql.DB
 	schema string
 }
 
@@ -35,11 +35,11 @@ func (c Conn) MigrationTableExists() (bool, error) {
 	if err != nil && err != sql.ErrNoRows {
 		return false, err
 	}
-	
+
 	if err == sql.ErrNoRows {
 		return false, nil
 	}
-	
+
 	return true, nil
 }
 

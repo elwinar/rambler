@@ -15,7 +15,7 @@ import (
 // and migrations on the filesystem.
 type Service interface {
 	driver.Conn
-	ListAvailableMigrations() ([]uint64)
+	ListAvailableMigrations() []uint64
 }
 
 // CoreService is the basic implementation of the Service interface
@@ -42,7 +42,7 @@ func NewService(env Environment) (Service, error) {
 }
 
 // ListAvailableMigrations return the list migrations in the environment's directory
-func (s CoreService) ListAvailableMigrations() ([]uint64) {
+func (s CoreService) ListAvailableMigrations() []uint64 {
 	raw, _ := filepath.Glob(filepath.Join(s.env.Directory, `*.sql`)) // The only possible error here is a pattern error
 
 	versions := make([]uint64, 0)

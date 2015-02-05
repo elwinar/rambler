@@ -7,13 +7,13 @@ import (
 
 var (
 	defaults Environment = Environment{
-		Driver: "mysql",
-		Protocol: "tcp",
-		Host: "localhost",
-		Port: 3306,
-		User: "root",
-		Password: "",
-		Database: "rambler_default",
+		Driver:    "mysql",
+		Protocol:  "tcp",
+		Host:      "localhost",
+		Port:      3306,
+		User:      "root",
+		Password:  "",
+		Database:  "rambler_default",
 		Directory: ".",
 	}
 	good Configuration = Configuration{
@@ -51,7 +51,7 @@ func Test_Load_OK(t *testing.T) {
 	if err != nil {
 		t.Fail()
 	}
-	
+
 	if !reflect.DeepEqual(c, good) {
 		t.Fail()
 	}
@@ -69,7 +69,7 @@ func Test_Configuration_Env_DefaultNotOverriden(t *testing.T) {
 	if err != nil {
 		t.Fail()
 	}
-	
+
 	if !reflect.DeepEqual(e, defaults) {
 		t.Fail()
 	}
@@ -92,12 +92,12 @@ func Test_Configuration_Env_DefinedEnvironments(t *testing.T) {
 func Test_Configuration_Env_Override(t *testing.T) {
 	testing := defaults
 	testing.Database = "rambler_testing"
-	
+
 	e, err := good.Env("testing")
 	if err != nil {
 		t.Fail()
 	}
-	
+
 	if !reflect.DeepEqual(testing, e) {
 		t.Fail()
 	}

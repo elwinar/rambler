@@ -6,7 +6,7 @@ import (
 
 func Test_NewService_InvalidDirectory(t *testing.T) {
 	_, err := NewService(Environment{
-		Driver: "mysql",
+		Driver:    "mysql",
 		Directory: "unknown",
 	})
 
@@ -17,7 +17,7 @@ func Test_NewService_InvalidDirectory(t *testing.T) {
 
 func Test_NewService_InvalidDriver(t *testing.T) {
 	_, err := NewService(Environment{
-		Driver: "unknown",
+		Driver:    "unknown",
 		Directory: "test",
 	})
 
@@ -28,7 +28,7 @@ func Test_NewService_InvalidDriver(t *testing.T) {
 
 func Test_NewService_OK(t *testing.T) {
 	s, err := NewService(Environment{
-		Driver: "mysql",
+		Driver:    "mysql",
 		Directory: "test",
 	})
 
@@ -42,14 +42,14 @@ func Test_NewService_OK(t *testing.T) {
 }
 
 func Test_Service_ListAvailableMigrations_ParseFilenames(t *testing.T) {
-	
+
 	s := CoreService{
 		env: Environment{
 			Directory: "test",
 		},
 	}
 	versions := s.ListAvailableMigrations()
-	
+
 	if len(versions) != 8 {
 		t.Errorf("didn't found the correct number of versions: %d", len(versions))
 	}
