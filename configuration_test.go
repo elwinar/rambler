@@ -57,14 +57,14 @@ func Test_Load_OK(t *testing.T) {
 	}
 }
 
-func Test_Env_Unknown(t *testing.T) {
+func Test_Configuration_Env_Unknown(t *testing.T) {
 	_, err := good.Env("unknown")
 	if err == nil {
 		t.Fail()
 	}
 }
 
-func Test_Env_DefaultNotOverriden(t *testing.T) {
+func Test_Configuration_Env_DefaultNotOverriden(t *testing.T) {
 	e, err := good.Env("default")
 	if err != nil {
 		t.Fail()
@@ -75,7 +75,7 @@ func Test_Env_DefaultNotOverriden(t *testing.T) {
 	}
 }
 
-func Test_Env_DefinedEnvironments(t *testing.T) {
+func Test_Configuration_Env_DefinedEnvironments(t *testing.T) {
 	for _, name := range []string{
 		"default",
 		"testing",
@@ -89,7 +89,7 @@ func Test_Env_DefinedEnvironments(t *testing.T) {
 	}
 }
 
-func Test_Env_Override(t *testing.T) {
+func Test_Configuration_Env_Override(t *testing.T) {
 	testing := defaults
 	testing.Database = "rambler_testing"
 	

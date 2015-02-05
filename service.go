@@ -15,7 +15,7 @@ import (
 // and migrations on the filesystem.
 type Service interface {
 	driver.Conn
-	ListAvailableMigrations() ([]uint64, error)
+	ListAvailableMigrations() ([]uint64)
 }
 
 // CoreService is the basic implementation of the Service interface
@@ -26,17 +26,13 @@ type CoreService struct {
 
 // NewService initialize a new service with the given informations
 func NewService(env Environment) (Service, error) {
-	return newService(env, os.Stat, driver.Get)
-}
-
-func newService(env Environment, stat stater, get connConstructor) (*CoreService, error) {
-	if _, err := stat(env.Directory); err != nil {
-		return nil, fmt.Errorf(errUnavailableDirectory, env.Directory, err.Error())
+	if _, err := os.Stat(env.Directory); err != nil {
+		return nil, fmt.Errorf("directory %s unavailable: %s", env.Directory, err.Error())
 	}
 
-	conn, err := get(env.Driver, env.DSN(), env.Database)
+	conn, err := driver.Get(env.Driver, env.DSN(), env.Database)
 	if err != nil {
-		return nil, fmt.Errorf(errDriverError, env.Driver, err.Error())
+		return nil, fmt.Errorf("unable to initialize driver %s: %s", env.Driver, err.Error())
 	}
 
 	return &CoreService{
@@ -46,15 +42,8 @@ func newService(env Environment, stat stater, get connConstructor) (*CoreService
 }
 
 // ListAvailableMigrations return the list migrations in the environment's directory
-func (s CoreService) ListAvailableMigrations() ([]uint64, error) {
-	return listAvailableMigrations(s.env, filepath.Glob)
-}
-
-func listAvailableMigrations(env Environment, glob glober) ([]uint64, error) {
-	raw, err := glob(filepath.Join(env.Directory, "*.sql"))
-	if err != nil {
-		return nil, fmt.Errorf(errUnavailableDirectory, env.Directory, err.Error())
-	}
+func (s CoreService) ListAvailableMigrations() ([]uint64) {
+	raw, _ := filepath.Glob(filepath.Join(s.env.Directory, "*.sql")) // The only possible error here is a pattern error
 
 	versions := make([]uint64, 0)
 	for _, r := range raw {
@@ -74,5 +63,5 @@ func listAvailableMigrations(env Environment, glob glober) ([]uint64, error) {
 		versions = append(versions, version)
 	}
 
-	return versions, nil
+	return versions
 }

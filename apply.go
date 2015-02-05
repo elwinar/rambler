@@ -40,10 +40,7 @@ func Apply(ctx *cli.Context) {
 		log.Fatalln("failed to list applied migrations:", err)
 	}
 
-	available, err := s.ListAvailableMigrations()
-	if err != nil {
-		log.Fatalln("failed to list available migrations:", err)
-	}
+	available := s.ListAvailableMigrations()
 
 	var i, j int = 0, 0
 	for i < len(available) && j < len(applied) {

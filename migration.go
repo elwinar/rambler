@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const prefix = `-- rambler`
+
 // Migration represent a migration file, composed of up and down sections containing
 // one or more statements each.
 type Migration struct {
@@ -26,20 +28,20 @@ type Migration struct {
 func NewMigration(directory string, version uint64) (*Migration, error) {
 	matches, err := filepath.Glob(path.Join(directory, strconv.FormatUint(version, 10)+"_*.sql"))
 	if err != nil {
-		return nil, fmt.Errorf(errUnavailableDirectory, directory, err.Error())
+		return nil, fmt.Errorf("directory %s unavailable: %s", directory, err.Error())
 	}
 
 	if len(matches) == 0 {
-		return nil, fmt.Errorf(errUnknownVersion, version)
+		return nil, fmt.Errorf("no migration for version %d", version)
 	}
 
 	if len(matches) > 1 {
-		return nil, fmt.Errorf(errAmbiguousVersion, version)
+		return nil, fmt.Errorf("ambiguous version %d", version)
 	}
 
 	file, err := os.Open(matches[0])
 	if err != nil {
-		return nil, fmt.Errorf(errUnavailableFile, matches[0], err.Error())
+		return nil, fmt.Errorf("file %s unavailable: %s", matches[0], err.Error())
 	}
 
 	m := &Migration{
