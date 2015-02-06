@@ -39,7 +39,7 @@ func Test_Load_NotFound(t *testing.T) {
 	}
 }
 
-func Test_Load_InvalidSyntaxd(t *testing.T) {
+func Test_Load_InvalidSyntax(t *testing.T) {
 	_, err := Load("test/bad.json")
 	if err == nil {
 		t.Fail()
