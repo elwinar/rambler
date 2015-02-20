@@ -4,8 +4,6 @@ import (
 	"fmt"
 )
 
-//go:generate ffjson $GOFILE
-
 // Environment is the execution environment of a command. It contains every information
 // about the database and migrations to use.
 type Environment struct {

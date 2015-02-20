@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 )
 
-//go:generate ffjson $GOFILE
-
 // Configuration is the configuration type
 type Configuration struct {
 	Environment

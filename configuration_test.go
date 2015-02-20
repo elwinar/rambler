@@ -5,100 +5,138 @@ import (
 	"testing"
 )
 
-var (
-	defaults Environment = Environment{
-		Driver:    "mysql",
-		Protocol:  "tcp",
-		Host:      "localhost",
-		Port:      3306,
-		User:      "root",
-		Password:  "",
-		Database:  "rambler_default",
-		Directory: ".",
-	}
-	good Configuration = Configuration{
-		Environment: defaults,
-		Environments: map[string]Environment{
-			"testing": Environment{
-				Database: "rambler_testing",
-			},
-			"development": Environment{
-				Database: "rambler_development",
-			},
-			"production": Environment{
-				Database: "rambler_production",
+func Test_Load(t *testing.T) {
+	var cases = []struct{
+		input string
+		err bool
+		output Configuration
+	}{
+		{
+			input: "test/notfound.json",
+			err: true,
+			output: Configuration{},
+		},
+		{
+			input: "test/bad.json",
+			err: true,
+			output: Configuration{},
+		},
+		{
+			input: "test/good.json",
+			err: false,
+			output: Configuration{
+				Environment: Environment{
+					Driver: "mysql",
+					Protocol: "tcp",
+					Host: "localhost",
+					Port: 3306,
+					User: "root",
+					Password: "",
+					Database: "rambler_default",
+					Directory: ".",
+				},
+				Environments: map[string]Environment{
+					"testing": Environment{
+						Database: "rambler_testing",
+					},
+					"development": Environment{
+						Database: "rambler_development",
+					},
+					"production": Environment{
+						Database: "rambler_production",
+					},
+				},
 			},
 		},
 	}
-)
-
-func Test_Load_NotFound(t *testing.T) {
-	_, err := Load("test/notfound.json")
-	if err == nil {
-		t.Fail()
-	}
-}
-
-func Test_Load_InvalidSyntax(t *testing.T) {
-	_, err := Load("test/bad.json")
-	if err == nil {
-		t.Fail()
-	}
-}
-
-func Test_Load_OK(t *testing.T) {
-	c, err := Load("test/good.json")
-	if err != nil {
-		t.Fail()
-	}
-
-	if !reflect.DeepEqual(c, good) {
-		t.Fail()
-	}
-}
-
-func Test_Configuration_Env_Unknown(t *testing.T) {
-	_, err := good.Env("unknown")
-	if err == nil {
-		t.Fail()
-	}
-}
-
-func Test_Configuration_Env_DefaultNotOverriden(t *testing.T) {
-	e, err := good.Env("default")
-	if err != nil {
-		t.Fail()
-	}
-
-	if !reflect.DeepEqual(e, defaults) {
-		t.Fail()
-	}
-}
-
-func Test_Configuration_Env_DefinedEnvironments(t *testing.T) {
-	for _, name := range []string{
-		"default",
-		"testing",
-		"development",
-		"production",
-	} {
-		_, err := good.Env(name)
-		if err != nil {
-			t.Fail()
+	
+	for n, c := range cases {
+		cfg, err := Load(c.input)
+		if (err != nil) != c.err {
+			t.Error("case", n, "got unexpected error:", err)
+			continue
+		}
+		
+		if !reflect.DeepEqual(cfg, c.output) {
+			t.Error("case", n, "got unexpected output:", cfg)
 		}
 	}
 }
 
-func Test_Configuration_Env_Override(t *testing.T) {
-	testing := defaults
-	testing.Database = "rambler_testing"
-
-	e, err := good.Env("testing")
-	if err != nil {
-		t.Fail()
+func Test_Configuration_Env(t *testing.T) {
+	var cases = []struct{
+		input string
+		err bool
+		output Environment
+	}{
+		{
+			input: "unknown",
+			err: true,
+			output: Environment{},
+		},
+		{
+			input: "default",
+			err: false,
+			output: Environment{
+				Driver: "mysql",
+				Protocol: "tcp",
+				Host: "localhost",
+				Port: 3306,
+				User: "root",
+				Password: "",
+				Database: "rambler_default",
+				Directory: ".",
+			},
+		},
+		{
+			input: "testing",
+			err: false,
+			output: Environment{
+				Driver: "mysql",
+				Protocol: "tcp",
+				Host: "localhost",
+				Port: 3306,
+				User: "root",
+				Password: "",
+				Database: "rambler_testing",
+				Directory: ".",
+			},
+		},
 	}
-
-	if !reflect.DeepEqual(testing, e) {
-		t.Fail()
+	
+	for n, c := range cases {
+		cfg := Configuration{
+			Environment: Environment{
+				Driver: "mysql",
+				Protocol: "tcp",
+				Host: "localhost",
+				Port: 3306,
+				User: "root",
+				Password: "",
+				Database: "rambler_default",
+				Directory: ".",
+			},
+			Environments: map[string]Environment{
+				"testing": Environment{
+					Database: "rambler_testing",
+				},
+				"development": Environment{
+					Database: "rambler_development",
+				},
+				"production": Environment{
+					Database: "rambler_production",
+				},
+			},
+		}
+		
+		env, err := cfg.Env(c.input)
+		if (err != nil) != c.err {
+			t.Error("case", n, "got unexpected error:", err)
+			continue
+		}
+		
+		if !reflect.DeepEqual(env, c.output) {
+			t.Error("case", n, "got unexpected output:", cfg)
+		}
 	}
 }
