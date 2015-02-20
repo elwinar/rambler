@@ -6,14 +6,14 @@ import (
 )
 
 func Test_Load(t *testing.T) {
-	var cases = []struct{
-		input string
-		err bool
+	var cases = []struct {
+		input  string
+		err    bool
 		output Configuration
 	}{
 		{
-			input: "test/notfound.json",
-			err: true,
+			input:  "test/notfound.json",
+			err:    true,
 			output: Configuration{},
 		},
 		{
@@ -26,13 +26,13 @@ func Test_Load(t *testing.T) {
 			err: false,
 			output: Configuration{
 				Environment: Environment{
-					Driver: "mysql",
-					Protocol: "tcp",
-					Host: "localhost",
-					Port: 3306,
-					User: "root",
-					Password: "",
-					Database: "rambler_default",
+					Driver:    "mysql",
+					Protocol:  "tcp",
+					Host:      "localhost",
+					Port:      3306,
+					User:      "root",
+					Password:  "",
+					Database:  "rambler_default",
 					Directory: ".",
 				},
 				Environments: map[string]Environment{
@@ -49,14 +49,14 @@ func Test_Load(t *testing.T) {
 			},
 		},
 	}
-	
+
 	for n, c := range cases {
 		cfg, err := Load(c.input)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue
 		}
-		
+
 		if !reflect.DeepEqual(cfg, c.output) {
 			t.Error("case", n, "got unexpected output:", cfg)
 		}
@@ -64,56 +64,56 @@ func Test_Load(t *testing.T) {
 }
 
 func Test_Configuration_Env(t *testing.T) {
-	var cases = []struct{
-		input string
-		err bool
+	var cases = []struct {
+		input  string
+		err    bool
 		output Environment
 	}{
 		{
-			input: "unknown",
-			err: true,
+			input:  "unknown",
+			err:    true,
 			output: Environment{},
 		},
 		{
 			input: "default",
-			err: false,
+			err:   false,
 			output: Environment{
-				Driver: "mysql",
-				Protocol: "tcp",
-				Host: "localhost",
-				Port: 3306,
-				User: "root",
-				Password: "",
-				Database: "rambler_default",
+				Driver:    "mysql",
+				Protocol:  "tcp",
+				Host:      "localhost",
+				Port:      3306,
+				User:      "root",
+				Password:  "",
+				Database:  "rambler_default",
 				Directory: ".",
 			},
 		},
 		{
 			input: "testing",
-			err: false,
+			err:   false,
 			output: Environment{
-				Driver: "mysql",
-				Protocol: "tcp",
-				Host: "localhost",
-				Port: 3306,
-				User: "root",
-				Password: "",
-				Database: "rambler_testing",
+				Driver:    "mysql",
+				Protocol:  "tcp",
+				Host:      "localhost",
+				Port:      3306,
+				User:      "root",
+				Password:  "",
+				Database:  "rambler_testing",
 				Directory: ".",
 			},
 		},
 	}
-	
+
 	for n, c := range cases {
 		cfg := Configuration{
 			Environment: Environment{
-				Driver: "mysql",
-				Protocol: "tcp",
-				Host: "localhost",
-				Port: 3306,
-				User: "root",
-				Password: "",
-				Database: "rambler_default",
+				Driver:    "mysql",
+				Protocol:  "tcp",
+				Host:      "localhost",
+				Port:      3306,
+				User:      "root",
+				Password:  "",
+				Database:  "rambler_default",
 				Directory: ".",
 			},
 			Environments: map[string]Environment{
@@ -128,13 +128,13 @@ func Test_Configuration_Env(t *testing.T) {
 				},
 			},
 		}
-		
+
 		env, err := cfg.Env(c.input)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue
 		}
-		
+
 		if !reflect.DeepEqual(env, c.output) {
 			t.Error("case", n, "got unexpected output:", cfg)
 		}

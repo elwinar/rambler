@@ -6,7 +6,7 @@ import (
 )
 
 func Test_Environment_DSN(t *testing.T) {
-	var cases = []struct{
+	var cases = []struct {
 		driver string
 		output string
 	}{
@@ -23,18 +23,18 @@ func Test_Environment_DSN(t *testing.T) {
 			output: "user=user password=password host=host port=42 dbname=database sslmode=disable",
 		},
 	}
-	
+
 	for n, c := range cases {
 		env := Environment{
-			Driver: c.driver,
+			Driver:   c.driver,
 			Protocol: "protocol",
-			Host: "host",
-			Port: 42,
-			User: "user",
+			Host:     "host",
+			Port:     42,
+			User:     "user",
 			Password: "password",
 			Database: "database",
 		}
-		
+
 		dsn := env.DSN()
 		if !reflect.DeepEqual(dsn, c.output) {
 			t.Error("case", n, "got unexpected output:", dsn)
