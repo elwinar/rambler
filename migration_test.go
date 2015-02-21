@@ -2,6 +2,7 @@ package main
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -83,3 +84,46 @@ func Test_Migration_Scan(t *testing.T) {
 		}
 	}
 }
+
+func Test_scan(t *testing.T) {
+	var cases = []struct{
+		reader *strings.Reader
+		section string
+		output []string
+	}{
+		{
+			reader: strings.NewReader(`-- rambler up
+first
+-- rambler up
+second
+-- rambler down
+third
+-- rambler up
+fourth
+`),
+			section: "up",
+			output: []string{"first", "second", "fourth"},
+		},
+		{
+			reader: strings.NewReader(`-- rambler up
+first
+-- rambler up
+second
+-- rambler down
+third
+-- rambler up
+fourth
+`),
+			section: "down",
+			output: []string{"third"},
+		},
+	}
+	
+	for n, c := range cases {
+		statements := scan(c.reader, c.section)
+		if !reflect.DeepEqual(statements, c.output) {
+			t.Error("case", n, "got unexpected output:", statements)
+		}
+	}
+}
+
