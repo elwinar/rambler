@@ -50,7 +50,7 @@ func Test_Service_ListAvailableMigrations_ParseFilenames(t *testing.T) {
 	}
 	versions := s.ListAvailableMigrations()
 
-	if len(versions) != 8 {
+	if len(versions) != 4 {
 		t.Errorf("didn't found the correct number of versions: %d", len(versions))
 	}
 }

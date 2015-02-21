@@ -21,7 +21,6 @@ type Migration struct {
 	Version     uint64
 	Description string
 	AppliedAt   *time.Time
-	Reader      io.ReadSeeker
 }
 
 // NewMigration get a migration given its directory and version number
@@ -39,26 +38,26 @@ func NewMigration(directory string, version uint64) (*Migration, error) {
 		return nil, fmt.Errorf("ambiguous version %d", version)
 	}
 
-	file, err := os.Open(matches[0])
-	if err != nil {
-		return nil, fmt.Errorf("file %s unavailable: %s", matches[0], err.Error())
-	}
-
 	m := &Migration{
 		Name:        matches[0],
 		Version:     version,
 		Description: strings.Split(strings.SplitN(matches[0], "_", 2)[1], ".")[0],
-		Reader:      file,
 	}
 
 	return m, nil
 }
 
 // Scan retrieve all sections of the file with the given section marker.
-func (m *Migration) Scan(section string) []string {
-	m.Reader.Seek(0, 0)
+func (m *Migration) Scan(section string) ([]string, error) {
+	file, err := os.Open(m.Name)
+	if err != nil {
+		return nil, fmt.Errorf("file %s unavailable: %s", m.Name, err.Error())
+	}
+	return scan(file, section), nil
+}
 
-	var scanner = bufio.NewScanner(m.Reader)
+func scan(reader io.Reader, section string) []string {
+	var scanner = bufio.NewScanner(reader)
 	var statements []string
 	var buffer string
 

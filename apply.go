@@ -68,7 +68,12 @@ func Apply(ctx *cli.Context) {
 
 		log.Println(`applying`, m.Name)
 
-		for _, statement := range m.Scan(`up`) {
+		statements, err := m.Scan(`up`)
+		if err != nil {
+			log.Fatalln(`failed to open migration`, v, `:`, err)
+		}
+		
+		for _, statement := range statements {
 			log.Println(statement)
 			err := s.Exec(statement)
 			if err != nil {

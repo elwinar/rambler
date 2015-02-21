@@ -17,12 +17,12 @@ func Test_Load(t *testing.T) {
 			output: Configuration{},
 		},
 		{
-			input: "test/bad.json",
+			input: "test/invalid.json",
 			err: true,
 			output: Configuration{},
 		},
 		{
-			input: "test/good.json",
+			input: "test/valid.json",
 			err: false,
 			output: Configuration{
 				Environment: Environment{
