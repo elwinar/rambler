@@ -55,3 +55,31 @@ func Test_NewMigration(t *testing.T) {
 		}
 	}
 }
+
+
+func Test_Migration_Scan(t *testing.T) {
+	var cases = []struct{
+		migration Migration
+		err bool
+	}{
+		{
+			migration: Migration{
+				Name: "test/1_foo.sql",
+			},
+			err: false,
+		},
+		{
+			migration: Migration{
+				Name: "test/0_unknown.sql",
+			},
+			err: true,
+		},
+	}
+	
+	for n, c := range cases {
+		_, err := c.migration.Scan(`up`)
+		if (err != nil) != c.err {
+			t.Error("case", n, "got unexpected error:", err)
+		}
+	}
+}
