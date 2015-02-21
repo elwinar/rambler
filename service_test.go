@@ -1,56 +1,75 @@
 package main
 
 import (
+	"reflect"
 	"testing"
 )
 
-func Test_NewService_InvalidDirectory(t *testing.T) {
-	_, err := NewService(Environment{
-		Driver:    "mysql",
-		Directory: "unknown",
-	})
-
-	if err == nil {
-		t.Error("didn't failed on stat error")
+func Test_NewService(t *testing.T) {
+	var cases = []struct{
+		input Environment
+		err bool
+	}{
+		{
+			input: Environment{
+				Driver: "mysql",
+				Directory: "unkown",
+			},
+			err: true,
+		},
+		{
+			input: Environment{
+				Driver: "unkown",
+				Directory: "test",
+			},
+			err: true,
+		},
+		{
+			input: Environment{
+				Driver: "mysql",
+				Directory: "test",
+			},
+			err: false,
+		},
 	}
-}
-
-func Test_NewService_InvalidDriver(t *testing.T) {
-	_, err := NewService(Environment{
-		Driver:    "unknown",
-		Directory: "test",
-	})
-
-	if err == nil {
-		t.Error("didn't failed on driver error")
-	}
-}
-
-func Test_NewService_OK(t *testing.T) {
-	s, err := NewService(Environment{
-		Driver:    "mysql",
-		Directory: "test",
-	})
-
-	if err != nil {
-		t.Error("unexpected error:", err)
-	}
-
-	if s == nil {
-		t.Error("returned uninitialized service")
+	
+	for n, c := range cases {
+		_, err := NewService(c.input)
+		if (err != nil) != c.err {
+			t.Error("case", n, "got unexpected error:", err)
+		}
 	}
 }
 
 func Test_Service_ListAvailableMigrations_ParseFilenames(t *testing.T) {
-
-	s := CoreService{
-		env: Environment{
-			Directory: "test",
+	var cases = []struct{
+		directory string
+		output []uint64
+	}{
+		{
+			directory: "test/",
+			output: []uint64{1, 2, 3},
+		},
+		{
+			directory: "test/empty/",
+			output: nil,
+		},
+		{
+			directory: "test/not_a_directory",
+			output: nil,
 		},
 	}
-	versions := s.ListAvailableMigrations()
+	
+	for n, c := range cases {
+		s := CoreService{
+			env: Environment{
+				Directory: c.directory,
+			},
+		}
+		versions := s.ListAvailableMigrations()
 
-	if len(versions) != 4 {
-		t.Errorf("didn't found the correct number of versions: %d", len(versions))
+		if !reflect.DeepEqual(versions, c.output) {
+			t.Error("case", n, "got unexpected outout:", versions)
+		}
 	}
 }

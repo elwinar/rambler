@@ -45,7 +45,7 @@ func NewService(env Environment) (Service, error) {
 func (s CoreService) ListAvailableMigrations() []uint64 {
 	raw, _ := filepath.Glob(filepath.Join(s.env.Directory, `*.sql`)) // The only possible error here is a pattern error
 
-	versions := make([]uint64, 0)
+	var versions = make(map[uint64]struct{})
 	for _, r := range raw {
 		file := filepath.Base(r)
 
@@ -59,9 +59,14 @@ func (s CoreService) ListAvailableMigrations() []uint64 {
 		if err != nil {
 			continue
 		}
-
-		versions = append(versions, version)
+		
+		versions[version] = struct{}{}
+	}
+	
+	var result []uint64
+	for k, _ := range versions {
+		result = append(result, k)
 	}
 
-	return versions
+	return result
 }
