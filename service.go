@@ -11,21 +11,15 @@ import (
 	"strings"
 )
 
-// Service is the interface that gather operations to manipulate migrations table
+// Service is the struct that gather operations to manipulate migrations table
 // and migrations on the filesystem.
-type Service interface {
-	driver.Conn
-	ListAvailableMigrations() []uint64
-}
-
-// CoreService is the basic implementation of the Service interface
-type CoreService struct {
+type Service struct {
 	driver.Conn
 	env Environment
 }
 
 // NewService initialize a new service with the given informations
-func NewService(env Environment) (Service, error) {
+func NewService(env Environment) (*Service, error) {
 	if _, err := os.Stat(env.Directory); err != nil {
 		return nil, fmt.Errorf(`directory %s unavailable: %s`, env.Directory, err.Error())
 	}
@@ -35,14 +29,14 @@ func NewService(env Environment) (Service, error) {
 		return nil, fmt.Errorf(`unable to initialize driver: %s`, err.Error())
 	}
 
-	return &CoreService{
+	return &Service{
 		Conn: conn,
 		env:  env,
 	}, nil
 }
 
 // ListAvailableMigrations return the list migrations in the environment's directory
-func (s CoreService) ListAvailableMigrations() []uint64 {
+func (s Service) ListAvailableMigrations() []uint64 {
 	raw, _ := filepath.Glob(filepath.Join(s.env.Directory, `*.sql`)) // The only possible error here is a pattern error
 
 	var versions = make(map[uint64]struct{})

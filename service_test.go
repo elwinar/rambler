@@ -61,7 +61,7 @@ func Test_Service_ListAvailableMigrations_ParseFilenames(t *testing.T) {
 	}
 
 	for n, c := range cases {
-		s := CoreService{
+		s := &Service{
 			env: Environment{
 				Directory: c.directory,
 			},
