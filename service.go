@@ -67,6 +67,8 @@ func (s CoreService) ListAvailableMigrations() []uint64 {
 	for k, _ := range versions {
 		result = append(result, k)
 	}
+	
+	SortUint64s(result)
 
 	return result
 }
