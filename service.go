@@ -59,10 +59,10 @@ func (s CoreService) ListAvailableMigrations() []uint64 {
 		if err != nil {
 			continue
 		}
-		
+
 		versions[version] = struct{}{}
 	}
-	
+
 	var result []uint64
 	for k, _ := range versions {
 		result = append(result, k)

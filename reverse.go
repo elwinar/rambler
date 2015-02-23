@@ -81,7 +81,7 @@ func Reverse(ctx *cli.Context) {
 		if err != nil {
 			log.Fatalln(`failed to open migration`, v, `:`, err)
 		}
-		
+
 		for i := len(statements) - 1; i >= 0; i-- {
 			statement := statements[i]
 			log.Println(statement)

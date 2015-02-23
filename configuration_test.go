@@ -17,13 +17,13 @@ func Test_Load(t *testing.T) {
 			output: Configuration{},
 		},
 		{
-			input: "test/invalid.json",
-			err: true,
+			input:  "test/invalid.json",
+			err:    true,
 			output: Configuration{},
 		},
 		{
 			input: "test/valid.json",
-			err: false,
+			err:   false,
 			output: Configuration{
 				Environment: Environment{
 					Driver:    "mysql",

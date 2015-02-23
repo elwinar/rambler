@@ -72,7 +72,7 @@ func Apply(ctx *cli.Context) {
 		if err != nil {
 			log.Fatalln(`failed to open migration`, v, `:`, err)
 		}
-		
+
 		for _, statement := range statements {
 			log.Println(statement)
 			err := s.Exec(statement)
