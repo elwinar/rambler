@@ -36,7 +36,16 @@ func NewService(env Environment) (*Service, error) {
 }
 
 // ListAvailableMigrations return the list migrations in the environment's directory
-func (s Service) ListAvailableMigrations() []uint64 {
+func (s Service) ListAvailableMigrations() ([]uint64, error) {
+	fi, err := os.Stat(s.env.Directory)
+	if err != nil {
+		return nil, err
+	}
+
+	if !fi.Mode().IsDir() {
+		return nil, fmt.Errorf("file %s isn't a directory", s.env.Directory)
+	}
+
 	raw, _ := filepath.Glob(filepath.Join(s.env.Directory, `*.sql`)) // The only possible error here is a pattern error
 
 	var versions = make(map[uint64]struct{})
@@ -61,8 +70,8 @@ func (s Service) ListAvailableMigrations() []uint64 {
 	for k, _ := range versions {
 		result = append(result, k)
 	}
-	
+
 	SortUint64s(result)
 
-	return result
+	return result, nil
 }

@@ -35,7 +35,10 @@ func Reverse(ctx *cli.Context) {
 		log.Fatalln(`failed to list applied migrations:`, err)
 	}
 
-	available := s.ListAvailableMigrations()
+	available, err := s.ListAvailableMigrations()
+	if err != nil {
+		log.Fatalln(`failed to list available migrations:`, err)
+	}
 
 	if len(applied) == 0 {
 		return
@@ -77,10 +80,7 @@ func Reverse(ctx *cli.Context) {
 
 		log.Println(`applying`, m.Name)
 
-		statements, err := m.Scan(`down`)
-		if err != nil {
-			log.Fatalln(`failed to open migration`, v, `:`, err)
-		}
+		statements := m.Scan(`down`)
 
 		for i := len(statements) - 1; i >= 0; i-- {
 			statement := statements[i]

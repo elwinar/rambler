@@ -40,7 +40,10 @@ func Apply(ctx *cli.Context) {
 		log.Fatalln(`failed to list applied migrations:`, err)
 	}
 
-	available := s.ListAvailableMigrations()
+	available, err := s.ListAvailableMigrations()
+	if err != nil {
+		log.Fatalln(`failed to list available migrations:`, err)
+	}
 
 	var i, j int = 0, 0
 	for i < len(available) && j < len(applied) {
@@ -68,10 +71,7 @@ func Apply(ctx *cli.Context) {
 
 		log.Println(`applying`, m.Name)
 
-		statements, err := m.Scan(`up`)
-		if err != nil {
-			log.Fatalln(`failed to open migration`, v, `:`, err)
-		}
+		statements := m.Scan(`up`)
 
 		for _, statement := range statements {
 			log.Println(statement)

@@ -44,18 +44,27 @@ func Test_NewService(t *testing.T) {
 func Test_Service_ListAvailableMigrations(t *testing.T) {
 	var cases = []struct {
 		directory string
+		err       bool
 		output    []uint64
 	}{
 		{
 			directory: "test/",
+			err:       false,
 			output:    []uint64{1, 2, 3},
 		},
 		{
 			directory: "test/empty/",
+			err:       false,
 			output:    nil,
 		},
 		{
 			directory: "test/not_a_directory",
+			err:       true,
+			output:    nil,
+		},
+		{
+			directory: "test/doesnt_exists",
+			err:       true,
 			output:    nil,
 		},
 	}
@@ -66,7 +75,11 @@ func Test_Service_ListAvailableMigrations(t *testing.T) {
 				Directory: c.directory,
 			},
 		}
-		versions := s.ListAvailableMigrations()
+
+		versions, err := s.ListAvailableMigrations()
+		if (err != nil) != c.err {
+			t.Error("case", n, "got unexpected error:", err)
+		}
 
 		if !reflect.DeepEqual(versions, c.output) {
 			t.Error("case", n, "got unexpected outout:", versions)

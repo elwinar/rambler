@@ -21,14 +21,21 @@ type Migration struct {
 	Version     uint64
 	Description string
 	AppliedAt   *time.Time
+	reader      io.Reader
 }
 
 // NewMigration get a migration given its directory and version number
 func NewMigration(directory string, version uint64) (*Migration, error) {
-	matches, err := filepath.Glob(path.Join(directory, strconv.FormatUint(version, 10)+"_*.sql"))
+	fi, err := os.Stat(directory)
 	if err != nil {
-		return nil, fmt.Errorf("directory %s unavailable: %s", directory, err.Error())
+		return nil, err
 	}
+
+	if !fi.Mode().IsDir() {
+		return nil, fmt.Errorf("file %s isn't a directory", directory)
+	}
+
+	matches, _ := filepath.Glob(path.Join(directory, strconv.FormatUint(version, 10)+"_*.sql"))
 
 	if len(matches) == 0 {
 		return nil, fmt.Errorf("no migration for version %d", version)
@@ -38,26 +45,24 @@ func NewMigration(directory string, version uint64) (*Migration, error) {
 		return nil, fmt.Errorf("ambiguous version %d", version)
 	}
 
+	file, err := os.Open(matches[0])
+	if err != nil {
+		return nil, fmt.Errorf("unable to open file %s: %s", matches[0], err.Error())
+	}
+
 	m := &Migration{
 		Name:        matches[0],
 		Version:     version,
 		Description: strings.Split(strings.SplitN(matches[0], "_", 2)[1], ".")[0],
+		reader:      file,
 	}
 
 	return m, nil
 }
 
 // Scan retrieve all sections of the file with the given section marker.
-func (m *Migration) Scan(section string) ([]string, error) {
-	file, err := os.Open(m.Name)
-	if err != nil {
-		return nil, fmt.Errorf("file %s unavailable: %s", m.Name, err.Error())
-	}
-	return scan(file, section), nil
-}
-
-func scan(reader io.Reader, section string) []string {
-	var scanner = bufio.NewScanner(reader)
+func (m Migration) Scan(section string) []string {
+	var scanner = bufio.NewScanner(m.reader)
 	var statements []string
 	var buffer string
 
@@ -93,4 +98,17 @@ func scan(reader io.Reader, section string) []string {
 	}
 
 	return statements
+}
+
+func (m Migration) Up() []string {
+	return m.Scan(`up`)
+}
+
+func (m Migration) Down() []string {
+	raw := m.Scan(`down`)
+	var stmt []string
+	for i := len(raw) - 1; i >= 0; i-- {
+		stmt = append(stmt, raw[i])
+	}
+	return stmt
 }
