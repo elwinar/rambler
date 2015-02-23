@@ -41,7 +41,7 @@ func Test_NewService(t *testing.T) {
 	}
 }
 
-func Test_Service_ListAvailableMigrations_ParseFilenames(t *testing.T) {
+func Test_Service_ListAvailableMigrations(t *testing.T) {
 	var cases = []struct {
 		directory string
 		output    []uint64
