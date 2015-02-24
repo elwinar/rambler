@@ -35,8 +35,8 @@ func NewService(env Environment) (*Service, error) {
 	}, nil
 }
 
-// ListAvailableMigrations return the list migrations in the environment's directory
-func (s Service) ListAvailableMigrations() ([]uint64, error) {
+// Available return the list migrations in the environment's directory
+func (s Service) Available() ([]uint64, error) {
 	fi, err := os.Stat(s.env.Directory)
 	if err != nil {
 		return nil, err

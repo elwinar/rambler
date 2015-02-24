@@ -41,7 +41,7 @@ func Test_NewService(t *testing.T) {
 	}
 }
 
-func Test_Service_ListAvailableMigrations(t *testing.T) {
+func Test_Service_Available(t *testing.T) {
 	var cases = []struct {
 		directory string
 		err       bool
@@ -76,7 +76,7 @@ func Test_Service_ListAvailableMigrations(t *testing.T) {
 			},
 		}
 
-		versions, err := s.ListAvailableMigrations()
+		versions, err := s.Available()
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 		}

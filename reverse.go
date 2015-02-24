@@ -35,7 +35,7 @@ func Reverse(ctx *cli.Context) {
 		log.Fatalln(`failed to list applied migrations:`, err)
 	}
 
-	available, err := s.ListAvailableMigrations()
+	available, err := s.Available()
 	if err != nil {
 		log.Fatalln(`failed to list available migrations:`, err)
 	}
