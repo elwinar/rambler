@@ -48,6 +48,12 @@ func Test_NewMigration(t *testing.T) {
 			err:       true,
 			output:    nil,
 		},
+		{
+			directory: "test",
+			version:   4,
+			err:       true,
+			output:    nil,
+		},
 	}
 
 	for n, c := range cases {

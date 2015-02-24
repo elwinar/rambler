@@ -50,7 +50,7 @@ func Test_Service_ListAvailableMigrations(t *testing.T) {
 		{
 			directory: "test/",
 			err:       false,
-			output:    []uint64{1, 2, 3},
+			output:    []uint64{1, 2, 3, 4},
 		},
 		{
 			directory: "test/empty/",
