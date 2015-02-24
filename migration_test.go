@@ -73,10 +73,9 @@ func Test_NewMigration(t *testing.T) {
 	}
 }
 
-func Test_Migration_Scan(t *testing.T) {
+func Test_Migration_Up(t *testing.T) {
 	var cases = []struct {
 		reader  *strings.Reader
-		section string
 		output  []string
 	}{
 		{
@@ -89,9 +88,28 @@ third
 -- rambler up
 fourth
 `),
-			section: "up",
 			output:  []string{"first", "second", "fourth"},
 		},
+	}
+
+	for n, c := range cases {
+		migration := &Migration{
+			reader: c.reader,
+		}
+
+		statements := migration.Up()
+		if !reflect.DeepEqual(statements, c.output) {
+			t.Error("case", n, "got unexpected output:", statements)
+		}
+	}
+}
+
+
+func Test_Migration_Down(t *testing.T) {
+	var cases = []struct {
+		reader  *strings.Reader
+		output  []string
+	}{
 		{
 			reader: strings.NewReader(`-- rambler up
 first
@@ -102,8 +120,19 @@ third
 -- rambler up
 fourth
 `),
-			section: "down",
 			output:  []string{"third"},
+		},
+		{
+			reader: strings.NewReader(`-- rambler up
+first
+-- rambler down
+second
+-- rambler down
+third
+-- rambler up
+fourth
+`),
+			output:  []string{"third", "second"},
 		},
 	}
 
@@ -112,7 +141,7 @@ fourth
 			reader: c.reader,
 		}
 
-		statements := migration.Scan(c.section)
+		statements := migration.Down()
 		if !reflect.DeepEqual(statements, c.output) {
 			t.Error("case", n, "got unexpected output:", statements)
 		}

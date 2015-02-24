@@ -61,7 +61,7 @@ func NewMigration(directory string, version uint64) (*Migration, error) {
 }
 
 // Scan retrieve all sections of the file with the given section marker.
-func (m Migration) Scan(section string) []string {
+func (m Migration) scan(section string) []string {
 	var scanner = bufio.NewScanner(m.reader)
 	var statements []string
 	var buffer string
@@ -101,11 +101,11 @@ func (m Migration) Scan(section string) []string {
 }
 
 func (m Migration) Up() []string {
-	return m.Scan(`up`)
+	return m.scan(`up`)
 }
 
 func (m Migration) Down() []string {
-	raw := m.Scan(`down`)
+	raw := m.scan(`down`)
 	var stmt []string
 	for i := len(raw) - 1; i >= 0; i-- {
 		stmt = append(stmt, raw[i])

@@ -80,10 +80,9 @@ func Reverse(ctx *cli.Context) {
 
 		log.Println(`applying`, m.Name)
 
-		statements := m.Scan(`down`)
+		statements := m.Down()
 
-		for i := len(statements) - 1; i >= 0; i-- {
-			statement := statements[i]
+		for _, statement := range statements {
 			log.Println(statement)
 			err := s.Exec(statement)
 			if err != nil {

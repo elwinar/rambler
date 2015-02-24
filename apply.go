@@ -71,7 +71,7 @@ func Apply(ctx *cli.Context) {
 
 		log.Println(`applying`, m.Name)
 
-		statements := m.Scan(`up`)
+		statements := m.Up()
 
 		for _, statement := range statements {
 			log.Println(statement)
