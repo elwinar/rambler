@@ -1,12 +1,15 @@
 package main
 
 import (
+	"os"
 	"reflect"
 	"strings"
 	"testing"
 )
 
 func Test_NewMigration(t *testing.T) {
+	os.Chmod("test/4_unreadable.sql", 0000)
+	
 	var cases = []struct {
 		directory string
 		version   uint64
@@ -71,6 +74,8 @@ func Test_NewMigration(t *testing.T) {
 			t.Error("case", n, "got unexpected output:", migration)
 		}
 	}
+	
+	os.Chmod("test/4_unreadable.sql", 0664)
 }
 
 func Test_Migration_Up(t *testing.T) {
