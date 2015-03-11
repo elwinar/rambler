@@ -9,7 +9,7 @@ import (
 
 func Test_NewMigration(t *testing.T) {
 	os.Chmod("test/4_unreadable.sql", 0000)
-	
+
 	var cases = []struct {
 		directory string
 		version   uint64
@@ -74,14 +74,14 @@ func Test_NewMigration(t *testing.T) {
 			t.Error("case", n, "got unexpected output:", migration)
 		}
 	}
-	
+
 	os.Chmod("test/4_unreadable.sql", 0664)
 }
 
 func Test_Migration_Up(t *testing.T) {
 	var cases = []struct {
-		reader  *strings.Reader
-		output  []string
+		reader *strings.Reader
+		output []string
 	}{
 		{
 			reader: strings.NewReader(`-- rambler up
@@ -93,7 +93,7 @@ third
 -- rambler up
 fourth
 `),
-			output:  []string{"first", "second", "fourth"},
+			output: []string{"first", "second", "fourth"},
 		},
 	}
 
@@ -109,11 +109,10 @@ fourth
 	}
 }
 
-
 func Test_Migration_Down(t *testing.T) {
 	var cases = []struct {
-		reader  *strings.Reader
-		output  []string
+		reader *strings.Reader
+		output []string
 	}{
 		{
 			reader: strings.NewReader(`-- rambler up
@@ -125,7 +124,7 @@ third
 -- rambler up
 fourth
 `),
-			output:  []string{"third"},
+			output: []string{"third"},
 		},
 		{
 			reader: strings.NewReader(`-- rambler up
@@ -137,7 +136,7 @@ third
 -- rambler up
 fourth
 `),
-			output:  []string{"third", "second"},
+			output: []string{"third", "second"},
 		},
 	}
 
