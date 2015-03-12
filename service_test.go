@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -186,6 +187,118 @@ func TestServiceApplied(t *testing.T) {
 
 		if !reflect.DeepEqual(migrations, c.migrations) {
 			t.Error("case", n, "got unexpected migrations:", migrations)
+		}
+	}
+}
+
+func TestServiceApply(t *testing.T) {
+	var cases = []struct{
+		migration *Migration
+		executeFail error
+		addAppliedFail error
+		err bool
+		executed []string
+		applied []string
+	}{
+		{
+			migration: &Migration{
+				Name: "1_one.sql",
+				reader: strings.NewReader(`-- rambler up
+first
+-- rambler up
+second
+-- rambler down
+third
+-- rambler up
+fourth
+`),
+			},
+			executeFail: nil,
+			addAppliedFail: nil,
+			err: false,
+			executed: []string{
+				"first",
+				"second",
+				"fourth",
+			},
+			applied: []string{
+				"1_one.sql",
+			},
+		},
+		{
+			migration: &Migration{
+				Name: "1_one.sql",
+				reader: strings.NewReader(`-- rambler up
+first
+-- rambler up
+second
+-- rambler down
+third
+-- rambler up
+fourth
+`),
+			},
+			executeFail: errors.New("error"),
+			addAppliedFail: nil,
+			err: true,
+			executed: []string{
+				"first",
+			},
+			applied: nil,
+		},
+		{
+			migration: &Migration{
+				Name: "1_one.sql",
+				reader: strings.NewReader(`-- rambler up
+first
+-- rambler up
+second
+-- rambler down
+third
+-- rambler up
+fourth
+`),
+			},
+			executeFail: nil,
+			addAppliedFail: errors.New("error"),
+			err: true,
+			executed: []string{
+				"first",
+				"second",
+				"fourth",
+			},
+			applied: []string{
+				"1_one.sql",
+			},
+		},
+	}
+
+	for n, c := range cases {
+		var executed, applied []string
+		service := &Service{
+			conn: MockConn{
+				execute: func(statement string) error {
+					executed = append(executed, statement)
+					return c.executeFail
+				},
+				addApplied: func(migration string) error {
+					applied = append(applied, migration)
+					return c.addAppliedFail
+				},
+			},
+		}
+
+		err := service.Apply(c.migration)
+		if (err != nil) != c.err {
+			t.Error("case", n, "got unexpected error:", err)
+		}
+
+		if !reflect.DeepEqual(executed, c.executed) {
+			t.Error("case", n, "got unexpected statements:", executed)
+		}
+
+		if !reflect.DeepEqual(applied, c.applied) {
+			t.Error("case", n, "got unexpected applied:", applied)
 		}
 	}
 }
