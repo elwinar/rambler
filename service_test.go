@@ -271,6 +271,14 @@ fourth
 				"1_one.sql",
 			},
 		},
+		{
+			migration: nil,
+			executeFail: nil,
+			addAppliedFail: nil,
+			err: true,
+			executed: nil,
+			applied: nil,
+		},
 	}
 
 	for n, c := range cases {
@@ -299,6 +307,125 @@ fourth
 
 		if !reflect.DeepEqual(applied, c.applied) {
 			t.Error("case", n, "got unexpected applied:", applied)
+		}
+	}
+}
+
+
+func TestServiceReverse(t *testing.T) {
+	var cases = []struct{
+		migration *Migration
+		executeFail error
+		removeAppliedFail error
+		err bool
+		executed []string
+		reversed []string
+	}{
+		{
+			migration: &Migration{
+				Name: "1_one.sql",
+				reader: strings.NewReader(`-- rambler up
+first
+-- rambler up
+second
+-- rambler down
+third
+-- rambler down
+fourth
+`),
+			},
+			executeFail: nil,
+			removeAppliedFail: nil,
+			err: false,
+			executed: []string{
+				"fourth",
+				"third",
+			},
+			reversed: []string{
+				"1_one.sql",
+			},
+		},
+		{
+			migration: &Migration{
+				Name: "1_one.sql",
+				reader: strings.NewReader(`-- rambler up
+first
+-- rambler up
+second
+-- rambler down
+third
+-- rambler down
+fourth
+`),
+			},
+			executeFail: errors.New("error"),
+			removeAppliedFail: nil,
+			err: true,
+			executed: []string{
+				"fourth",
+			},
+			reversed: nil,
+		},
+		{
+			migration: &Migration{
+				Name: "1_one.sql",
+				reader: strings.NewReader(`-- rambler up
+first
+-- rambler up
+second
+-- rambler down
+third
+-- rambler down
+fourth
+`),
+			},
+			executeFail: nil,
+			removeAppliedFail: errors.New("error"),
+			err: true,
+			executed: []string{
+				"fourth",
+				"third",
+			},
+			reversed: []string{
+				"1_one.sql",
+			},
+		},
+		{
+			migration: nil,
+			executeFail: nil,
+			removeAppliedFail: nil,
+			err: true,
+			executed: nil,
+			reversed: nil,
+		},
+	}
+
+	for n, c := range cases {
+		var executed, reversed []string
+		service := &Service{
+			conn: MockConn{
+				execute: func(statement string) error {
+					executed = append(executed, statement)
+					return c.executeFail
+				},
+				removeApplied: func(migration string) error {
+					reversed = append(reversed, migration)
+					return c.removeAppliedFail
+				},
+			},
+		}
+
+		err := service.Reverse(c.migration)
+		if (err != nil) != c.err {
+			t.Error("case", n, "got unexpected error:", err)
+		}
+
+		if !reflect.DeepEqual(executed, c.executed) {
+			t.Error("case", n, "got unexpected statements:", executed)
+		}
+
+		if !reflect.DeepEqual(reversed, c.reversed) {
+			t.Error("case", n, "got unexpected reversed:", reversed)
 		}
 	}
 }
