@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func Test_Load(t *testing.T) {
+func TestLoad(t *testing.T) {
 	var cases = []struct {
 		input  string
 		err    bool
@@ -63,7 +63,7 @@ func Test_Load(t *testing.T) {
 	}
 }
 
-func Test_Configuration_Env(t *testing.T) {
+func TestConfigurationEnv(t *testing.T) {
 	var cases = []struct {
 		input  string
 		err    bool
