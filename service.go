@@ -1,77 +1,137 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/elwinar/rambler/driver"
 	_ "github.com/elwinar/rambler/driver/mysql"
 	_ "github.com/elwinar/rambler/driver/postgresql"
 	"os"
 	"path/filepath"
-	"strconv"
-	"strings"
 )
 
-// Service is the struct that gather operations to manipulate migrations table
-// and migrations on the filesystem.
+var (
+	ErrNilMigration = errors.New("nil migration")
+)
+
+// Service is the struct that gather operations to manipulate the
+// database and migrations on disk
 type Service struct {
-	driver.Conn
-	env Environment
+	conn driver.Conn
+	env  Environment
 }
 
-// NewService initialize a new service with the given informations
+// NewService initialize a new service with the given environment
 func NewService(env Environment) (*Service, error) {
-	if _, err := os.Stat(env.Directory); err != nil {
-		return nil, fmt.Errorf(`directory %s unavailable: %s`, env.Directory, err.Error())
+	fi, err := os.Stat(env.Directory)
+	if err != nil {
+		return nil, fmt.Errorf("directory %s unavailable: %s", env.Directory, err.Error())
+	}
+
+	if !fi.Mode().IsDir() {
+		return nil, fmt.Errorf("%s isn't a directory", env.Directory)
 	}
 
 	conn, err := driver.Get(env.Driver, env.DSN(), env.Database)
 	if err != nil {
-		return nil, fmt.Errorf(`unable to initialize driver: %s`, err.Error())
+		return nil, fmt.Errorf("unable to initialize driver: %s", err.Error())
 	}
 
 	return &Service{
-		Conn: conn,
+		conn: conn,
 		env:  env,
 	}, nil
 }
 
-// Available return the list migrations in the environment's directory
-func (s Service) Available() ([]uint64, error) {
-	fi, err := os.Stat(s.env.Directory)
+// Initialized check if the migration table exists in the
+// database
+func (s Service) Initialized() (bool, error) {
+	return s.conn.HasTable()
+}
+
+// Initialize create the migration table in the database
+func (s Service) Initialize() error {
+	return s.conn.CreateTable()
+}
+
+// Available return the migrations in the environment's directory
+func (s Service) Available() ([]*Migration, error) {
+	files, _ := filepath.Glob(filepath.Join(s.env.Directory, "*.sql")) // The only possible error here is a pattern error
+
+	var migrations []*Migration
+	for _, file := range files {
+		migration, err := NewMigration(file)
+		if err != nil {
+			return nil, err
+		}
+
+		migrations = append(migrations, migration)
+	}
+
+	return migrations, nil
+}
+
+// Applied return the migrations in the environment's directory
+// that are marked as applied in the database
+func (s Service) Applied() ([]*Migration, error) {
+	files, err := s.conn.GetApplied()
 	if err != nil {
 		return nil, err
 	}
 
-	if !fi.Mode().IsDir() {
-		return nil, fmt.Errorf("file %s isn't a directory", s.env.Directory)
-	}
-
-	raw, _ := filepath.Glob(filepath.Join(s.env.Directory, `*.sql`)) // The only possible error here is a pattern error
-
-	var versions = make(map[uint64]struct{})
-	for _, r := range raw {
-		file := filepath.Base(r)
-
-		chunks := strings.SplitN(file, `_`, 2)
-
-		if len(chunks) != 2 {
-			continue
-		}
-
-		version, err := strconv.ParseUint(chunks[0], 10, 64)
+	var migrations []*Migration
+	for _, file := range files {
+		migration, err := NewMigration(filepath.Join(s.env.Directory, file))
 		if err != nil {
-			continue
+			return nil, err
 		}
 
-		versions[version] = struct{}{}
+		migrations = append(migrations, migration)
 	}
 
-	var result []uint64
-	for k, _ := range versions {
-		result = append(result, k)
+	return migrations, nil
+}
+
+// Apply execute the up statements the given migration to the
+// database then mark the migration as applied
+func (s Service) Apply(migration *Migration) error {
+	if migration == nil {
+		return ErrNilMigration
 	}
 
-	SortUint64s(result)
+	for _, statement := range migration.Up() {
+		err := s.conn.Execute(statement)
+		if err != nil {
+			return fmt.Errorf("unable to apply migration %s: %s\n%s", migration.Name, err, statement)
+		}
+	}
 
-	return result, nil
+	err := s.conn.AddApplied(migration.Name)
+	if err != nil {
+		return fmt.Errorf("unable to mark migration %s as applied: %s", migration.Name, err)
+	}
+
+	return nil
+}
+
+// Apply execute the down statements the given migration to the
+// database then mark the migration as not applied
+func (s Service) Reverse(migration *Migration) error {
+	if migration == nil {
+		return ErrNilMigration
+	}
+
+	for _, statement := range migration.Down() {
+		err := s.conn.Execute(statement)
+		if err != nil {
+			return fmt.Errorf("unable to reverse migration %s: %s\n%s", migration.Name, err, statement)
+		}
+	}
+
+	err := s.conn.RemoveApplied(migration.Name)
+	if err != nil {
+		return fmt.Errorf("unable to mark migration %s as not applied: %s", migration.Name, err)
+	}
+
+	return nil
 }

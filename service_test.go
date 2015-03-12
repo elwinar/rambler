@@ -1,11 +1,10 @@
 package main
 
 import (
-	"reflect"
 	"testing"
 )
 
-func Test_NewService(t *testing.T) {
+func TestNewService(t *testing.T) {
 	var cases = []struct {
 		input Environment
 		err   bool
@@ -14,6 +13,13 @@ func Test_NewService(t *testing.T) {
 			input: Environment{
 				Driver:    "mysql",
 				Directory: "unkown",
+			},
+			err: true,
+		},
+		{
+			input: Environment{
+				Driver:    "mysql",
+				Directory: "test/not_a_directory",
 			},
 			err: true,
 		},
@@ -41,48 +47,76 @@ func Test_NewService(t *testing.T) {
 	}
 }
 
-func Test_Service_Available(t *testing.T) {
+func TestServiceAvailable(t *testing.T) {
 	var cases = []struct {
-		directory string
-		err       bool
-		output    []uint64
+		directory  string
+		migrations []*Migration
+		err        bool
 	}{
 		{
-			directory: "test/",
-			err:       false,
-			output:    []uint64{1, 2, 3, 4},
+			directory:  "test/empty",
+			migrations: nil,
+			err:        false,
 		},
 		{
-			directory: "test/empty/",
-			err:       false,
-			output:    nil,
+			directory:  "test/not_a_directory",
+			migrations: nil,
+			err:        true,
 		},
 		{
-			directory: "test/not_a_directory",
-			err:       true,
-			output:    nil,
+			directory: "test/one",
+			migrations: []*Migration{
+				&Migration{
+					Name:   "1_one.sql",
+					reader: nil,
+				},
+			},
+			err: false,
 		},
 		{
-			directory: "test/doesnt_exists",
-			err:       true,
-			output:    nil,
+			directory: "test/two",
+			migrations: []*Migration{
+				&Migration{
+					Name:   "1_one.sql",
+					reader: nil,
+				},
+				&Migration{
+					Name:   "2_two.sql",
+					reader: nil,
+				},
+			},
+			err: true,
+		},
+		{
+			directory: "test/others",
+			migrations: []*Migration{
+				&Migration{
+					Name:   "1_one.sql",
+					reader: nil,
+				},
+				&Migration{
+					Name:   "2_two.sql",
+					reader: nil,
+				},
+			},
+			err: false,
 		},
 	}
 
 	for n, c := range cases {
-		s := &Service{
+		service := &Service{
 			env: Environment{
 				Directory: c.directory,
 			},
 		}
 
-		versions, err := s.Available()
+		migrations, err := service.Available()
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 		}
 
-		if !reflect.DeepEqual(versions, c.output) {
-			t.Error("case", n, "got unexpected outout:", versions)
+		if !reflect.DeepEqual(migrations, c.migrations) {
+			t.Error("case", n, "got unexpected migrations:", migrations)
 		}
 	}
 }
