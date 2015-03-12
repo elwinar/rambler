@@ -21,7 +21,6 @@ func TestNewMigration(t *testing.T) {
 			path: "test/1_foo.sql",
 			migration: &Migration{
 				Name:      "1_foo.sql",
-				AppliedAt: nil,
 				reader:    nil,
 			},
 			err: false,

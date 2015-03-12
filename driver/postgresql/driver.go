@@ -45,7 +45,7 @@ func (c *Conn) HasTable() (bool, error) {
 }
 
 func (c *Conn) CreateTable() error {
-	_, err := c.db.Exec(`CREATE TABLE migrations ( migration VARCHAR(255) NOT NULL, applied_at TIMESTAMP NOT NULL );`)
+	_, err := c.db.Exec(`CREATE TABLE migrations ( migration VARCHAR(255) NOT NULL );`)
 	return err
 }
 
@@ -71,7 +71,7 @@ func (c *Conn) GetApplied() ([]string, error) {
 }
 
 func (c *Conn) AddApplied(migration string) error {
-	_, err := c.db.Exec(`INSERT INTO migrations (migration, applied_at) VALUES ($1, NOW())`, migration)
+	_, err := c.db.Exec(`INSERT INTO migrations (migration) VALUES ($1)`, migration)
 	return err
 }
 

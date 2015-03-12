@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 const prefix = `-- rambler`
@@ -15,9 +14,8 @@ const prefix = `-- rambler`
 // Migration represent a migration file, composed of up and down sections containing
 // one or more statements each.
 type Migration struct {
-	Name      string
-	AppliedAt *time.Time
-	reader    io.Reader
+	Name   string
+	reader io.Reader
 }
 
 // NewMigration generate a migration from the given file
@@ -29,7 +27,6 @@ func NewMigration(path string) (*Migration, error) {
 
 	m := &Migration{
 		Name:      filepath.Base(path),
-		AppliedAt: nil,
 		reader:    file,
 	}
 
