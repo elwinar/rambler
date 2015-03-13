@@ -99,6 +99,11 @@ func TestServiceAvailable(t *testing.T) {
 			},
 			err: false,
 		},
+		{
+			directory: "test/unreachable",
+			migrations: nil,
+			err: true,
+		},
 	}
 
 	for n, c := range cases {
