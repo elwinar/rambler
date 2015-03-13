@@ -37,21 +37,16 @@ func init() {
 	app.Before = Bootstrap
 	app.Commands = []cli.Command{
 		{
-			Name:   "noop",
-			Usage:  "no-op command for testing purpose",
-			Action: func(_ *cli.Context) { return },
+			Name:   "apply",
+			Usage:  "apply the next migration",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "all, a",
+					Usage: "Apply all migrations",
+				},
+			},
+			Action: Apply,
 		},
-		// 		{
-		// 			Name:   "apply",
-		// 			Usage:  "apply the next migration",
-		// 			Flags: []cli.Flag{
-		// 				cli.BoolFlag{
-		// 					Name:  "all, a",
-		// 					Usage: "Apply all migrations",
-		// 				},
-		// 			},
-		// 			Action: Apply,
-		// 		},
 		// 		{
 		// 			Name:   "reverse",
 		// 			Usage:  "reverse the last migration",
