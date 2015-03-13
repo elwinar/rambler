@@ -26,8 +26,8 @@ func NewMigration(path string) (*Migration, error) {
 	}
 
 	m := &Migration{
-		Name:      filepath.Base(path),
-		reader:    file,
+		Name:   filepath.Base(path),
+		reader: file,
 	}
 
 	return m, nil

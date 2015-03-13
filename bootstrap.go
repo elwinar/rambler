@@ -5,7 +5,7 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-// Bootstrap go the initialization job, and finish by setting the 
+// Bootstrap go the initialization job, and finish by setting the
 // `service` global var that will be used by other commands.
 func Bootstrap(ctx *cli.Context) error {
 	return bootstrap(ctx.GlobalString("configuration"), ctx.GlobalString("environment"))
@@ -26,7 +26,7 @@ func bootstrap(configuration, environment string) error {
 	if err != nil {
 		return fmt.Errorf("unable to initialize the migration service: %s", err)
 	}
-	
+
 	service = srv
 	return nil
 }

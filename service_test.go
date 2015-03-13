@@ -100,9 +100,9 @@ func TestServiceAvailable(t *testing.T) {
 			err: false,
 		},
 		{
-			directory: "test/unreachable",
+			directory:  "test/unreachable",
 			migrations: nil,
-			err: true,
+			err:        true,
 		},
 	}
 
@@ -117,7 +117,7 @@ func TestServiceAvailable(t *testing.T) {
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 		}
-		
+
 		for _, m := range migrations {
 			m.reader = nil
 		}
@@ -129,12 +129,12 @@ func TestServiceAvailable(t *testing.T) {
 }
 
 func TestServiceApplied(t *testing.T) {
-	var cases = []struct{
-		directory string
-		table []string
-		fail error
+	var cases = []struct {
+		directory  string
+		table      []string
+		fail       error
 		migrations []*Migration
-		err bool
+		err        bool
 	}{
 		{
 			directory: "test/one",
@@ -151,11 +151,11 @@ func TestServiceApplied(t *testing.T) {
 			err: false,
 		},
 		{
-			directory: "test/one",
-			table: []string{},
-			fail: errors.New("error"),
+			directory:  "test/one",
+			table:      []string{},
+			fail:       errors.New("error"),
 			migrations: nil,
-			err: true,
+			err:        true,
 		},
 		{
 			directory: "test/one",
@@ -163,9 +163,9 @@ func TestServiceApplied(t *testing.T) {
 				"1_one.sql",
 				"2_two.sql",
 			},
-			fail: nil,
+			fail:       nil,
 			migrations: nil,
-			err: true,
+			err:        true,
 		},
 	}
 
@@ -185,7 +185,7 @@ func TestServiceApplied(t *testing.T) {
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 		}
-		
+
 		for _, m := range migrations {
 			m.reader = nil
 		}
@@ -197,13 +197,13 @@ func TestServiceApplied(t *testing.T) {
 }
 
 func TestServiceApply(t *testing.T) {
-	var cases = []struct{
-		migration *Migration
-		executeFail error
+	var cases = []struct {
+		migration      *Migration
+		executeFail    error
 		addAppliedFail error
-		err bool
-		executed []string
-		applied []string
+		err            bool
+		executed       []string
+		applied        []string
 	}{
 		{
 			migration: &Migration{
@@ -218,9 +218,9 @@ third
 fourth
 `),
 			},
-			executeFail: nil,
+			executeFail:    nil,
 			addAppliedFail: nil,
-			err: false,
+			err:            false,
 			executed: []string{
 				"first",
 				"second",
@@ -243,9 +243,9 @@ third
 fourth
 `),
 			},
-			executeFail: errors.New("error"),
+			executeFail:    errors.New("error"),
 			addAppliedFail: nil,
-			err: true,
+			err:            true,
 			executed: []string{
 				"first",
 			},
@@ -264,9 +264,9 @@ third
 fourth
 `),
 			},
-			executeFail: nil,
+			executeFail:    nil,
 			addAppliedFail: errors.New("error"),
-			err: true,
+			err:            true,
 			executed: []string{
 				"first",
 				"second",
@@ -277,12 +277,12 @@ fourth
 			},
 		},
 		{
-			migration: nil,
-			executeFail: nil,
+			migration:      nil,
+			executeFail:    nil,
 			addAppliedFail: nil,
-			err: true,
-			executed: nil,
-			applied: nil,
+			err:            true,
+			executed:       nil,
+			applied:        nil,
 		},
 	}
 
@@ -316,15 +316,14 @@ fourth
 	}
 }
 
-
 func TestServiceReverse(t *testing.T) {
-	var cases = []struct{
-		migration *Migration
-		executeFail error
+	var cases = []struct {
+		migration         *Migration
+		executeFail       error
 		removeAppliedFail error
-		err bool
-		executed []string
-		reversed []string
+		err               bool
+		executed          []string
+		reversed          []string
 	}{
 		{
 			migration: &Migration{
@@ -339,9 +338,9 @@ third
 fourth
 `),
 			},
-			executeFail: nil,
+			executeFail:       nil,
 			removeAppliedFail: nil,
-			err: false,
+			err:               false,
 			executed: []string{
 				"fourth",
 				"third",
@@ -363,9 +362,9 @@ third
 fourth
 `),
 			},
-			executeFail: errors.New("error"),
+			executeFail:       errors.New("error"),
 			removeAppliedFail: nil,
-			err: true,
+			err:               true,
 			executed: []string{
 				"fourth",
 			},
@@ -384,9 +383,9 @@ third
 fourth
 `),
 			},
-			executeFail: nil,
+			executeFail:       nil,
 			removeAppliedFail: errors.New("error"),
-			err: true,
+			err:               true,
 			executed: []string{
 				"fourth",
 				"third",
@@ -396,12 +395,12 @@ fourth
 			},
 		},
 		{
-			migration: nil,
-			executeFail: nil,
+			migration:         nil,
+			executeFail:       nil,
 			removeAppliedFail: nil,
-			err: true,
-			executed: nil,
-			reversed: nil,
+			err:               true,
+			executed:          nil,
+			reversed:          nil,
 		},
 	}
 
