@@ -302,6 +302,78 @@ func TestApply(t *testing.T) {
 			err: true,
 			executed: nil,
 		},
+		{
+			initialized: false,
+			initializedError: nil,
+			initializeError: nil,
+			available: []*Migration{
+				&Migration{
+					Name: "bar.sql",
+					reader: strings.NewReader(""),
+				},
+				&Migration{
+					Name: "foo.sql",
+					reader: strings.NewReader(""),
+				},
+				&Migration{
+					Name: "zoo.sql",
+					reader: strings.NewReader(""),
+				},
+			},
+			availableError: nil,
+			applied: []*Migration{
+				&Migration{
+					Name: "bar.sql",
+					reader: strings.NewReader(""),
+				},
+				&Migration{
+					Name: "zoo.sql",
+					reader: strings.NewReader(""),
+				},
+			},
+			appliedError: nil,
+			applyError: nil,
+			all: false,
+			
+			err: true,
+			executed: nil,
+		},
+		{
+			initialized: false,
+			initializedError: nil,
+			initializeError: nil,
+			available: []*Migration{
+				&Migration{
+					Name: "bar.sql",
+					reader: strings.NewReader(""),
+				},
+				&Migration{
+					Name: "foo.sql",
+					reader: strings.NewReader(""),
+				},
+			},
+			availableError: nil,
+			applied: []*Migration{
+				&Migration{
+					Name: "bar.sql",
+					reader: strings.NewReader(""),
+				},
+				&Migration{
+					Name: "foo.sql",
+					reader: strings.NewReader(""),
+				},
+				&Migration{
+					Name: "zoo.sql",
+					reader: strings.NewReader(""),
+				},
+			},
+			appliedError: nil,
+			applyError: nil,
+			all: false,
+			
+			err: true,
+			executed: nil,
+		},
 	}
 	
 	for n, c := range cases {
