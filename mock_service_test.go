@@ -32,4 +32,3 @@ func (s MockService) Apply(migration *Migration) error {
 func (s MockService) Reverse(migration *Migration) error {
 	return s.reverse(migration)
 }
-

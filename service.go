@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/bradfitz/slice"
 	"github.com/elwinar/rambler/driver"
 	_ "github.com/elwinar/rambler/driver/mysql"
 	_ "github.com/elwinar/rambler/driver/postgresql"
@@ -54,7 +55,8 @@ func (s Service) Initialize() error {
 	return s.conn.CreateTable()
 }
 
-// Available return the migrations in the environment's directory
+// Available return the migrations in the environment's directory sorted in 
+// ascending lexicographic order.
 func (s Service) Available() ([]*Migration, error) {
 	files, _ := filepath.Glob(filepath.Join(s.env.Directory, "*.sql")) // The only possible error here is a pattern error
 
@@ -67,12 +69,16 @@ func (s Service) Available() ([]*Migration, error) {
 
 		migrations = append(migrations, migration)
 	}
+	
+	slice.Sort(migrations, func(i, j int) bool {
+		return migrations[i].Name < migrations[j].Name
+	})
 
 	return migrations, nil
 }
 
-// Applied return the migrations in the environment's directory
-// that are marked as applied in the database
+// Applied return the migrations in the environment's directory that are marked 
+// as applied in the database sorted in ascending lexicographic order.
 func (s Service) Applied() ([]*Migration, error) {
 	files, err := s.conn.GetApplied()
 	if err != nil {
@@ -88,6 +94,10 @@ func (s Service) Applied() ([]*Migration, error) {
 
 		migrations = append(migrations, migration)
 	}
+	
+	slice.Sort(migrations, func(i, j int) bool {
+		return migrations[i].Name < migrations[j].Name
+	})
 
 	return migrations, nil
 }
