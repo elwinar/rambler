@@ -36,11 +36,11 @@ func (c Configuration) Env(name string) (Environment, error) {
 		return c.Environment, nil
 	}
 
-	overrides, found := c.Environments[name]
+	env, found := c.Environments[name]
 	if !found {
 		return Environment{}, fmt.Errorf("unknown environment %s", name)
 	}
 
-	_ = mergo.Merge(&overrides, c.Environment) // No error can possibly occur here
-	return overrides, nil
+	_ = mergo.Merge(&env, c.Environment) // No error can possibly occur here
+	return env, nil
 }
