@@ -1,4 +1,4 @@
-# rambler [![wercker status](https://app.wercker.com/status/65c8a55b6431d38e0820c0d5f4280417/s/master "wercker status")](https://app.wercker.com/project/bykey/65c8a55b6431d38e0820c0d5f4280417)
+# rambler
 
 A simple and language-independent SQL schema migration tool
 
@@ -119,32 +119,30 @@ Here we have three environments defined:
 - `development`, will use the `rambler_development` database,
 - `testing`, will use the `rambler_testing` database;
 
-## TODO
-
-* Add a `refresh` command that will reverse the last migration then apply it again
-* Add a `number` option to choose the number of migrations to apply, reverse, or refresh
-
 ## CONTRIBUTORS
 
 - [cjhubert](https://github.com/cjhubert)
 
 ## CHANGELOG
 
+- **3.0**
+	- Major refactor to improve the unit testing of the tool
+	- Fix the bugs introduced by the mergo breaking change
 - **2.1**
-    - Added the postgresql driver from the good work of [cjhubert](https://github.com/cjhubert)
+	- Added the postgresql driver from the good work of [cjhubert](https://github.com/cjhubert)
 - **2.0**
-    - Complete rewrite to add unit-testing
-    - Removed the command-line options to override the configuration
-    - Fixed behavior of the transactions
-    - Switched from spf13/cobra & spf13/viper to codegangsta/cli and encoding/json : removed the posibility of using alternatives configuration file types (namely YAML and TOML), changed the command-line usage
+	- Complete rewrite to add unit-testing
+	- Removed the command-line options to override the configuration
+	- Fixed behavior of the transactions
+	- Switched from spf13/cobra & spf13/viper to codegangsta/cli and encoding/json : removed the posibility of using alternatives configuration file types (namely YAML and TOML), changed the command-line usage
 - **1.1.0**
-    - Added environments handling
+	- Added environments handling
 - **1.0.2**
-    - Fixed a bug about the migration paths building whilte scanning
-    - Made a real documentation
-    - Fixed misconceptions about spf13/viper & spf13/cobra (thanks @spf13 for the pointers)
+	- Fixed a bug about the migration paths building whilte scanning
+	- Made a real documentation
+	- Fixed misconceptions about spf13/viper & spf13/cobra (thanks @spf13 for the pointers)
 - **1.0.1**
-    - Fixed imports paths of the internal packages
+	- Fixed imports paths of the internal packages
 
 ## Feedback and contributions
 
