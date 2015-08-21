@@ -2,18 +2,26 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
+	"log"
 	"os"
 )
 
-func main() {
-	app := cli.NewApp()
+var app *cli.App
+var service *Service
 
+func init() {
+	log.SetFlags(0)
+
+	app = cli.NewApp()
 	app.Name = "rambler"
 	app.Usage = "Migrate all the things!"
-	app.Version = "2"
-	app.Author = "Romain Baugue"
-	app.Email = "romain.baugue@elwinar.com"
-
+	app.Version = "3"
+	app.Authors = []cli.Author{
+		{
+			Name:  "Romain Baugue",
+			Email: "romain.baugue@elwinar.com",
+		},
+	}
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "configuration, c",
@@ -26,31 +34,36 @@ func main() {
 			Usage: "set the working environment",
 		},
 	}
-
+	app.Before = Bootstrap
 	app.Commands = []cli.Command{
 		{
-			Name:   "apply",
-			Usage:  "apply the next migration",
-			Action: Apply,
+			Name:  "apply",
+			Usage: "apply the next migration",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "all, a",
 					Usage: "Apply all migrations",
 				},
 			},
+			Action: Apply,
 		},
 		{
 			Name:   "reverse",
 			Usage:  "reverse the last migration",
-			Action: Reverse,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "all, a",
 					Usage: "Reverse all migrations",
 				},
 			},
+			Action: Reverse,
 		},
 	}
+}
 
-	app.Run(os.Args)
+func main() {
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Println(err)
+	}
 }

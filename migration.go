@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"time"
 )
 
 const prefix = `-- rambler`
@@ -17,44 +14,20 @@ const prefix = `-- rambler`
 // Migration represent a migration file, composed of up and down sections containing
 // one or more statements each.
 type Migration struct {
-	Name        string
-	Version     uint64
-	Description string
-	AppliedAt   *time.Time
-	reader      io.Reader
+	Name   string
+	reader io.Reader
 }
 
-// NewMigration get a migration given its directory and version number
-func NewMigration(directory string, version uint64) (*Migration, error) {
-	fi, err := os.Stat(directory)
+// NewMigration generate a migration from the given file
+func NewMigration(path string) (*Migration, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
-	}
-
-	if !fi.Mode().IsDir() {
-		return nil, fmt.Errorf("file %s isn't a directory", directory)
-	}
-
-	matches, _ := filepath.Glob(path.Join(directory, strconv.FormatUint(version, 10)+"_*.sql"))
-
-	if len(matches) == 0 {
-		return nil, fmt.Errorf("no migration for version %d", version)
-	}
-
-	if len(matches) > 1 {
-		return nil, fmt.Errorf("ambiguous version %d", version)
-	}
-
-	file, err := os.Open(matches[0])
-	if err != nil {
-		return nil, fmt.Errorf("unable to open file %s: %s", matches[0], err.Error())
+		return nil, fmt.Errorf("unable to open file %s: %s", path, err.Error())
 	}
 
 	m := &Migration{
-		Name:        matches[0],
-		Version:     version,
-		Description: strings.Split(strings.SplitN(matches[0], "_", 2)[1], ".")[0],
-		reader:      file,
+		Name:   filepath.Base(path),
+		reader: file,
 	}
 
 	return m, nil
@@ -100,10 +73,12 @@ func (m Migration) scan(section string) []string {
 	return statements
 }
 
+// Return the up statements of the migration
 func (m Migration) Up() []string {
 	return m.scan(`up`)
 }
 
+// Return the down statements of the migration
 func (m Migration) Down() []string {
 	raw := m.scan(`down`)
 	var stmt []string

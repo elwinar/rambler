@@ -1,95 +1,76 @@
 package main
 
 import (
+	"fmt"
 	"github.com/codegangsta/cli"
 	"log"
 )
 
 func Apply(ctx *cli.Context) {
-	cfg, err := Load(ctx.GlobalString(`configuration`))
+	err := apply(service, ctx.Bool("all"))
 	if err != nil {
-		log.Fatalln(`unable to load configuration file:`, err)
+		log.Println(err)
+	}
+}
+
+func apply(service Servicer, all bool) error {
+	initialized, err := service.Initialized()
+	if err != nil {
+		return fmt.Errorf("unable to check for database state: %s", err)
 	}
 
-	env, err := cfg.Env(ctx.GlobalString(`environment`))
-	if err != nil {
-		log.Fatalln(`unable to load requested environment:`, err)
-	}
-
-	s, err := NewService(env)
-	if err != nil {
-		log.Fatalln(`unable to initialize the migration service:`, err)
-	}
-
-	exists, err := s.MigrationTableExists()
-	if err != nil {
-		log.Fatalln(`failed to look for migration table:`, err)
-	}
-
-	if !exists {
-		log.Println(`migration table not found`)
-		err := s.CreateMigrationTable()
+	if !initialized {
+		err := service.Initialize()
 		if err != nil {
-			log.Fatalln(`unable to create the migration table:`, err)
+			return fmt.Errorf("unable to initialize database: %s", err)
 		}
-		log.Println(`created`)
 	}
 
-	applied, err := s.ListAppliedMigrations()
+	available, err := service.Available()
 	if err != nil {
-		log.Fatalln(`failed to list applied migrations:`, err)
+		return fmt.Errorf("unable to retrieve available migrations: %s", err)
 	}
 
-	available, err := s.Available()
+	applied, err := service.Applied()
 	if err != nil {
-		log.Fatalln(`failed to list available migrations:`, err)
+		return fmt.Errorf("unable to retrieve applied migrations: %s", err)
 	}
 
-	var i, j int = 0, 0
+	var i, j = 0, 0
 	for i < len(available) && j < len(applied) {
-		if available[i] < applied[j] {
-			log.Fatalln(`out of order migration`, available[i])
+		if available[i].Name == applied[j].Name {
+			i++
+			j++
+			continue
 		}
 
-		if available[i] > applied[j] {
-			log.Fatalln(`missing mgiration`, applied[j])
+		if available[i].Name < applied[j].Name {
+			return fmt.Errorf("out of order migration: %s", available[i].Name)
 		}
 
-		i++
-		j++
+		if available[i].Name > applied[j].Name {
+			return fmt.Errorf("missing migration: %s", applied[j].Name)
+		}
 	}
 
 	if j != len(applied) {
-		log.Fatalln(`missing mgiration`, applied[j])
+		return fmt.Errorf("missing migration: %s", applied[j].Name)
 	}
 
-	for _, v := range available[i:] {
-		m, err := NewMigration(env.Directory, v)
+	if i == len(available) {
+		return nil
+	}
+
+	for _, migration := range available[i:] {
+		err := service.Apply(migration)
 		if err != nil {
-			log.Fatalln(`failed to retrieve migration`, v, `:`, err)
+			return err
 		}
-
-		log.Println(`applying`, m.Name)
-
-		statements := m.Up()
-
-		for _, statement := range statements {
-			log.Println(statement)
-			err := s.Exec(statement)
-			if err != nil {
-				log.Fatalln(`migration failed:`, err)
-			}
-		}
-
-		err = s.SetMigrationApplied(m.Version, m.Description)
-		if err != nil {
-			log.Fatalln(`unable to set migration as applied:`, err)
-		}
-
-		if !ctx.Bool(`all`) {
-			break
+		
+		if !all {
+			return nil
 		}
 	}
 
-	return
+	return nil
 }

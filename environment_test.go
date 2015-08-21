@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func Test_Environment_DSN(t *testing.T) {
+func TestEnvironmentDSN(t *testing.T) {
 	var cases = []struct {
 		driver string
 		output string

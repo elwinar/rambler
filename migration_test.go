@@ -1,66 +1,34 @@
 package main
 
 import (
-	"os"
 	"reflect"
 	"strings"
 	"testing"
 )
 
-func Test_NewMigration(t *testing.T) {
-	os.Chmod("test/4_unreadable.sql", 0000)
-
+func TestNewMigration(t *testing.T) {
 	var cases = []struct {
-		directory string
-		version   uint64
+		path      string
+		migration *Migration
 		err       bool
-		output    *Migration
 	}{
 		{
-			directory: "unknown_directory",
-			version:   0,
+			path:      "test/0_unknown.sql",
+			migration: nil,
 			err:       true,
-			output:    nil,
 		},
 		{
-			directory: "test/not_a_directory",
-			version:   0,
-			err:       true,
-			output:    nil,
-		},
-		{
-			directory: "test",
-			version:   0,
-			err:       true,
-			output:    nil,
-		},
-		{
-			directory: "test",
-			version:   1,
-			err:       false,
-			output: &Migration{
-				Name:        "test/1_foo.sql",
-				Version:     1,
-				Description: "foo",
-				AppliedAt:   nil,
+			path: "test/1_foo.sql",
+			migration: &Migration{
+				Name:   "1_foo.sql",
+				reader: nil,
 			},
-		},
-		{
-			directory: "test",
-			version:   2,
-			err:       true,
-			output:    nil,
-		},
-		{
-			directory: "test",
-			version:   4,
-			err:       true,
-			output:    nil,
+			err: false,
 		},
 	}
 
 	for n, c := range cases {
-		migration, err := NewMigration(c.directory, c.version)
+		migration, err := NewMigration(c.path)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue
@@ -70,15 +38,13 @@ func Test_NewMigration(t *testing.T) {
 			migration.reader = nil
 		}
 
-		if !reflect.DeepEqual(migration, c.output) {
+		if !reflect.DeepEqual(migration, c.migration) {
 			t.Error("case", n, "got unexpected output:", migration)
 		}
 	}
-
-	os.Chmod("test/4_unreadable.sql", 0664)
 }
 
-func Test_Migration_Up(t *testing.T) {
+func TestMigrationUp(t *testing.T) {
 	var cases = []struct {
 		reader *strings.Reader
 		output []string
@@ -109,7 +75,7 @@ fourth
 	}
 }
 
-func Test_Migration_Down(t *testing.T) {
+func TestMigrationDown(t *testing.T) {
 	var cases = []struct {
 		reader *strings.Reader
 		output []string

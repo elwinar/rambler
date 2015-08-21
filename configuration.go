@@ -32,17 +32,15 @@ func Load(filename string) (Configuration, error) {
 
 // Env return the requested environment from the configuration
 func (c Configuration) Env(name string) (Environment, error) {
-	environment := c.Environment
-
 	if name == "default" {
-		return environment, nil
+		return c.Environment, nil
 	}
 
-	overrides, found := c.Environments[name]
+	env, found := c.Environments[name]
 	if !found {
 		return Environment{}, fmt.Errorf("unknown environment %s", name)
 	}
 
-	_ = mergo.Merge(&environment, overrides) // No error can possibly occur here
-	return environment, nil
+	_ = mergo.Merge(&env, c.Environment) // No error can possibly occur here
+	return env, nil
 }

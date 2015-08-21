@@ -29,7 +29,7 @@ type Conn struct {
 	schema string
 }
 
-func (c Conn) MigrationTableExists() (bool, error) {
+func (c Conn) HasTable() (bool, error) {
 	var table string
 	err := c.db.QueryRow(`select table_name from information_schema.tables where table_schema = ? and table_name = ?`, c.schema, "migrations").Scan(&table)
 	if err != nil && err != sql.ErrNoRows {
@@ -43,43 +43,43 @@ func (c Conn) MigrationTableExists() (bool, error) {
 	return true, nil
 }
 
-func (c Conn) CreateMigrationTable() error {
-	_, err := c.db.Exec(`CREATE TABLE migrations ( version BIGINT UNSIGNED NOT NULL PRIMARY KEY, description VARCHAR(255) NOT NULL, applied_at DATETIME NOT NULL ) DEFAULT CHARSET=utf8`)
+func (c Conn) CreateTable() error {
+	_, err := c.db.Exec(`CREATE TABLE migrations ( migration VARCHAR(255) NOT NULL ) DEFAULT CHARSET=utf8`)
 	return err
 }
 
-func (c Conn) ListAppliedMigrations() ([]uint64, error) {
-	rows, err := c.db.Query(`SELECT version FROM migrations ORDER BY version ASC`)
+func (c Conn) GetApplied() ([]string, error) {
+	rows, err := c.db.Query(`SELECT migration FROM migrations ORDER BY migration ASC`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var versions []uint64
+	var migrations []string
 	for rows.Next() {
-		var version uint64
-		err := rows.Scan(&version)
+		var migration string
+		err := rows.Scan(&migration)
 		if err != nil {
 			return nil, err
 		}
 
-		versions = append(versions, version)
+		migrations = append(migrations, migration)
 	}
 
-	return versions, nil
+	return migrations, nil
 }
 
-func (c Conn) SetMigrationApplied(version uint64, description string) error {
-	_, err := c.db.Exec(`INSERT INTO migrations (version, description, applied_at) VALUES (?, ?, NOW())`, version, description)
+func (c Conn) AddApplied(migration string) error {
+	_, err := c.db.Exec(`INSERT INTO migrations (migration) VALUES (?)`, migration)
 	return err
 }
 
-func (c Conn) UnsetMigrationApplied(version uint64) error {
-	_, err := c.db.Exec(`DELETE FROM migrations WHERE version = ?`, version)
+func (c Conn) RemoveApplied(migration string) error {
+	_, err := c.db.Exec(`DELETE FROM migrations WHERE migration = ?`, migration)
 	return err
 }
 
-func (c Conn) Exec(query string) error {
-	_, err := c.db.Exec(query)
+func (c Conn) Execute(statement string) error {
+	_, err := c.db.Exec(statement)
 	return err
 }
