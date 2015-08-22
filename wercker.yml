@@ -1,0 +1,41 @@
+box: golang
+
+build:
+  steps:
+    - setup-go-workspace
+
+    - script:
+        name: go get
+        code: |
+            go get
+
+    - script:
+        name: go build
+        code: |
+            go build ./...
+
+    - script:
+        name: go test
+        code: |
+            go test ./...
+
+    - script:
+        name: goveralls
+        code: |
+            # Check that the token is set
+            if [ -z "${WERCKER_SCRIPT_TOKEN}" ]; then
+                fail "Please set your Coveralls token."
+            fi
+            
+            # Setup the git branch variable globally
+            export GIT_BRANCH=$WERCKER_GIT_BRANCH
+
+            # Get the tools of the trade
+            go get github.com/axw/gocov/gocov
+            go get github.com/mattn/goveralls
+
+            # Export the coverage
+            go test --covermode=count -coverprofile=profile.cov .
+            goveralls -coverprofile=profile.cov -service=wercker.com -repotoken $WERCKER_SCRIPT_TOKEN
+
+        token: $COVERALLS_TOKEN
