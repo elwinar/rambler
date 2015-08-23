@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	// ErrNilMigration is returned when the service is given a nil migration
 	ErrNilMigration = errors.New("nil migration")
 )
 
@@ -55,7 +56,7 @@ func (s Service) Initialize() error {
 	return s.conn.CreateTable()
 }
 
-// Available return the migrations in the environment's directory sorted in 
+// Available return the migrations in the environment's directory sorted in
 // ascending lexicographic order.
 func (s Service) Available() ([]*Migration, error) {
 	files, _ := filepath.Glob(filepath.Join(s.env.Directory, "*.sql")) // The only possible error here is a pattern error
@@ -69,7 +70,7 @@ func (s Service) Available() ([]*Migration, error) {
 
 		migrations = append(migrations, migration)
 	}
-	
+
 	slice.Sort(migrations, func(i, j int) bool {
 		return migrations[i].Name < migrations[j].Name
 	})
@@ -77,7 +78,7 @@ func (s Service) Available() ([]*Migration, error) {
 	return migrations, nil
 }
 
-// Applied return the migrations in the environment's directory that are marked 
+// Applied return the migrations in the environment's directory that are marked
 // as applied in the database sorted in ascending lexicographic order.
 func (s Service) Applied() ([]*Migration, error) {
 	files, err := s.conn.GetApplied()
@@ -94,7 +95,7 @@ func (s Service) Applied() ([]*Migration, error) {
 
 		migrations = append(migrations, migration)
 	}
-	
+
 	slice.Sort(migrations, func(i, j int) bool {
 		return migrations[i].Name < migrations[j].Name
 	})
@@ -102,7 +103,7 @@ func (s Service) Applied() ([]*Migration, error) {
 	return migrations, nil
 }
 
-// Apply execute the up statements the given migration to the
+// Apply execute the up statements of the given migration to the
 // database then mark the migration as applied
 func (s Service) Apply(migration *Migration) error {
 	if migration == nil {
@@ -124,7 +125,7 @@ func (s Service) Apply(migration *Migration) error {
 	return nil
 }
 
-// Apply execute the down statements the given migration to the
+// Reverse execute the down statements of the given migration to the
 // database then mark the migration as not applied
 func (s Service) Reverse(migration *Migration) error {
 	if migration == nil {

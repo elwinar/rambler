@@ -7,6 +7,7 @@ import (
 	"log"
 )
 
+// Reverse available migrations based on the provided context.
 func Reverse(ctx *cli.Context) {
 	err := reverse(service, ctx.Bool("all"))
 	if err != nil {
@@ -33,7 +34,7 @@ func reverse(service Servicer, all bool) error {
 	if err != nil {
 		return fmt.Errorf("unable to retrieve applied migrations: %s", err)
 	}
-	
+
 	if len(applied) == 0 {
 		return nil
 	}
@@ -42,7 +43,7 @@ func reverse(service Servicer, all bool) error {
 	for i >= 0 && j >= 0 && available[i].Name > applied[j].Name {
 		i--
 	}
-	
+
 	for i >= 0 && j >= 0 {
 		if available[i].Name == applied[j].Name {
 			i--
@@ -58,15 +59,15 @@ func reverse(service Servicer, all bool) error {
 			return fmt.Errorf("out of order migration: %s", available[i].Name)
 		}
 	}
-	
+
 	if i >= 0 {
 		return fmt.Errorf("out of order migration: %s", available[i].Name)
 	}
-	
+
 	if j >= 0 {
 		return fmt.Errorf("missing migration: %s", applied[j].Name)
 	}
-	
+
 	slice.Sort(applied, func(i, j int) bool {
 		return applied[i].Name > applied[j].Name
 	})
@@ -76,7 +77,7 @@ func reverse(service Servicer, all bool) error {
 		if err != nil {
 			return err
 		}
-		
+
 		if !all {
 			return nil
 		}

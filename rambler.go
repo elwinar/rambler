@@ -48,8 +48,8 @@ func init() {
 			Action: Apply,
 		},
 		{
-			Name:   "reverse",
-			Usage:  "reverse the last migration",
+			Name:  "reverse",
+			Usage: "reverse the last migration",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "all, a",

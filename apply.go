@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+// Apply available migrations based on the provided context.
 func Apply(ctx *cli.Context) {
 	err := apply(service, ctx.Bool("all"))
 	if err != nil {
@@ -66,7 +67,7 @@ func apply(service Servicer, all bool) error {
 		if err != nil {
 			return err
 		}
-		
+
 		if !all {
 			return nil
 		}

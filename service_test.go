@@ -167,6 +167,25 @@ func TestServiceApplied(t *testing.T) {
 			migrations: nil,
 			err:        true,
 		},
+		{
+			directory: "test/two",
+			table: []string{
+				"1_one.sql",
+				"2_two.sql",
+			},
+			fail: nil,
+			migrations: []*Migration{
+				&Migration{
+					Name:   "1_one.sql",
+					reader: nil,
+				},
+				&Migration{
+					Name:   "2_two.sql",
+					reader: nil,
+				},
+			},
+			err: false,
+		},
 	}
 
 	for n, c := range cases {

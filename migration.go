@@ -73,12 +73,12 @@ func (m Migration) scan(section string) []string {
 	return statements
 }
 
-// Return the up statements of the migration
+// Up return the up statements of the migration
 func (m Migration) Up() []string {
 	return m.scan(`up`)
 }
 
-// Return the down statements of the migration
+// Down return the down statements of the migration
 func (m Migration) Down() []string {
 	raw := m.scan(`down`)
 	var stmt []string
