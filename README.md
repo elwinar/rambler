@@ -4,13 +4,15 @@ A simple and language-independent SQL schema migration tool
 
 ## Installation
 
-Go users can simply compile it from source and install it as a go executable using the following command :
+You can download the latest release on the [release page](https://github.com/elwinar/rambler/releases) of the project.
+The standard release include executables for linux, mac and windows on both 386 and amd64 architectures.
+The compilation is done using the wonderful [GoXC](https://github.com/laher/goxc) tool, let me know if you want your particular architecture added to the standard set.
+
+Go users can also simply compile it from source and install it as a go executable using the following command :
 
 ```
 go install github.com/elwinar/rambler
 ```
-
-Others will have to wait for me to have time to cross-compile the executables and do a distribution website… nothing really fancy (thank to golang), but not done yet.
 
 ## Usage
 
@@ -90,7 +92,8 @@ To ensure database schema consistency, rambler will complain and stop when encou
 
 An environment is an additionnal configuration that is given a name, and can be used to create multiple configurations for a single application (for example, to differenciate production, testing, etc).
 
-Environments are defined in the configuration file, under the `environments` item. Each environment is defined as an attribute of this item, the key being the name and the value being the configuration options.
+Environments are defined in the configuration file, under the `environments` item.
+Each environment is defined as an attribute of this item, the key being the name and the value being the configuration options.
 
 Environments configuration are derived from the default configuration of rambler (at the configuration file's root), so you only need to override the needed options:
 
@@ -102,7 +105,7 @@ Environments configuration are derived from the default configuration of rambler
 	"user": "root",
 	"password": "",
 	"database": "rambler_default",
-	"migrations": "migrations",
+	"directory": "migrations",
 	"environments": {
 		"development": {
 			"database": "rambler_development"
@@ -125,6 +128,12 @@ Here we have three environments defined:
 
 ## CHANGELOG
 
+- **3.2**
+	- Add GoXC configuration file to automate
+- **3.1**
+	- Add continuous integration tooling
+	- Add the [Unlicense](http://unlicense.org/) LICENSE file
+	- Add ego-growing badges on the top of the README file
 - **3.0**
 	- Major refactor to improve the unit testing of the tool
 	- Fix the bugs introduced by the mergo breaking change
