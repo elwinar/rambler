@@ -13,6 +13,7 @@ type Environment struct {
 	Port      uint64 `json:"port"`
 	User      string `json:"user"`
 	Password  string `json:"password"`
+	Path      string `json:"path"`
 	Database  string `json:"database"`
 	Directory string `json:"directory"`
 }
@@ -24,6 +25,8 @@ func (e Environment) DSN() string {
 		return fmt.Sprintf("%s:%s@%s(%s:%d)/%s", e.User, e.Password, e.Protocol, e.Host, e.Port, e.Database)
 	case "postgresql":
 		return fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable", e.User, e.Password, e.Host, e.Port, e.Database)
+	case "sqlite":
+		return e.Path
 	default:
 		return ""
 	}
