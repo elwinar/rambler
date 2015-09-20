@@ -14,6 +14,12 @@ Go users can also simply compile it from source and install it as a go executabl
 go install github.com/elwinar/rambler
 ```
 
+### SQLite
+
+For those that want to use the `sqlite` driver, there is no choice but to compile it from source in your native environment, as the sqlite libraries are all bindings to the original C SQLite library, which Go cannot cross-compile natively.
+
+The sqlite driver is available in the [sqlite](https://github.com/elwinar/rambler/tree/sqlite) branch of repository.
+
 ## Usage
 
 ### Migrations
@@ -59,6 +65,16 @@ Rambler configuration is lightweight: just dump the credentials of your database
 ```
 
 When running, rambler will try to find a configuration file in the working directory and use its values to connect to the managed database.
+
+#### Drivers
+
+Rambler supports actually 3 drivers:
+
+- `mysql`
+- `postgresql`
+- `sqlite`
+
+Don't hesitate to get in touch if you want to see another one supported, provided a golang `database/sql` driver exist for your database vendor.
 
 ### Applying a migration
 
