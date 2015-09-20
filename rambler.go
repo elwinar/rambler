@@ -1,13 +1,16 @@
 package main
 
 import (
-	"github.com/codegangsta/cli"
 	"log"
 	"os"
+
+	"github.com/codegangsta/cli"
 )
 
 var app *cli.App
 var service *Service
+
+var VERSION string
 
 func init() {
 	log.SetFlags(0)
@@ -15,7 +18,7 @@ func init() {
 	app = cli.NewApp()
 	app.Name = "rambler"
 	app.Usage = "Migrate all the things!"
-	app.Version = "3"
+	app.Version = VERSION
 	app.Authors = []cli.Author{
 		{
 			Name:  "Romain Baugue",

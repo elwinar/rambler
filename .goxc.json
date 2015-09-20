@@ -1,5 +1,4 @@
 {
-	"PackageVersion": "3.1.0",
 	"ConfigVersion": "0.9",
 	"Arch": "386 amd64",
 	"Os": "linux windows darwin",
