@@ -91,22 +91,22 @@ func TestReverse(t *testing.T) {
 			initialized:      true,
 			initializedError: nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
@@ -117,11 +117,11 @@ func TestReverse(t *testing.T) {
 
 			err: false,
 			reversed: []*Migration{
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
@@ -131,22 +131,22 @@ func TestReverse(t *testing.T) {
 			initialized:      true,
 			initializedError: nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
@@ -157,7 +157,7 @@ func TestReverse(t *testing.T) {
 
 			err: false,
 			reversed: []*Migration{
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
@@ -167,18 +167,18 @@ func TestReverse(t *testing.T) {
 			initialized:      true,
 			initializedError: nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
@@ -194,26 +194,26 @@ func TestReverse(t *testing.T) {
 			initialized:      true,
 			initializedError: nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "3.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "3.sql",
 					reader: strings.NewReader(""),
 				},
@@ -229,26 +229,26 @@ func TestReverse(t *testing.T) {
 			initialized:      true,
 			initializedError: nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "3.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
@@ -259,11 +259,11 @@ func TestReverse(t *testing.T) {
 
 			err: false,
 			reversed: []*Migration{
-				&Migration{
+				{
 					Name:   "2.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "1.sql",
 					reader: strings.NewReader(""),
 				},

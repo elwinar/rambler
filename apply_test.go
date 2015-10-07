@@ -98,11 +98,11 @@ func TestApply(t *testing.T) {
 			initializedError: nil,
 			initializeError:  nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
@@ -115,7 +115,7 @@ func TestApply(t *testing.T) {
 
 			err: true,
 			executed: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
@@ -126,11 +126,11 @@ func TestApply(t *testing.T) {
 			initializedError: nil,
 			initializeError:  nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
@@ -143,11 +143,11 @@ func TestApply(t *testing.T) {
 
 			err: false,
 			executed: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
@@ -158,11 +158,11 @@ func TestApply(t *testing.T) {
 			initializedError: nil,
 			initializeError:  nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
@@ -175,7 +175,7 @@ func TestApply(t *testing.T) {
 
 			err: false,
 			executed: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
@@ -186,26 +186,26 @@ func TestApply(t *testing.T) {
 			initializedError: nil,
 			initializeError:  nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "zoo.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
@@ -216,7 +216,7 @@ func TestApply(t *testing.T) {
 
 			err: false,
 			executed: []*Migration{
-				&Migration{
+				{
 					Name:   "zoo.sql",
 					reader: strings.NewReader(""),
 				},
@@ -227,30 +227,30 @@ func TestApply(t *testing.T) {
 			initializedError: nil,
 			initializeError:  nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "zoo.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "zoo.sql",
 					reader: strings.NewReader(""),
 				},
@@ -267,30 +267,30 @@ func TestApply(t *testing.T) {
 			initializedError: nil,
 			initializeError:  nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "zoo.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "wee.sql",
 					reader: strings.NewReader(""),
 				},
@@ -307,26 +307,26 @@ func TestApply(t *testing.T) {
 			initializedError: nil,
 			initializeError:  nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "zoo.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "zoo.sql",
 					reader: strings.NewReader(""),
 				},
@@ -343,26 +343,26 @@ func TestApply(t *testing.T) {
 			initializedError: nil,
 			initializeError:  nil,
 			available: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				&Migration{
+				{
 					Name:   "bar.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "foo.sql",
 					reader: strings.NewReader(""),
 				},
-				&Migration{
+				{
 					Name:   "zoo.sql",
 					reader: strings.NewReader(""),
 				},

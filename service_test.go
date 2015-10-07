@@ -64,7 +64,7 @@ func TestServiceAvailable(t *testing.T) {
 		{
 			directory: "test/one",
 			migrations: []*Migration{
-				&Migration{
+				{
 					Name:   "1_one.sql",
 					reader: nil,
 				},
@@ -74,11 +74,11 @@ func TestServiceAvailable(t *testing.T) {
 		{
 			directory: "test/two",
 			migrations: []*Migration{
-				&Migration{
+				{
 					Name:   "1_one.sql",
 					reader: nil,
 				},
-				&Migration{
+				{
 					Name:   "2_two.sql",
 					reader: nil,
 				},
@@ -88,11 +88,11 @@ func TestServiceAvailable(t *testing.T) {
 		{
 			directory: "test/others",
 			migrations: []*Migration{
-				&Migration{
+				{
 					Name:   "1_one.sql",
 					reader: nil,
 				},
-				&Migration{
+				{
 					Name:   "2_two.sql",
 					reader: nil,
 				},
@@ -143,7 +143,7 @@ func TestServiceApplied(t *testing.T) {
 			},
 			fail: nil,
 			migrations: []*Migration{
-				&Migration{
+				{
 					Name:   "1_one.sql",
 					reader: nil,
 				},
@@ -175,11 +175,11 @@ func TestServiceApplied(t *testing.T) {
 			},
 			fail: nil,
 			migrations: []*Migration{
-				&Migration{
+				{
 					Name:   "1_one.sql",
 					reader: nil,
 				},
-				&Migration{
+				{
 					Name:   "2_two.sql",
 					reader: nil,
 				},

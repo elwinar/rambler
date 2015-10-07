@@ -36,13 +36,13 @@ func TestLoad(t *testing.T) {
 					Directory: ".",
 				},
 				Environments: map[string]Environment{
-					"testing": Environment{
+					"testing": {
 						Database: "rambler_testing",
 					},
-					"development": Environment{
+					"development": {
 						Database: "rambler_development",
 					},
-					"production": Environment{
+					"production": {
 						Database: "rambler_production",
 					},
 				},
@@ -117,13 +117,13 @@ func TestConfigurationEnv(t *testing.T) {
 				Directory: ".",
 			},
 			Environments: map[string]Environment{
-				"testing": Environment{
+				"testing": {
 					Database: "rambler_testing",
 				},
-				"development": Environment{
+				"development": {
 					Database: "rambler_development",
 				},
-				"production": Environment{
+				"production": {
 					Database: "rambler_production",
 				},
 			},
