@@ -22,6 +22,10 @@ func TestEnvironmentDSN(t *testing.T) {
 			driver: "postgresql",
 			output: "user=user password=password host=host port=42 dbname=database sslmode=disable",
 		},
+		{
+			driver: "sqlite",
+			output: "database",
+		},
 	}
 
 	for n, c := range cases {

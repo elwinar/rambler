@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
 	"log"
+
+	"github.com/codegangsta/cli"
 )
 
 // Apply available migrations based on the provided context.

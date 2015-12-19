@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/elwinar/rambler/driver"
 	_ "github.com/mattn/go-sqlite3"
@@ -14,6 +15,7 @@ func init() {
 type Driver struct{}
 
 func (d Driver) New(dsn, schema string) (driver.Conn, error) {
+	log.Println("opening", dsn)
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
