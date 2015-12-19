@@ -24,6 +24,8 @@ func (e Environment) DSN() string {
 		return fmt.Sprintf("%s:%s@%s(%s:%d)/%s", e.User, e.Password, e.Protocol, e.Host, e.Port, e.Database)
 	case "postgresql":
 		return fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable", e.User, e.Password, e.Host, e.Port, e.Database)
+	case "sqlite":
+		return e.Database
 	default:
 		return ""
 	}
