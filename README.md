@@ -14,17 +14,11 @@ Go users can also simply compile it from source and install it as a go executabl
 go install github.com/elwinar/rambler
 ```
 
-### SQLite
-
-For those that want to use the `sqlite` driver, there is no choice but to compile it from source in your native environment, as the sqlite libraries are all bindings to the original C SQLite library, which Go cannot cross-compile natively.
-
-The sqlite driver is available in the [sqlite](https://github.com/elwinar/rambler/tree/sqlite) branch of repository.
-
 ## Usage
 
 ### Migrations
 
-In rambler, migrations are kept in the simplest form possible: a migration is a list of sections (`up` and `down`), each section being *chunks* of sql. Example:
+In rambler, migrations are kept in the simplest form possible: a migration is a list of sections (`up` and `down`), each section being an SQL statement. Example:
 
 ```sql
 -- rambler up
@@ -42,7 +36,7 @@ DROP TABLE foo;
 
 Sections are delimited by SQL comments sufixed by the rambler marker (white-spaces sensitive). While applying a migration, rambler will execute each `up` section in order, and while reversing it it will execute each `down` section in reverse order.
 
-Migrations filename must be of the form `version_comment.sql`, version being an integer value, and comment an underscored string. Examples:
+Migrations are executed in alphabetical order, thus a versionning scheme of the form `version_description.sql` is highly recommended, version being an integer value, and description an underscored string. Examples:
 
 * `201409272258_Added_table_foo.sql`
 * `01_First_migration.sql`
@@ -84,7 +78,7 @@ To apply a migration, use the `apply` command.
 rambler apply
 ```
 
-Rambler will compare the migrations already applied and the available migrations in increasing version order to find the next migration to apply, then execute all its `up` sections' statements in order. 
+Rambler will compare the migrations already applied and the available migrations in increasing order to find the next migration to apply, then execute all its `up` sections' statements in order. 
 
 ### Reversing a migration
 
@@ -94,7 +88,7 @@ To reverse a migration, use the `reverse` command.
 rambler reverse
 ```
 
-Rambler will compare the migrations already applied and the available migrations in decreasing version order to find the last applied migrations, then execute all its `down` sections' statements in reverse order.
+Rambler will compare the migrations already applied and the available migrations in decreasing order to find the last applied migrations, then execute all its `down` sections' statements in reverse order.
 
 ### Options
 
