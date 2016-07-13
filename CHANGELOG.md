@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Added
+
+- SQLite driver
+- Exit with error code 1 in case of error
+- Dynamic version into the build
+
+### Removed
+
+- GoXC configuration file
+
 ## [3.2.0](https://github.com/elwinar/rambler/releases/tag/v3.2.0) - 2015-09-19
 
 ### Added
