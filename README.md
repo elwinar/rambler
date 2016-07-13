@@ -138,33 +138,6 @@ Here we have three environments defined:
 
 - [cjhubert](https://github.com/cjhubert)
 
-## CHANGELOG
-
-- **3.2**
-	- Add GoXC configuration file to automate
-- **3.1**
-	- Add continuous integration tooling
-	- Add the [Unlicense](http://unlicense.org/) LICENSE file
-	- Add ego-growing badges on the top of the README file
-- **3.0**
-	- Major refactor to improve the unit testing of the tool
-	- Fix the bugs introduced by the mergo breaking change
-- **2.1**
-	- Added the postgresql driver from the good work of [cjhubert](https://github.com/cjhubert)
-- **2.0**
-	- Complete rewrite to add unit-testing
-	- Removed the command-line options to override the configuration
-	- Fixed behavior of the transactions
-	- Switched from spf13/cobra & spf13/viper to codegangsta/cli and encoding/json : removed the posibility of using alternatives configuration file types (namely YAML and TOML), changed the command-line usage
-- **1.1.0**
-	- Added environments handling
-- **1.0.2**
-	- Fixed a bug about the migration paths building whilte scanning
-	- Made a real documentation
-	- Fixed misconceptions about spf13/viper & spf13/cobra (thanks @spf13 for the pointers)
-- **1.0.1**
-	- Fixed imports paths of the internal packages
-
 ## Feedback and contributions
 
 Feel free to give feedback, make pull requests or simply open issues if you find a bug or have an idea.
