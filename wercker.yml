@@ -26,7 +26,7 @@ build:
             if [ -z "${WERCKER_SCRIPT_TOKEN}" ]; then
                 fail "Please set your Coveralls token."
             fi
-            
+
             # Setup the git branch variable globally
             export GIT_BRANCH=$WERCKER_GIT_BRANCH
 

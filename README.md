@@ -5,8 +5,10 @@ A simple and language-independent SQL schema migration tool
 ## Installation
 
 You can download the latest release on the [release page](https://github.com/elwinar/rambler/releases) of the project.
-The standard release include executables for linux, mac and windows on both 386 and amd64 architectures.
-The compilation is done using the wonderful [GoXC](https://github.com/laher/goxc) tool, let me know if you want your particular architecture added to the standard set.
+
+**NOTE** : Due to adding an SQLite driver, I'm not able to cross-compile as simply as before.
+I'm currently looking for ways to have a simple way to generate a full release for all available environments, but things haven't changed much in that domain since a long time.
+As such, I'm only compiling for the linux/amd64 as I believe it is the most used environment for this kind of tool.
 
 Go users can also simply compile it from source and install it as a go executable using the following command :
 
