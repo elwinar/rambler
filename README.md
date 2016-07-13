@@ -6,15 +6,13 @@ A simple and language-independent SQL schema migration tool
 
 You can download the latest release on the [release page](https://github.com/elwinar/rambler/releases) of the project.
 
-**NOTE** : Due to adding an SQLite driver, I'm not able to cross-compile as simply as before.
-I'm currently looking for ways to have a simple way to generate a full release for all available environments, but things haven't changed much in that domain since a long time.
-As such, I'm only compiling for the linux/amd64 as I believe it is the most used environment for this kind of tool.
-
 Go users can also simply compile it from source and install it as a go executable using the following command :
 
 ```
 go install github.com/elwinar/rambler
 ```
+
+Releases are compiled using the wonderful [XGo](https://github.com/karalabe/xgo). Don't hesitate to check it out, it really kicks some serious ass.
 
 ## Usage
 
@@ -137,6 +135,7 @@ Here we have three environments defined:
 ## CONTRIBUTORS
 
 - [cjhubert](https://github.com/cjhubert)
+- [shawndellysse](https://github.com/shawndellysse)
 
 ## Feedback and contributions
 

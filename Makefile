@@ -1,5 +1,5 @@
 TARGETS="windows/amd64,windows/386,darwin/amd64,darwin/386,linux/amd64,linux/386"
-LDFLAGS="-s -linkmode external -extldflags -static -w -X main.VERSION=`git describe --tags`"
+LDFLAGS="-X main.VERSION=`git describe --tags`"
 PKG="github.com/elwinar/rambler"
 
 help: ## Get help

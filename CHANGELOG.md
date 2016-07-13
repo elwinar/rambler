@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - SQLite driver
 - Exit with error code 1 in case of error
 - Dynamic version into the build
+- A simple makefile for convenience
 
 ### Removed
 

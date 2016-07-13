@@ -10,7 +10,7 @@ import (
 var app *cli.App
 var service *Service
 
-// VERSION holds the version of rambler as defined at compile time by GoXC.
+// VERSION holds the version of rambler as defined at compile time.
 var VERSION string
 
 func init() {
