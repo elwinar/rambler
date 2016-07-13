@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [3.3.0](https://github.com/elwinar/rambler/releases/tag/v3.3.0) - 2016-07-13
+
 ### Added
 
 - SQLite driver
