@@ -1,10 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/imdario/mergo"
 	"io/ioutil"
+
+	"github.com/client9/xson/hjson"
+	"github.com/imdario/mergo"
 )
 
 // Configuration is the configuration type
@@ -22,7 +23,7 @@ func Load(filename string) (Configuration, error) {
 		return c, err
 	}
 
-	err = json.Unmarshal(raw, &c)
+	err = hjson.Unmarshal(raw, &c)
 	if err != nil {
 		return c, err
 	}

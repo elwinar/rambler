@@ -60,6 +60,10 @@ Rambler configuration is lightweight: just dump the credentials of your database
 
 When running, rambler will try to find a configuration file in the working directory and use its values to connect to the managed database.
 
+#### HJSON
+
+Rambler now supports [HJSON](http://hjson.org/) configuration files, which is by the way retrocompatible with JSON.
+
 #### Drivers
 
 Rambler supports actually 3 drivers:
