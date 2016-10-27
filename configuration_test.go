@@ -48,6 +48,33 @@ func TestLoad(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "test/valid.hjson",
+			err:   false,
+			output: Configuration{
+				Environment: Environment{
+					Driver:    "mysql",
+					Protocol:  "tcp",
+					Host:      "localhost",
+					Port:      3306,
+					User:      "root",
+					Password:  "",
+					Database:  "rambler_default",
+					Directory: ".",
+				},
+				Environments: map[string]Environment{
+					"testing": {
+						Database: "rambler_testing",
+					},
+					"development": {
+						Database: "rambler_development",
+					},
+					"production": {
+						Database: "rambler_production",
+					},
+				},
+			},
+		},
 	}
 
 	for n, c := range cases {

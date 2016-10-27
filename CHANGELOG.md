@@ -4,6 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [3.4.0](https://github.com/elwinar/rambler/releases/tag/v3.4.0) - 2016-10-27
+
+### Added
+
+- HJSON support for the configuration file
+
 ## [3.3.0](https://github.com/elwinar/rambler/releases/tag/v3.3.0) - 2016-07-13
 
 ### Added
