@@ -11,7 +11,7 @@ build: ## Build the binary for the local architecture
 
 .PHONY: fetch
 fetch: ## Fetch the dependencies
-	go get ./...
+	go get -d ./...
 
 .PHONY: help
 help: ## Get help
@@ -19,6 +19,7 @@ help: ## Get help
 
 .PHONY: release
 release: ## Build the release files
+	go get github.com/karalabe/xgo
 	xgo --targets=$(TARGETS) --ldflags=$(LDFLAGS) $(PKG)
 
 .PHONY: test

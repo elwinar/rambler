@@ -34,6 +34,7 @@ func TestLoad(t *testing.T) {
 					Password:  "",
 					Database:  "rambler_default",
 					Directory: ".",
+					Table:     "migrations",
 				},
 				Environments: map[string]Environment{
 					"testing": {
@@ -61,6 +62,7 @@ func TestLoad(t *testing.T) {
 					Password:  "",
 					Database:  "rambler_default",
 					Directory: ".",
+					Table:     "migrations",
 				},
 				Environments: map[string]Environment{
 					"testing": {
@@ -85,7 +87,7 @@ func TestLoad(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(cfg, c.output) {
-			t.Error("case", n, "got unexpected output:", cfg)
+			t.Error("case", n, "got unexpected output: wanted", c.output, "got", cfg)
 		}
 	}
 }
@@ -113,6 +115,7 @@ func TestConfigurationEnv(t *testing.T) {
 				Password:  "",
 				Database:  "rambler_default",
 				Directory: ".",
+				Table:     "migrations",
 			},
 		},
 		{
@@ -127,6 +130,7 @@ func TestConfigurationEnv(t *testing.T) {
 				Password:  "",
 				Database:  "rambler_testing",
 				Directory: ".",
+				Table:     "migrations",
 			},
 		},
 	}
@@ -142,6 +146,7 @@ func TestConfigurationEnv(t *testing.T) {
 				Password:  "",
 				Database:  "rambler_default",
 				Directory: ".",
+				Table:     "migrations",
 			},
 			Environments: map[string]Environment{
 				"testing": {

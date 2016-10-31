@@ -41,6 +41,8 @@ Migrations are executed in alphabetical order, thus a versionning scheme of the 
 * `201409272258_Added_table_foo.sql`
 * `01_First_migration.sql`
 
+The migrations applied to the database are stored in a table named `migration` (can be changed with the `table` configuration option).
+
 ### Configuration
 
 Rambler configuration is lightweight: just dump the credentials of your database and the path to your migrations' directory into a JSON file, and you're done. Here is an example or JSON configuration file with the default values of rambler:
@@ -54,7 +56,8 @@ Rambler configuration is lightweight: just dump the credentials of your database
 	"user": "root",
 	"password": "",
 	"database": "",
-	"directory": "."
+	"directory": ".",
+	"table": "migrations"
 }
 ```
 
@@ -120,6 +123,7 @@ Environments configuration are derived from the default configuration of rambler
 	"password": "",
 	"database": "rambler_default",
 	"directory": "migrations",
+	"table": "migrations",
 	"environments": {
 		"development": {
 			"database": "rambler_development"

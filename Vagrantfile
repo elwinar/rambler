@@ -16,5 +16,10 @@ Server = http://archlinux.mirror.root.lu/$repo/os/$arch
 		echo "export GOPATH=~
 		export PATH=\$GOPATH/bin:\$PATH
 		" >> /home/vagrant/.bashrc
+
+		pacman -S --noconfirm docker
+		gpasswd -a vagrant docker
+		systemctl enable docker
+		systemctl start docker
 EOS
 end

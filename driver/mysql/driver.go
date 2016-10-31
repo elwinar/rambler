@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/elwinar/rambler/driver"
 	_ "github.com/go-sql-driver/mysql" // Where are working with the go-sql-driver/mysql driver for database/sql.
@@ -14,7 +15,7 @@ func init() {
 // Driver is the type that initialize new connections.
 type Driver struct{}
 
-func (d Driver) New(dsn, schema string) (driver.Conn, error) {
+func (d Driver) New(dsn, schema, table string) (driver.Conn, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
@@ -23,6 +24,7 @@ func (d Driver) New(dsn, schema string) (driver.Conn, error) {
 	return Conn{
 		db:     db,
 		schema: schema,
+		table:  table,
 	}, nil
 }
 
@@ -30,12 +32,13 @@ func (d Driver) New(dsn, schema string) (driver.Conn, error) {
 type Conn struct {
 	db     *sql.DB
 	schema string
+	table  string
 }
 
 // HasTable check if the schema has the migration table needed for Rambler to operate on it.
 func (c Conn) HasTable() (bool, error) {
 	var table string
-	err := c.db.QueryRow(`select table_name from information_schema.tables where table_schema = ? and table_name = ?`, c.schema, "migrations").Scan(&table)
+	err := c.db.QueryRow(`select table_name from information_schema.tables where table_schema = ? and table_name = ?`, c.schema, c.table).Scan(&table)
 	if err != nil && err != sql.ErrNoRows {
 		return false, err
 	}
@@ -49,13 +52,13 @@ func (c Conn) HasTable() (bool, error) {
 
 // CreateTable create the migration table using a MySQL-compatible syntax.
 func (c Conn) CreateTable() error {
-	_, err := c.db.Exec(`CREATE TABLE migrations ( migration VARCHAR(255) NOT NULL ) DEFAULT CHARSET=utf8`)
+	_, err := c.db.Exec(fmt.Sprintf(`CREATE TABLE %s ( migration VARCHAR(255) NOT NULL ) DEFAULT CHARSET=utf8`, c.table))
 	return err
 }
 
 // GetApplied returns the list of already applied migrations.
 func (c Conn) GetApplied() ([]string, error) {
-	rows, err := c.db.Query(`SELECT migration FROM migrations ORDER BY migration ASC`)
+	rows, err := c.db.Query(fmt.Sprintf(`SELECT migration FROM %s ORDER BY migration ASC`, c.table))
 	if err != nil {
 		return nil, err
 	}
@@ -77,13 +80,13 @@ func (c Conn) GetApplied() ([]string, error) {
 
 // AddApplied record that a migration was applied.
 func (c Conn) AddApplied(migration string) error {
-	_, err := c.db.Exec(`INSERT INTO migrations (migration) VALUES (?)`, migration)
+	_, err := c.db.Exec(fmt.Sprintf(`INSERT INTO %s (migration) VALUES (?)`, c.table), migration)
 	return err
 }
 
 // RemoveApplied record that a migration was reversed.
 func (c Conn) RemoveApplied(migration string) error {
-	_, err := c.db.Exec(`DELETE FROM migrations WHERE migration = ?`, migration)
+	_, err := c.db.Exec(fmt.Sprintf(`DELETE FROM %s WHERE migration = ?`, c.table), migration)
 	return err
 }
 

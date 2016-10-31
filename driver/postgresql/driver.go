@@ -16,7 +16,7 @@ func init() {
 type Driver struct{}
 
 // New returns a new connection.
-func (d Driver) New(dsn, schema string) (driver.Conn, error) {
+func (d Driver) New(dsn, schema, table string) (driver.Conn, error) {
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, err
@@ -25,6 +25,7 @@ func (d Driver) New(dsn, schema string) (driver.Conn, error) {
 	c := &Conn{
 		db:     db,
 		schema: schema,
+		table:  table,
 	}
 
 	return c, nil
@@ -34,12 +35,13 @@ func (d Driver) New(dsn, schema string) (driver.Conn, error) {
 type Conn struct {
 	db     *sql.DB
 	schema string
+	table  string
 }
 
 // HasTable check if the schema has the migration table.
 func (c *Conn) HasTable() (bool, error) {
 	var name string
-	err := c.db.QueryRow(fmt.Sprintf(`SELECT table_name FROM information_schema.tables WHERE table_catalog = '%s' AND table_name = 'migrations'`, c.schema)).Scan(&name)
+	err := c.db.QueryRow(`SELECT table_name FROM information_schema.tables WHERE table_catalog = $1 AND table_name = $2`, c.schema, c.table).Scan(&name)
 	if err != nil && err != sql.ErrNoRows {
 		return false, err
 	}
@@ -51,13 +53,13 @@ func (c *Conn) HasTable() (bool, error) {
 
 // CreateTable create the migration table using a PostgreSQL-compatible syntax.
 func (c *Conn) CreateTable() error {
-	_, err := c.db.Exec(`CREATE TABLE migrations ( migration VARCHAR(255) NOT NULL );`)
+	_, err := c.db.Exec(fmt.Sprintf(`CREATE TABLE %s ( migration VARCHAR(255) NOT NULL );`, c.table))
 	return err
 }
 
 // GetApplied returns the list of applied migrations.
 func (c *Conn) GetApplied() ([]string, error) {
-	rows, err := c.db.Query(`SELECT migration FROM migrations ORDER BY migration ASC`)
+	rows, err := c.db.Query(fmt.Sprintf(`SELECT migration FROM %s ORDER BY migration ASC`, c.table))
 	if err != nil {
 		return nil, err
 	}
@@ -79,13 +81,13 @@ func (c *Conn) GetApplied() ([]string, error) {
 
 // AddApplied records a migration as applied.
 func (c *Conn) AddApplied(migration string) error {
-	_, err := c.db.Exec(`INSERT INTO migrations (migration) VALUES ($1)`, migration)
+	_, err := c.db.Exec(fmt.Sprintf(`INSERT INTO %s (migration) VALUES ($1)`, c.table), migration)
 	return err
 }
 
 // RemoveApplied records a migration as reversed.
 func (c *Conn) RemoveApplied(migration string) error {
-	_, err := c.db.Exec(`DELETE FROM migrations WHERE migration = $1`, migration)
+	_, err := c.db.Exec(fmt.Sprintf(`DELETE FROM %s WHERE migration = $1`, c.table), migration)
 	return err
 }
 

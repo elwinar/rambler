@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"database/sql"
-	"log"
+	"fmt"
 
 	"github.com/elwinar/rambler/driver"
 	_ "github.com/mattn/go-sqlite3"
@@ -14,8 +14,7 @@ func init() {
 
 type Driver struct{}
 
-func (d Driver) New(dsn, schema string) (driver.Conn, error) {
-	log.Println("opening", dsn)
+func (d Driver) New(dsn, schema, table string) (driver.Conn, error) {
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
@@ -24,17 +23,19 @@ func (d Driver) New(dsn, schema string) (driver.Conn, error) {
 	return Conn{
 		db:     db,
 		schema: schema,
+		table:  table,
 	}, nil
 }
 
 type Conn struct {
 	db     *sql.DB
 	schema string
+	table  string
 }
 
 func (c Conn) HasTable() (bool, error) {
 	var table string
-	err := c.db.QueryRow(`SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?`, "migrations").Scan(&table)
+	err := c.db.QueryRow(`SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?`, c.table).Scan(&table)
 	if err != nil && err != sql.ErrNoRows {
 		return false, err
 	}
@@ -47,12 +48,12 @@ func (c Conn) HasTable() (bool, error) {
 }
 
 func (c Conn) CreateTable() error {
-	_, err := c.db.Exec(`CREATE TABLE migrations ( migration VARCHAR(255) NOT NULL );`)
+	_, err := c.db.Exec(fmt.Sprintf(`CREATE TABLE %s ( migration VARCHAR(255) NOT NULL );`, c.table))
 	return err
 }
 
 func (c Conn) GetApplied() ([]string, error) {
-	rows, err := c.db.Query(`SELECT migration FROM migrations ORDER BY migration ASC`)
+	rows, err := c.db.Query(fmt.Sprintf(`SELECT migration FROM %s ORDER BY migration ASC`, c.table))
 	if err != nil {
 		return nil, err
 	}
@@ -73,12 +74,12 @@ func (c Conn) GetApplied() ([]string, error) {
 }
 
 func (c Conn) AddApplied(migration string) error {
-	_, err := c.db.Exec(`INSERT INTO migrations (migration) VALUES (?)`, migration)
+	_, err := c.db.Exec(fmt.Sprintf(`INSERT INTO %s (migration) VALUES (?)`, c.table), migration)
 	return err
 }
 
 func (c Conn) RemoveApplied(migration string) error {
-	_, err := c.db.Exec(`DELETE FROM migrations WHERE migration = ?`, migration)
+	_, err := c.db.Exec(fmt.Sprintf(`DELETE FROM %s WHERE migration = ?`, c.table), migration)
 	return err
 }
 

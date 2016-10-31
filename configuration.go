@@ -17,15 +17,16 @@ type Configuration struct {
 // Load open, read and parse the given configuration file
 func Load(filename string) (Configuration, error) {
 	var c Configuration
+	c.Table = "migrations"
 
 	raw, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return c, err
+		return Configuration{}, err
 	}
 
 	err = hjson.Unmarshal(raw, &c)
 	if err != nil {
-		return c, err
+		return Configuration{}, err
 	}
 
 	return c, nil

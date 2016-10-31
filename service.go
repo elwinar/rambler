@@ -36,7 +36,7 @@ func NewService(env Environment) (*Service, error) {
 		return nil, fmt.Errorf("%s isn't a directory", env.Directory)
 	}
 
-	conn, err := driver.Get(env.Driver, env.DSN(), env.Database)
+	conn, err := driver.Get(env.Driver, env.DSN(), env.Database, env.Table)
 	if err != nil {
 		return nil, fmt.Errorf("unable to initialize driver: %s", err.Error())
 	}
