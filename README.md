@@ -34,9 +34,9 @@ CREATE TABLE foo (
 DROP TABLE foo;
 ```
 
-Sections are delimited by SQL comments sufixed by the rambler marker (white-spaces sensitive). While applying a migration, rambler will execute each `up` section in order, and while reversing it it will execute each `down` section in reverse order.
+Sections are delimited by SQL comments suffixed by the rambler marker (white-spaces sensitive). While applying a migration, rambler will execute each `up` section in order, and while reversing it it will execute each `down` section in reverse order.
 
-Migrations are executed in alphabetical order, thus a versionning scheme of the form `version_description.sql` is highly recommended, version being an integer value, and description an underscored string. Examples:
+Migrations are executed in alphabetical order, thus a versioning scheme of the form `version_description.sql` is highly recommended, version being an integer value, and description an underscored string. Examples:
 
 * `201409272258_Added_table_foo.sql`
 * `01_First_migration.sql`
@@ -107,7 +107,7 @@ To ensure database schema consistency, rambler will complain and stop when encou
 
 ### Environments
 
-An environment is an additionnal configuration that is given a name, and can be used to create multiple configurations for a single application (for example, to differenciate production, testing, etc).
+An environment is an additional configuration that is given a name, and can be used to create multiple configurations for a single application (for example, to differentiate production, testing, etc).
 
 Environments are defined in the configuration file, under the `environments` item.
 Each environment is defined as an attribute of this item, the key being the name and the value being the configuration options.
