@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 // Apply available migrations based on the provided context.
