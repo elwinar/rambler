@@ -66,7 +66,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 
 - The command-line options to override the configuration
-- Posibility of using alternatives configuration file types (namely YAML and TOML)
+- Possibility of using alternatives configuration file types (namely YAML and TOML)
 
 ### Fixed
 
