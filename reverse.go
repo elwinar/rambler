@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/bradfitz/slice"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"log"
 )
 

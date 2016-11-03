@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Changed
+
+- Moved from github.com/codegangsta/cli to [github.com/urfave/cli](https://github.com/urfave/cli)
+
 ## [3.4.0](https://github.com/elwinar/rambler/releases/tag/v3.4.0) - 2016-10-27
 
 ### Added
@@ -53,7 +57,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.1.0](https://github.com/elwinar/rambler/releases/tag/v2.1.0) - 2014-12-24
 
-### Added 
+### Added
 
 - Postgresql driver from the good work of [cjhubert](https://github.com/cjhubert)
 
@@ -71,4 +75,3 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Behavior of the transactions
-
