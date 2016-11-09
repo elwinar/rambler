@@ -67,6 +67,24 @@ When running, rambler will try to find a configuration file in the working direc
 
 Rambler now supports [HJSON](http://hjson.org/) configuration files, which is by the way retrocompatible with JSON.
 
+#### Environment Variables
+
+Alternatively, Rambler can read configuration from environment variables. The
+environment variables can override any of the confifuration file values and
+are prefixed with `RAMBLER_`.
+
+| Env Var           | Config    |
+|-------------------|-----------|
+| RAMBLER_DRIVER    | driver    |
+| RAMBLER_PROTOCOL  | protocol  |
+| RAMBLER_HOST      | host      |
+| RAMBLER_PORT      | port      |
+| RAMBLER_USER      | user      |
+| RAMBLER_PASSWORD  | password  |
+| RAMBLER_DATABASE  | database  |
+| RAMBLER_DIRECTORY | directory |
+| RAMBLER_TABLE     | table     |
+
 #### Drivers
 
 Rambler supports actually 3 drivers:

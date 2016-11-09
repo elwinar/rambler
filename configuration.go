@@ -6,6 +6,7 @@ import (
 
 	"github.com/client9/xson/hjson"
 	"github.com/imdario/mergo"
+	"github.com/kelseyhightower/envconfig"
 )
 
 // Configuration is the configuration type
@@ -25,6 +26,11 @@ func Load(filename string) (Configuration, error) {
 	}
 
 	err = hjson.Unmarshal(raw, &c)
+	if err != nil {
+		return Configuration{}, err
+	}
+
+	err = envconfig.Process("rambler", &c)
 	if err != nil {
 		return Configuration{}, err
 	}
