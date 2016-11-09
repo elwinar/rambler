@@ -20,17 +20,19 @@ func Load(filename string) (Configuration, error) {
 	var c Configuration
 	c.Table = "migrations"
 
-	raw, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return Configuration{}, err
+	if filename != "" {
+		raw, err := ioutil.ReadFile(filename)
+		if err != nil {
+			return Configuration{}, err
+		}
+
+		err = hjson.Unmarshal(raw, &c)
+		if err != nil {
+			return Configuration{}, err
+		}
 	}
 
-	err = hjson.Unmarshal(raw, &c)
-	if err != nil {
-		return Configuration{}, err
-	}
-
-	err = envconfig.Process("rambler", &c)
+	err := envconfig.Process("rambler", &c)
 	if err != nil {
 		return Configuration{}, err
 	}
