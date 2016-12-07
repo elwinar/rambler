@@ -52,7 +52,7 @@ func (c Conn) HasTable() (bool, error) {
 
 // CreateTable create the migration table using a MySQL-compatible syntax.
 func (c Conn) CreateTable() error {
-	_, err := c.db.Exec(fmt.Sprintf(`CREATE TABLE %s ( migration VARCHAR(255) NOT NULL ) DEFAULT CHARSET=utf8`, c.table))
+	_, err := c.db.Exec(fmt.Sprintf(`CREATE TABLE %s ( migration VARCHAR(255) NOT NULL, PRIMARY KEY(migration) ) DEFAULT CHARSET=utf8`, c.table))
 	return err
 }
 

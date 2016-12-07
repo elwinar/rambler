@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Added
+
+- MySQL driver now use the migration name as primary key (necessary for Percona XtraDB clusters)
+
 ### Changed
 
 - Moved from github.com/codegangsta/cli to [github.com/urfave/cli](https://github.com/urfave/cli)
