@@ -29,7 +29,6 @@ func init() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "configuration, c",
-			Value: "rambler.json",
 			Usage: "path to the configuration file",
 		},
 		cli.StringFlag{
