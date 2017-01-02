@@ -14,3 +14,6 @@ sudo pacman -S --noconfirm go
 # Docker
 sudo pacman -S --noconfirm docker
 gpasswd -a vagrant docker
+
+# Fix the permission issue of Vagrant
+chown -R vagrant:vagrant /home/vagrant
