@@ -6,7 +6,6 @@ import (
 
 	"github.com/client9/xson/hjson"
 	"github.com/imdario/mergo"
-	"github.com/kelseyhightower/envconfig"
 )
 
 // Configuration is the configuration type
@@ -20,19 +19,12 @@ func Load(filename string) (Configuration, error) {
 	var c Configuration
 	c.Table = "migrations"
 
-	if filename != "" {
-		raw, err := ioutil.ReadFile(filename)
-		if err != nil {
-			return Configuration{}, err
-		}
-
-		err = hjson.Unmarshal(raw, &c)
-		if err != nil {
-			return Configuration{}, err
-		}
+	raw, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return Configuration{}, err
 	}
 
-	err := envconfig.Process("rambler", &c)
+	err = hjson.Unmarshal(raw, &c)
 	if err != nil {
 		return Configuration{}, err
 	}

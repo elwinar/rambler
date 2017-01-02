@@ -7,6 +7,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - MySQL driver now use the migration name as primary key (necessary for Percona XtraDB clusters)
+- Logs are now emitted during the execution, on both debug and info level
+- Debug command line flag to toggle the debug logs
 
 ### Changed
 

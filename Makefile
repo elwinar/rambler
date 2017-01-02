@@ -23,7 +23,6 @@ image: ## Build the docker image
 
 .PHONY: release
 release: ## Build the release files
-	go get github.com/karalabe/xgo
 	xgo --targets=$(TARGETS) --ldflags=$(LDFLAGS) $(PKG)
 
 .PHONY: test

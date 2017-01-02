@@ -40,7 +40,7 @@ func TestBootstrap(t *testing.T) {
 	for n, c := range cases {
 		service = nil
 
-		err := bootstrap(c.configuration, c.environment)
+		err := bootstrap(c.configuration, c.environment, false)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue

@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/elwinar/rambler/log"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/urfave/cli"
 )
 
@@ -12,17 +15,22 @@ func Bootstrap(ctx *cli.Context) error {
 }
 
 func bootstrap(configuration, environment string, debug bool) error {
-	logger = log.NewLogger(
-		log.Debug(debug),
-	)
+	logger = log.NewLogger(func(l *log.Logger) {
+		l.PrintDebug = debug
+	})
 
-	logger.Debug("loading configuration", logger.M{"file": configuration})
+	logger.Debug("loading configuration from", configuration)
 	cfg, err := Load(configuration)
 	if err != nil {
-		return fmt.Errorf("unable to load configuration file: %s", err)
+		return fmt.Errorf("unable to load configuration from file: %s", err)
 	}
 
-	logger.Debug("loading environment", logger.M{"name": environment})
+	err = envconfig.Process("rambler", &cfg)
+	if err != nil {
+		return fmt.Errorf("unable to load configuration from env: %s", err)
+	}
+
+	logger.Debug("loading environment", environment)
 	env, err := cfg.Env(environment)
 	if err != nil {
 		return fmt.Errorf("unable to load requested environment: %s", err)

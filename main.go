@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/elwinar/rambler/log"
@@ -37,10 +38,9 @@ func main() {
 			Usage: "set the working environment",
 		},
 		cli.BoolFlag{
-			Name: "debug, v",
-			Value: false,
+			Name:  "debug",
 			Usage: "display debug messages",
-		}
+		},
 	}
 
 	app.Before = Bootstrap

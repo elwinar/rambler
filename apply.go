@@ -47,7 +47,7 @@ func apply(service Servicer, all bool) error {
 	logger.Debug("comparing available and applied migrations")
 	var i, j = 0, 0
 	for i < len(available) && j < len(applied) {
-		logger.Debug("comparing %s and %s", availabble[i].Name, applied[j].Name)
+		logger.Debug("comparing %s and %s", available[i].Name, applied[j].Name)
 		if available[i].Name == applied[j].Name {
 			i++
 			j++

@@ -10,6 +10,8 @@ sudo ln -sf /vagrant/etc/bashrc /home/vagrant/.bashrc
 
 # Go
 sudo pacman -S --noconfirm go
+export GOPATH=/home/vagrant
+go get github.com/karalabe/xgo
 
 # Docker
 sudo pacman -S --noconfirm docker
