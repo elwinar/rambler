@@ -1,15 +1,22 @@
 package log
 
-type Logger struct{
-	Debug bool
-	Output   io.Writer
+import (
+	"fmt"
+	"io"
+	"os"
+	"time"
+)
+
+type Logger struct {
+	Debug      bool
+	Output     io.Writer
 	DateFormat string
 }
 
 func NewLogger(opts ...func(*Logger)) *Logger {
 	l := &Logger{
-		Debug: false,
-		Output: os.Stdout,
+		Debug:      false,
+		Output:     os.Stdout,
 		DateFormat: "15:04",
 	}
 
