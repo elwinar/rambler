@@ -39,11 +39,16 @@ func TestBootstrap(t *testing.T) {
 
 	for n, c := range cases {
 		service = nil
+		logger = nil
 
 		err := bootstrap(c.configuration, c.environment, false)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue
+		}
+
+		if logger == nil {
+			t.Error("case", n, "got an uninitialized logger")
 		}
 
 		if (service != nil) != c.initialized {

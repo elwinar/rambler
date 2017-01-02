@@ -2,20 +2,21 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"os"
 
+	"github.com/elwinar/rambler/log"
 	"github.com/urfave/cli"
 )
 
 // Apply available migrations based on the provided context.
 func Apply(ctx *cli.Context) {
-	err := apply(service, ctx.Bool("all"))
+	err := apply(service, ctx.Bool("all"), logger)
 	if err != nil {
-		log.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 	}
 }
 
-func apply(service Servicer, all bool) error {
+func apply(service Servicer, all bool, logger *log.Logger) error {
 	logger.Debug("checking database state")
 	initialized, err := service.Initialized()
 	if err != nil {

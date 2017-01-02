@@ -2,9 +2,12 @@ package main
 
 import (
 	"errors"
+	"io/ioutil"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/elwinar/rambler/log"
 )
 
 func TestApply(t *testing.T) {
@@ -398,7 +401,11 @@ func TestApply(t *testing.T) {
 			},
 		}
 
-		err := apply(service, c.all)
+		logger = log.NewLogger(func(l *log.Logger) {
+			l.Output = ioutil.Discard
+		})
+
+		err := apply(service, c.all, logger)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue

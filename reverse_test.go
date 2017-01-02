@@ -2,9 +2,12 @@ package main
 
 import (
 	"errors"
+	"io/ioutil"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/elwinar/rambler/log"
 )
 
 func TestReverse(t *testing.T) {
@@ -290,7 +293,11 @@ func TestReverse(t *testing.T) {
 			},
 		}
 
-		err := reverse(service, c.all)
+		logger = log.NewLogger(func(l *log.Logger) {
+			l.Output = ioutil.Discard
+		})
+
+		err := reverse(service, c.all, logger)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue

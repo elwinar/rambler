@@ -2,20 +2,22 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/bradfitz/slice"
+	"github.com/elwinar/rambler/log"
 	"github.com/urfave/cli"
-	"log"
 )
 
 // Reverse available migrations based on the provided context.
 func Reverse(ctx *cli.Context) {
-	err := reverse(service, ctx.Bool("all"))
+	err := reverse(service, ctx.Bool("all"), logger)
 	if err != nil {
-		log.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 	}
 }
 
-func reverse(service Servicer, all bool) error {
+func reverse(service Servicer, all bool, logger *log.Logger) error {
 	logger.Debug("checking database state")
 	initialized, err := service.Initialized()
 	if err != nil {
