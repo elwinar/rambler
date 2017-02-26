@@ -19,7 +19,7 @@ func bootstrap(configuration, environment string, debug bool) error {
 		l.PrintDebug = debug
 	})
 
-	logger.Debug("loading configuration from", configuration)
+	logger.Debug("loading configuration from %s", configuration)
 	cfg, err := Load(configuration)
 	if err != nil {
 		return fmt.Errorf("unable to load configuration from file: %s", err)

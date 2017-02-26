@@ -28,7 +28,7 @@ func NewLogger(opts ...func(*Logger)) *Logger {
 }
 
 func (l *Logger) log(lvl, msg string, args ...interface{}) {
-	fmt.Fprintf(l.Output, "%s %s %s", time.Now().Format(l.DateFormat), lvl, fmt.Sprintf(msg, args...))
+	fmt.Fprintf(l.Output, "%s %s %s\n", time.Now().Format(l.DateFormat), lvl, fmt.Sprintf(msg, args...))
 }
 
 func (l *Logger) Debug(msg string, args ...interface{}) {
