@@ -30,7 +30,7 @@ func bootstrap(configuration, environment string, debug bool) error {
 		return fmt.Errorf("unable to load configuration from env: %s", err)
 	}
 
-	logger.Debug("loading environment", environment)
+	logger.Debug("loading environment %s", environment)
 	env, err := cfg.Env(environment)
 	if err != nil {
 		return fmt.Errorf("unable to load requested environment: %s", err)
