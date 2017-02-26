@@ -32,7 +32,9 @@ func (l *Logger) log(lvl, msg string, args ...interface{}) {
 }
 
 func (l *Logger) Debug(msg string, args ...interface{}) {
-	l.log("debug", msg, args...)
+	if l.PrintDebug {
+		l.log("debug", msg, args...)
+	}
 }
 
 func (l *Logger) Info(msg string, args ...interface{}) {
