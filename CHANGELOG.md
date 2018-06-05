@@ -4,7 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-## [4.1.4](https://gihub.com/elwinar/rambler/releases/tag/4.1.4) - 2016-06-05
+## [4.2.0](https://gihub.com/elwinar/rambler/releases/tag/4.2.0) - 2018-06-05
+### Added
+- Multistage docker build
+- DockerHub automated build
+
+## [4.1.4](https://gihub.com/elwinar/rambler/releases/tag/4.1.4) - 2018-06-05
 ### Fixed
 - PostgreSQL DSN order
 
