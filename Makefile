@@ -17,10 +17,6 @@ fetch: ## Fetch the dependencies
 help: ## Get help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: image
-image: ## Build the docker image
-	docker build . -t elwinar/rambler --no-cache
-
 .PHONY: release
 release: ## Build the release files
 	xgo --targets=$(TARGETS) --ldflags=$(LDFLAGS) $(PKG)

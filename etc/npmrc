@@ -1,4 +1,0 @@
-prefix=~/.local/npm
-cache=~/.cache/npm
-progress=false
-
