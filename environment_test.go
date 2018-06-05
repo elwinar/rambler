@@ -20,7 +20,7 @@ func TestEnvironmentDSN(t *testing.T) {
 		},
 		{
 			driver: "postgresql",
-			output: "user=user password=password host=host port=42 dbname=database sslmode=disable",
+			output: "host=host port=42 user=user password=password dbname=database sslmode=disable",
 		},
 		{
 			driver: "sqlite",
