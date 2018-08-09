@@ -4,29 +4,34 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-## [4.2.0](https://gihub.com/elwinar/rambler/releases/tag/4.2.0) - 2018-06-05
+## [4.2.1](https://github.com/elwinar/rambler/releases/tag/4.2.1) - 2018-08-09
+### Fixed
+- Return status of the commands in case of error
+- Static linking of the binary built for docker
+
+## [4.2.0](https://github.com/elwinar/rambler/releases/tag/4.2.0) - 2018-06-05
 ### Added
 - Multistage docker build
 - DockerHub automated build
 
-## [4.1.4](https://gihub.com/elwinar/rambler/releases/tag/4.1.4) - 2018-06-05
+## [4.1.4](https://github.com/elwinar/rambler/releases/tag/4.1.4) - 2018-06-05
 ### Fixed
 - PostgreSQL DSN order
 
-## [4.1.3](https://gihub.com/elwinar/rambler/releases/tag/4.1.3) - 2017-02-26
+## [4.1.3](https://github.com/elwinar/rambler/releases/tag/4.1.3) - 2017-02-26
 ### Fixed
 - Respect the debug logging flag
 
-## [4.1.2](https://gihub.com/elwinar/rambler/releases/tag/4.1.2) - 2017-02-26
+## [4.1.2](https://github.com/elwinar/rambler/releases/tag/4.1.2) - 2017-02-26
 ### Fixed
 - Missing formatter on environment log
 
-## [4.1.1](https://gihub.com/elwinar/rambler/releases/tag/4.1.1) - 2017-02-26
+## [4.1.1](https://github.com/elwinar/rambler/releases/tag/4.1.1) - 2017-02-26
 ### Fixed
 - Logging formatting
 - Missing default configuration values
 
-## [4.1.0](https://gihub.com/elwinar/rambler/releases/tag/4.1.0) - 2017-01-02
+## [4.1.0](https://github.com/elwinar/rambler/releases/tag/4.1.0) - 2017-01-02
 ### Added
 - Docker image
 - Logs various actions
