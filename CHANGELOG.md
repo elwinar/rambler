@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+### Changed
+- It is no longer an error if no configuration file is provided as option and
+  the default one doesn't exists.
 
 ## [4.2.1](https://github.com/elwinar/rambler/releases/tag/4.2.1) - 2018-08-09
 ### Fixed
