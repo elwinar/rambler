@@ -8,11 +8,17 @@ import (
 	"github.com/urfave/cli"
 )
 
-var service *Service
-var logger *log.Logger
+var (
+	service *Service
+	logger  *log.Logger
 
-// VERSION holds the version of rambler as defined at compile time.
-var VERSION string
+	// VERSION holds the version of rambler as defined at compile time.
+	VERSION string
+)
+
+const (
+	DefaultConfiguration = "rambler.json"
+)
 
 func main() {
 	var app = cli.NewApp()
@@ -30,7 +36,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "configuration, c",
-			Value: "rambler.json",
+			Value: DefaultConfiguration,
 			Usage: "path to the configuration file",
 		},
 		cli.StringFlag{

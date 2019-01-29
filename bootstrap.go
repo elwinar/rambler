@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/elwinar/rambler/log"
 	"github.com/kelseyhightower/envconfig"
@@ -14,15 +15,19 @@ func Bootstrap(ctx *cli.Context) error {
 	return bootstrap(ctx.GlobalString("configuration"), ctx.GlobalString("environment"), ctx.GlobalBool("debug"))
 }
 
-func bootstrap(configuration, environment string, debug bool) error {
+func bootstrap(configuration, environment string, debug bool) (err error) {
 	logger = log.NewLogger(func(l *log.Logger) {
 		l.PrintDebug = debug
 	})
 
-	logger.Debug("loading configuration from %s", configuration)
-	cfg, err := Load(configuration)
-	if err != nil {
-		return fmt.Errorf("unable to load configuration from file: %s", err)
+	var cfg Configuration
+
+	if configuration != DefaultConfiguration || exists(configuration) {
+		logger.Debug("loading configuration from %s", configuration)
+		cfg, err = Load(configuration)
+		if err != nil {
+			return fmt.Errorf("unable to load configuration from file: %s", err)
+		}
 	}
 
 	err = envconfig.Process("rambler", &cfg)
@@ -43,4 +48,11 @@ func bootstrap(configuration, environment string, debug bool) error {
 	}
 
 	return nil
+}
+
+func exists(file string) bool {
+	if _, err := os.Stat(file); err == nil {
+		return true
+	}
+	return false
 }
