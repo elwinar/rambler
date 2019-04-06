@@ -113,7 +113,11 @@ func (s Service) Apply(migration *Migration) error {
 	}
 
 	for _, statement := range migration.Up() {
-		err := s.conn.Execute(statement)
+		newStatement, err := replace(statement)
+		if err != nil {
+			return fmt.Errorf("unable to apply migration %s: %s\n%s", migration.Name, err, statement)
+		}
+		err = s.conn.Execute(newStatement)
 		if err != nil {
 			return fmt.Errorf("unable to apply migration %s: %s\n%s", migration.Name, err, statement)
 		}
@@ -135,7 +139,11 @@ func (s Service) Reverse(migration *Migration) error {
 	}
 
 	for _, statement := range migration.Down() {
-		err := s.conn.Execute(statement)
+		newStatement, err := replace(statement)
+		if err != nil {
+			return fmt.Errorf("unable to apply migration %s: %s\n%s", migration.Name, err, statement)
+		}
+		err = s.conn.Execute(newStatement)
 		if err != nil {
 			return fmt.Errorf("unable to reverse migration %s: %s\n%s", migration.Name, err, statement)
 		}
