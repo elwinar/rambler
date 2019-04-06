@@ -27,6 +27,7 @@ func findEnvVal(toReplace string) (string, error) {
 	key := strings.TrimSuffix(toReplace, "}")
 	key = strings.TrimPrefix(key, "${")
 	value := os.Getenv(strings.ToUpper(key))
+
 	if value == "" {
 		return "", fmt.Errorf("could not find env value for %s", toReplace)
 	}

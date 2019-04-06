@@ -87,7 +87,7 @@ by the way retrocompatible with JSON.
 #### Environment Variables
 
 Alternatively, Rambler can read configuration from environment variables. The
-environment variables can override any of the confifuration file values and
+environment variables can override any of the configuration file values and
 are prefixed with `RAMBLER_`.
 
 | Env Var           | Config    |
@@ -101,6 +101,12 @@ are prefixed with `RAMBLER_`.
 | RAMBLER_DATABASE  | database  |
 | RAMBLER_DIRECTORY | directory |
 | RAMBLER_TABLE     | table     |
+
+##### Environment Variables in Scripts
+If you need to externalize values, such as password hashes for default accounts,
+you can integrate environmental variable using ${var} syntax. This will match
+against environment values matched as all caps. ${sys_pass} find an environment
+variable an SYS_PASS as will ${SYS_PASS}.
 
 #### Drivers
 
