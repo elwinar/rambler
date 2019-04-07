@@ -31,6 +31,18 @@ func reverse(service Servicer, all bool, logger *log.Logger) error {
 	}
 	logger.Info("found %d available migrations", len(available))
 
+	var preinits []*Migration
+	var regular []*Migration
+	for _, m := range available {
+		if m.IsPreinit() {
+			preinits = append(preinits, m)
+		} else {
+			regular = append(regular, m)
+		}
+	}
+	available = regular
+
+
 	logger.Debug("fetching applied migrations")
 	applied, err := service.Applied()
 	if err != nil {
@@ -92,6 +104,20 @@ func reverse(service Servicer, all bool, logger *log.Logger) error {
 			break
 		}
 	}
+
+	logger.Debug("reversing %d pre-inits.", len(preinits))
+	for _, migration := range preinits {
+		logger.Debug("reversing %s", migration.Name)
+		err := service.Reverse(migration)
+		if err != nil {
+			return err
+		}
+
+		if !all {
+			break
+		}
+	}
+
 
 	logger.Info("done")
 	return nil

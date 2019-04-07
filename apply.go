@@ -13,6 +13,34 @@ func Apply(ctx *cli.Context) error {
 }
 
 func apply(service Servicer, all bool, logger *log.Logger) error {
+	logger.Debug("fetching available migrations")
+	available, err := service.Available()
+	if err != nil {
+		return fmt.Errorf("unable to retrieve available migrations: %s", err)
+	}
+	logger.Info("found %d available migrations", len(available))
+
+	var preinit []*Migration
+	var regularMigrations []*Migration
+	for _, m := range available {
+		if m.IsPreinit() {
+			preinit = append(preinit, m)
+		} else {
+			regularMigrations = append(regularMigrations, m)
+		}
+	}
+
+	logger.Info("%d pre-migrations to apply.", len(preinit))
+	for _, m := range preinit {
+		logger.Info("applying %s", m.Name)
+		err := service.Apply(m)
+		if err != nil {
+			return err
+		}
+	}
+
+	available = regularMigrations
+
 	logger.Debug("checking database state")
 	initialized, err := service.Initialized()
 	if err != nil {
@@ -26,13 +54,6 @@ func apply(service Servicer, all bool, logger *log.Logger) error {
 			return fmt.Errorf("unable to initialize database: %s", err)
 		}
 	}
-
-	logger.Debug("fetching available migrations")
-	available, err := service.Available()
-	if err != nil {
-		return fmt.Errorf("unable to retrieve available migrations: %s", err)
-	}
-	logger.Info("found %d available migrations", len(available))
 
 	logger.Debug("fetching applied migrations")
 	applied, err := service.Applied()

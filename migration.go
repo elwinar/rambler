@@ -33,6 +33,12 @@ func NewMigration(path string) (*Migration, error) {
 	return m, nil
 }
 
+// IsPreinit indicates the migration should run before the official tracking.
+// Pre-initialization files have the standard name ending in '_pre.sql'.
+func(m Migration) IsPreinit() bool {
+	return strings.HasSuffix(m.Name, "_pre.sql")
+}
+
 // Scan retrieve all sections of the file with the given section marker.
 func (m Migration) scan(section string) []string {
 	var scanner = bufio.NewScanner(m.reader)

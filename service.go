@@ -123,9 +123,11 @@ func (s Service) Apply(migration *Migration) error {
 		}
 	}
 
-	err := s.conn.AddApplied(migration.Name)
-	if err != nil {
-		return fmt.Errorf("unable to mark migration %s as applied: %s", migration.Name, err)
+	if !migration.IsPreinit() {
+		err := s.conn.AddApplied(migration.Name)
+		if err != nil {
+			return fmt.Errorf("unable to mark migration %s as applied: %s", migration.Name, err)
+		}
 	}
 
 	return nil
@@ -149,10 +151,11 @@ func (s Service) Reverse(migration *Migration) error {
 		}
 	}
 
-	err := s.conn.RemoveApplied(migration.Name)
-	if err != nil {
-		return fmt.Errorf("unable to mark migration %s as not applied: %s", migration.Name, err)
+	if !migration.IsPreinit() {
+		err := s.conn.RemoveApplied(migration.Name)
+		if err != nil {
+			return fmt.Errorf("unable to mark migration %s as not applied: %s", migration.Name, err)
+		}
 	}
-
 	return nil
 }
