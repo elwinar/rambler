@@ -6,11 +6,11 @@ import (
 )
 
 type MockDriver struct {
-	new func(string, string, string) (Conn, error)
+	new func(string, string, string, string) (Conn, error)
 }
 
-func (d *MockDriver) New(dsn, schema, table string) (Conn, error) {
-	return d.new(dsn, schema, table)
+func (d *MockDriver) New(dsn, database, schema, table string) (Conn, error) {
+	return d.new(dsn, database, schema, table)
 }
 
 func Test_Register_NilDriver(t *testing.T) {
@@ -52,7 +52,7 @@ func Test_Register_OK(t *testing.T) {
 func Test_Get_NotRegistered(t *testing.T) {
 	drivers = make(map[string]Driver)
 
-	_, err := Get("test", "", "", "migrations")
+	_, err := Get("test", "", "","", "migrations")
 	if err == nil {
 		t.Fail()
 	}
@@ -62,7 +62,7 @@ func Test_Get_InitializeError(t *testing.T) {
 	drivers = make(map[string]Driver)
 
 	driver := &MockDriver{}
-	driver.new = func(_, _, _ string) (Conn, error) {
+	driver.new = func(_, _, _, _ string) (Conn, error) {
 		return nil, errors.New("initialize error")
 	}
 
@@ -71,7 +71,7 @@ func Test_Get_InitializeError(t *testing.T) {
 		t.Fail()
 	}
 
-	_, err = Get("test", "", "", "migrations")
+	_, err = Get("test", "", "", "", "migrations")
 	if err == nil {
 		t.Fail()
 	}
@@ -80,7 +80,7 @@ func Test_Get_InitializeError(t *testing.T) {
 func Test_Get_OK(t *testing.T) {
 	drivers = make(map[string]Driver)
 	driver := &MockDriver{}
-	driver.new = func(_, _, _ string) (Conn, error) {
+	driver.new = func(_, _,_, _ string) (Conn, error) {
 		return nil, nil
 	}
 
@@ -89,7 +89,7 @@ func Test_Get_OK(t *testing.T) {
 		t.Fail()
 	}
 
-	_, err = Get("test", "", "", "migrations")
+	_, err = Get("test", "", "","", "migrations")
 	if err != nil {
 		t.Fail()
 	}

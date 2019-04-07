@@ -14,6 +14,7 @@ type Environment struct {
 	User      string `json:"user"`
 	Password  string `json:"password"`
 	Database  string `json:"database"`
+	Schema    string `json:"schema"`
 	Directory string `json:"directory"`
 	Table     string `json:"table"`
 }

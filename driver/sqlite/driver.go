@@ -14,23 +14,23 @@ func init() {
 
 type Driver struct{}
 
-func (d Driver) New(dsn, schema, table string) (driver.Conn, error) {
+func (d Driver) New(dsn, database, _, table string) (driver.Conn, error) {
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
 	}
 
 	return Conn{
-		db:     db,
-		schema: schema,
-		table:  table,
+		db:       db,
+		database: database,
+		table:    table,
 	}, nil
 }
 
 type Conn struct {
-	db     *sql.DB
-	schema string
-	table  string
+	db       *sql.DB
+	database string
+	table    string
 }
 
 func (c Conn) HasTable() (bool, error) {

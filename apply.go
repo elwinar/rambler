@@ -23,7 +23,7 @@ func apply(service Servicer, all bool, logger *log.Logger) error {
 		logger.Info("initializing database")
 		err := service.Initialize()
 		if err != nil {
-			return fmt.Errorf("unable to initialize database: %s", err)
+			return fmt.Errorf("unable to initialize database: %v", err)
 		}
 	}
 

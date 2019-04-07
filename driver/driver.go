@@ -6,7 +6,7 @@ import (
 
 // Driver is the interface used by the program to initialize the database connection.
 type Driver interface {
-	New(dns, schema, table string) (Conn, error)
+	New(dns, database, schema, table string) (Conn, error)
 }
 
 var drivers = make(map[string]Driver)
@@ -26,13 +26,13 @@ func Register(name string, driver Driver) error {
 }
 
 // Get initialize a driver from the given environment
-func Get(drv, dsn, schema, table string) (Conn, error) {
+func Get(drv, dsn, database, schema, table string) (Conn, error) {
 	driver, found := drivers[drv]
 	if !found {
 		return nil, fmt.Errorf(`driver "%s" not registered`, drv)
 	}
 
-	conn, err := driver.New(dsn, schema, table)
+	conn, err := driver.New(dsn, database, schema, table)
 	if err != nil {
 		return nil, err
 	}

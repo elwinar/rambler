@@ -99,6 +99,7 @@ are prefixed with `RAMBLER_`.
 | RAMBLER_USER      | user      |
 | RAMBLER_PASSWORD  | password  |
 | RAMBLER_DATABASE  | database  |
+| RAMBLER_SCHEMA    | schema    |
 | RAMBLER_DIRECTORY | directory |
 | RAMBLER_TABLE     | table     |
 

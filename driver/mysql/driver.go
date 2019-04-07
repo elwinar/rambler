@@ -15,7 +15,8 @@ func init() {
 // Driver is the type that initialize new connections.
 type Driver struct{}
 
-func (d Driver) New(dsn, schema, table string) (driver.Conn, error) {
+func (d Driver) New(dsn, database, _, table string) (driver.Conn, error) {
+	// MySQL treats database and schema as the same.
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
@@ -23,7 +24,8 @@ func (d Driver) New(dsn, schema, table string) (driver.Conn, error) {
 
 	return Conn{
 		db:     db,
-		schema: schema,
+		database: database,
+		schema: database,
 		table:  table,
 	}, nil
 }
@@ -31,6 +33,7 @@ func (d Driver) New(dsn, schema, table string) (driver.Conn, error) {
 // Conn holds a connection to a MySQL database schema.
 type Conn struct {
 	db     *sql.DB
+	database string
 	schema string
 	table  string
 }
