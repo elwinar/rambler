@@ -3,6 +3,7 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/elwinar/rambler/driver"
 	_ "github.com/lib/pq" // Working with the lib/pq PostgreSQL driver here.
@@ -40,8 +41,16 @@ type Conn struct {
 
 // HasTable check if the schema has the migration table.
 func (c *Conn) HasTable() (bool, error) {
+	pgSchema := "public"
+	pgTable := c.table
+	if strings.Contains(pgTable, ".") {
+		parts := strings.Split(pgTable, ".")
+		pgSchema = parts[0]
+		pgTable = parts[1]
+	}
+
 	var name string
-	err := c.db.QueryRow(`SELECT table_name FROM information_schema.tables WHERE table_catalog = $1 AND table_name = $2`, c.schema, c.table).Scan(&name)
+	err := c.db.QueryRow(`SELECT table_name FROM information_schema.tables WHERE table_catalog = $1 AND table_name = $2 AND table_schema = $3`, c.schema, pgTable, pgSchema).Scan(&name)
 	if err != nil && err != sql.ErrNoRows {
 		return false, err
 	}
