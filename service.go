@@ -29,7 +29,7 @@ type Service struct {
 func NewService(env Environment) (*Service, error) {
 	fi, err := os.Stat(env.Directory)
 	if err != nil {
-		return nil, fmt.Errorf("directory %s unavailable: %s", env.Directory, err.Error())
+		return nil, fmt.Errorf("directory '%s' unavailable: %s", env.Directory, err.Error())
 	}
 
 	if !fi.Mode().IsDir() {
