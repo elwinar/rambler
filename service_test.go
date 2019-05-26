@@ -22,21 +22,21 @@ func TestNewService(t *testing.T) {
 		{
 			input: Environment{
 				Driver:    "mysql",
-				Directory: "test/not_a_directory",
+				Directory: "testdata/not_a_directory",
 			},
 			err: true,
 		},
 		{
 			input: Environment{
 				Driver:    "unkown",
-				Directory: "test",
+				Directory: "testdata",
 			},
 			err: true,
 		},
 		{
 			input: Environment{
 				Driver:    "mysql",
-				Directory: "test",
+				Directory: "testdata",
 			},
 			err: false,
 		},
@@ -57,12 +57,12 @@ func TestServiceAvailable(t *testing.T) {
 		err        bool
 	}{
 		{
-			directory:  "test/empty",
+			directory:  "testdata/empty",
 			migrations: nil,
 			err:        false,
 		},
 		{
-			directory: "test/one",
+			directory: "testdata/one",
 			migrations: []*Migration{
 				{
 					Name:   "1_one.sql",
@@ -72,21 +72,7 @@ func TestServiceAvailable(t *testing.T) {
 			err: false,
 		},
 		{
-			directory: "test/two",
-			migrations: []*Migration{
-				{
-					Name:   "1_one.sql",
-					reader: nil,
-				},
-				{
-					Name:   "2_two.sql",
-					reader: nil,
-				},
-			},
-			err: false,
-		},
-		{
-			directory: "test/others",
+			directory: "testdata/two",
 			migrations: []*Migration{
 				{
 					Name:   "1_one.sql",
@@ -100,7 +86,21 @@ func TestServiceAvailable(t *testing.T) {
 			err: false,
 		},
 		{
-			directory:  "test/unreachable",
+			directory: "testdata/others",
+			migrations: []*Migration{
+				{
+					Name:   "1_one.sql",
+					reader: nil,
+				},
+				{
+					Name:   "2_two.sql",
+					reader: nil,
+				},
+			},
+			err: false,
+		},
+		{
+			directory:  "testdata/unreachable",
 			migrations: nil,
 			err:        true,
 		},
@@ -137,7 +137,7 @@ func TestServiceApplied(t *testing.T) {
 		err        bool
 	}{
 		{
-			directory: "test/one",
+			directory: "testdata/one",
 			table: []string{
 				"1_one.sql",
 			},
@@ -151,14 +151,14 @@ func TestServiceApplied(t *testing.T) {
 			err: false,
 		},
 		{
-			directory:  "test/one",
+			directory:  "testdata/one",
 			table:      []string{},
 			fail:       errors.New("error"),
 			migrations: nil,
 			err:        true,
 		},
 		{
-			directory: "test/one",
+			directory: "testdata/one",
 			table: []string{
 				"1_one.sql",
 				"2_two.sql",
@@ -168,7 +168,7 @@ func TestServiceApplied(t *testing.T) {
 			err:        true,
 		},
 		{
-			directory: "test/two",
+			directory: "testdata/two",
 			table: []string{
 				"1_one.sql",
 				"2_two.sql",

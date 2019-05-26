@@ -15,16 +15,16 @@ func init() {
 // Driver is the type that initialize new connections.
 type Driver struct{}
 
-func (d Driver) New(dsn, schema, table string) (driver.Conn, error) {
-	db, err := sql.Open("mysql", dsn)
+func (d Driver) New(config driver.Config) (driver.Conn, error) {
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s:%d)/%s", config.User, config.Password, config.Protocol, config.Host, config.Port, config.Database))
 	if err != nil {
 		return nil, err
 	}
 
 	return Conn{
 		db:     db,
-		schema: schema,
-		table:  table,
+		schema: config.Database,
+		table:  config.Table,
 	}, nil
 }
 

@@ -13,12 +13,12 @@ func TestNewMigration(t *testing.T) {
 		err       bool
 	}{
 		{
-			path:      "test/0_unknown.sql",
+			path:      "testdata/0_unknown.sql",
 			migration: nil,
 			err:       true,
 		},
 		{
-			path: "test/1_foo.sql",
+			path: "testdata/1_foo.sql",
 			migration: &Migration{
 				Name:   "1_foo.sql",
 				reader: nil,

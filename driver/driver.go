@@ -4,14 +4,14 @@ import (
 	"fmt"
 )
 
-// Driver is the interface used by the program to initialize the database connection.
+// Driver is the interface used by the program to initialize the database
+// connection.
 type Driver interface {
-	New(dns, schema, table string) (Conn, error)
+	New(Config) (Conn, error)
 }
 
 var drivers = make(map[string]Driver)
 
-// Register register a driver
 func Register(name string, driver Driver) error {
 	if _, found := drivers[name]; found {
 		return fmt.Errorf(`driver "%s" already registered`, name)
@@ -25,17 +25,32 @@ func Register(name string, driver Driver) error {
 	return nil
 }
 
-// Get initialize a driver from the given environment
-func Get(drv, dsn, schema, table string) (Conn, error) {
-	driver, found := drivers[drv]
+// Get returns the requested driver.
+func Get(driver string) (Driver, error) {
+	d, found := drivers[driver]
 	if !found {
-		return nil, fmt.Errorf(`driver "%s" not registered`, drv)
+		return nil, fmt.Errorf(`driver "%s" not registered`, driver)
 	}
 
-	conn, err := driver.New(dsn, schema, table)
-	if err != nil {
-		return nil, err
-	}
+	return d, nil
+}
 
-	return conn, nil
+type Config struct {
+	Protocol string `json:"protocol"`
+	Host     string `json:"host"`
+	Port     uint64 `json:"port"`
+	User     string `json:"user"`
+	Password string `json:"password"`
+	Database string `json:"database"`
+	Table    string `json:"table"`
+}
+
+// Conn is the interface used by the program to manipulate the database.
+type Conn interface {
+	HasTable() (bool, error)
+	CreateTable() error
+	GetApplied() ([]string, error)
+	AddApplied(string) error
+	RemoveApplied(string) error
+	Execute(string) error
 }

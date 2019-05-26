@@ -16,16 +16,16 @@ func init() {
 type Driver struct{}
 
 // New returns a new connection.
-func (d Driver) New(dsn, schema, table string) (driver.Conn, error) {
-	db, err := sql.Open("postgres", dsn)
+func (d Driver) New(config driver.Config) (driver.Conn, error) {
+	db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Host, config.Port, config.User, config.Password, config.Database))
 	if err != nil {
 		return nil, err
 	}
 
 	c := &Conn{
 		db:     db,
-		schema: schema,
-		table:  table,
+		schema: config.Database,
+		table:  config.Table,
 	}
 
 	return c, nil

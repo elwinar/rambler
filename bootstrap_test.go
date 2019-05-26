@@ -12,25 +12,25 @@ func TestBootstrap(t *testing.T) {
 		initialized   bool
 	}{
 		{
-			configuration: "test/valid.json",
+			configuration: "testdata/valid.json",
 			environment:   "default",
 			err:           false,
 			initialized:   true,
 		},
 		{
-			configuration: "test/invalid.json",
+			configuration: "testdata/invalid.json",
 			environment:   "default",
 			err:           true,
 			initialized:   false,
 		},
 		{
-			configuration: "test/valid.json",
+			configuration: "testdata/valid.json",
 			environment:   "unknown",
 			err:           true,
 			initialized:   false,
 		},
 		{
-			configuration: "test/faulty.json",
+			configuration: "testdata/faulty.json",
 			environment:   "faulty",
 			err:           true,
 			initialized:   false,

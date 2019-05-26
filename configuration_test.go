@@ -3,76 +3,95 @@ package main
 import (
 	"reflect"
 	"testing"
+
+	"github.com/elwinar/rambler/driver"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestLoad(t *testing.T) {
-	var cases = []struct {
+	var cases = map[string]struct {
 		input  string
 		err    bool
 		output Configuration
 	}{
-		{
-			input:  "test/notfound.json",
+		"not_found": {
+			input:  "testdata/notfound.json",
 			err:    true,
 			output: Configuration{},
 		},
-		{
-			input:  "test/invalid.json",
+		"invalid": {
+			input:  "testdata/invalid.json",
 			err:    true,
 			output: Configuration{},
 		},
-		{
-			input: "test/valid.json",
+		"valid_json": {
+			input: "testdata/valid.json",
 			err:   false,
 			output: Configuration{
 				Environment: Environment{
-					Driver:    "mysql",
-					Protocol:  "tcp",
-					Host:      "localhost",
-					Port:      3306,
-					User:      "root",
-					Password:  "",
-					Database:  "rambler_default",
+					Driver: "mysql",
+					Config: driver.Config{
+						Protocol: "tcp",
+						Host:     "localhost",
+						Port:     3306,
+						User:     "root",
+						Password: "",
+						Database: "rambler_default",
+						Table:    "migrations",
+					},
 					Directory: ".",
-					Table:     "migrations",
 				},
 				Environments: map[string]Environment{
 					"testing": {
-						Database: "rambler_testing",
+						Config: driver.Config{
+							Database: "rambler_testing",
+						},
 					},
 					"development": {
-						Database: "rambler_development",
+						Config: driver.Config{
+							Database: "rambler_development",
+						},
 					},
 					"production": {
-						Database: "rambler_production",
+						Config: driver.Config{
+							Database: "rambler_production",
+						},
 					},
 				},
 			},
 		},
-		{
-			input: "test/valid.hjson",
+		"valid_hjson": {
+			input: "testdata/valid.hjson",
 			err:   false,
 			output: Configuration{
 				Environment: Environment{
-					Driver:    "mysql",
-					Protocol:  "tcp",
-					Host:      "localhost",
-					Port:      3306,
-					User:      "root",
-					Password:  "",
-					Database:  "rambler_default",
+					Driver: "mysql",
+					Config: driver.Config{
+						Protocol: "tcp",
+						Host:     "localhost",
+						Port:     3306,
+						User:     "root",
+						Password: "",
+						Database: "rambler_default",
+						Table:    "migrations",
+					},
 					Directory: ".",
-					Table:     "migrations",
 				},
 				Environments: map[string]Environment{
 					"testing": {
-						Database: "rambler_testing",
+						Config: driver.Config{
+							Database: "rambler_testing",
+						},
 					},
 					"development": {
-						Database: "rambler_development",
+						Config: driver.Config{
+							Database: "rambler_development",
+						},
 					},
 					"production": {
-						Database: "rambler_production",
+						Config: driver.Config{
+							Database: "rambler_production",
+						},
 					},
 				},
 			},
@@ -80,95 +99,108 @@ func TestLoad(t *testing.T) {
 	}
 
 	for n, c := range cases {
-		cfg, err := Load(c.input)
-		if (err != nil) != c.err {
-			t.Error("case", n, "got unexpected error:", err)
-			continue
-		}
+		t.Run(n, func(t *testing.T) {
+			cfg, err := Load(c.input)
+			if (err != nil) != c.err {
+				t.Errorf("%s: unexpected error: %s", n, err)
+				return
+			}
 
-		if !reflect.DeepEqual(cfg, c.output) {
-			t.Error("case", n, "got unexpected output: wanted", c.output, "got", cfg)
-		}
+			if !reflect.DeepEqual(cfg, c.output) {
+				t.Errorf("%s: unexpected output: %s\n", n, cmp.Diff(c.output, cfg))
+			}
+		})
 	}
 }
 
 func TestConfigurationEnv(t *testing.T) {
-	var cases = []struct {
+	var cases = map[string]struct {
 		input  string
 		err    bool
 		output Environment
 	}{
-		{
-			input:  "unknown",
-			err:    true,
-			output: Environment{},
+		"unknown": {
+			input: "unknown",
+			err:   true,
 		},
-		{
+		"default": {
 			input: "default",
-			err:   false,
 			output: Environment{
-				Driver:    "mysql",
-				Protocol:  "tcp",
-				Host:      "localhost",
-				Port:      3306,
-				User:      "root",
-				Password:  "",
-				Database:  "rambler_default",
+				Driver: "mysql",
+				Config: driver.Config{
+					Protocol: "tcp",
+					Host:     "localhost",
+					Port:     3306,
+					User:     "root",
+					Password: "",
+					Database: "rambler_default",
+					Table:    "migrations",
+				},
 				Directory: ".",
-				Table:     "migrations",
 			},
 		},
-		{
+		"testing": {
 			input: "testing",
-			err:   false,
 			output: Environment{
-				Driver:    "mysql",
-				Protocol:  "tcp",
-				Host:      "localhost",
-				Port:      3306,
-				User:      "root",
-				Password:  "",
-				Database:  "rambler_testing",
+				Driver: "mysql",
+				Config: driver.Config{
+					Protocol: "tcp",
+					Host:     "localhost",
+					Port:     3306,
+					User:     "root",
+					Password: "",
+					Database: "rambler_testing",
+					Table:    "migrations",
+				},
 				Directory: ".",
-				Table:     "migrations",
 			},
 		},
 	}
 
 	for n, c := range cases {
-		cfg := Configuration{
-			Environment: Environment{
-				Driver:    "mysql",
-				Protocol:  "tcp",
-				Host:      "localhost",
-				Port:      3306,
-				User:      "root",
-				Password:  "",
-				Database:  "rambler_default",
-				Directory: ".",
-				Table:     "migrations",
-			},
-			Environments: map[string]Environment{
-				"testing": {
-					Database: "rambler_testing",
+		t.Run(n, func(t *testing.T) {
+			cfg := Configuration{
+				Environment: Environment{
+					Driver: "mysql",
+					Config: driver.Config{
+						Protocol: "tcp",
+						Host:     "localhost",
+						Port:     3306,
+						User:     "root",
+						Password: "",
+						Database: "rambler_default",
+						Table:    "migrations",
+					},
+					Directory: ".",
 				},
-				"development": {
-					Database: "rambler_development",
+				Environments: map[string]Environment{
+					"testing": {
+						Config: driver.Config{
+							Database: "rambler_testing",
+						},
+					},
+					"development": {
+						Config: driver.Config{
+							Database: "rambler_development",
+						},
+					},
+					"production": {
+						Config: driver.Config{
+							Database: "rambler_production",
+						},
+					},
 				},
-				"production": {
-					Database: "rambler_production",
-				},
-			},
-		}
+			}
 
-		env, err := cfg.Env(c.input)
-		if (err != nil) != c.err {
-			t.Error("case", n, "got unexpected error:", err)
-			continue
-		}
+			env, err := cfg.Env(c.input)
+			if (err != nil) != c.err {
+				t.Errorf("%s: unexpected error: %s", n, err)
+				return
+			}
 
-		if !reflect.DeepEqual(env, c.output) {
-			t.Error("case", n, "got unexpected output:", cfg)
-		}
+			if !reflect.DeepEqual(env, c.output) {
+				t.Errorf("%s: unexpected output: %s", n, cmp.Diff(c.output, env))
+			}
+		})
 	}
 }
