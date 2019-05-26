@@ -42,6 +42,7 @@ type Config struct {
 	User     string `json:"user"`
 	Password string `json:"password"`
 	Database string `json:"database"`
+	Schema   string `json:"schema"` // For PostgreSQL
 	Table    string `json:"table"`
 }
 

@@ -17,15 +17,23 @@ type Driver struct{}
 
 // New returns a new connection.
 func (d Driver) New(config driver.Config) (driver.Conn, error) {
-	db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Host, config.Port, config.User, config.Password, config.Database))
+	if config.Schema == "" {
+		config.Schema = "public"
+	}
+
+	db, err := sql.Open("postgres", fmt.Sprintf(
+		"host=%s port=%d user=%s password=%s dbname=%s search_path=%s sslmode=disable",
+		config.Host, config.Port, config.User, config.Password, config.Database, config.Schema,
+	))
 	if err != nil {
 		return nil, err
 	}
 
 	c := &Conn{
-		db:     db,
-		schema: config.Database,
-		table:  config.Table,
+		db:      db,
+		catalog: config.Database,
+		schema:  config.Schema,
+		table:   config.Table,
 	}
 
 	return c, nil
@@ -33,15 +41,16 @@ func (d Driver) New(config driver.Config) (driver.Conn, error) {
 
 // Connection holds a database connection.
 type Conn struct {
-	db     *sql.DB
-	schema string
-	table  string
+	db      *sql.DB
+	catalog string
+	schema  string
+	table   string
 }
 
 // HasTable check if the schema has the migration table.
 func (c *Conn) HasTable() (bool, error) {
 	var name string
-	err := c.db.QueryRow(`SELECT table_name FROM information_schema.tables WHERE table_catalog = $1 AND table_name = $2`, c.schema, c.table).Scan(&name)
+	err := c.db.QueryRow(`SELECT table_name FROM information_schema.tables WHERE table_catalog = $1 AND table_schema = $2 AND table_name = $3`, c.catalog, c.schema, c.table).Scan(&name)
 	if err != nil && err != sql.ErrNoRows {
 		return false, err
 	}

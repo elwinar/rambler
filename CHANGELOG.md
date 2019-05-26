@@ -3,9 +3,16 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+
+## [5.0.0](https://github.com/elwinar/rambler/releases/tag/5.0.0) - 2019-05-26
+### Added
+- PostgreSQL support for schemas
 ### Changed
 - It is no longer an error if no configuration file is provided as option and
   the default one doesn't exists.
+### Internal
+- Split the general configuration and the driver configuration to allow a
+  better structure.
 
 ## [4.2.1](https://github.com/elwinar/rambler/releases/tag/4.2.1) - 2018-08-09
 ### Fixed

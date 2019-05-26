@@ -1,4 +1,6 @@
-# rambler [![build](https://app.wercker.com/status/b645428b6f548288d71d3ba83cc1a783/s/master "wercker status")](https://app.wercker.com/project/bykey/b645428b6f548288d71d3ba83cc1a783) [![Coverage Status](https://coveralls.io/repos/elwinar/rambler/badge.svg?branch=master&service=github)](https://coveralls.io/github/elwinar/rambler?branch=master)
+# rambler 
+[![build](https://app.wercker.com/status/b645428b6f548288d71d3ba83cc1a783/s/master "wercker status")](https://app.wercker.com/project/bykey/b645428b6f548288d71d3ba83cc1a783)
+[![Coverage Status](https://coveralls.io/repos/elwinar/rambler/badge.svg?branch=master&service=github)](https://coveralls.io/github/elwinar/rambler?branch=master)
 
 A simple and language-independent SQL schema migration tool
 
@@ -30,9 +32,9 @@ Example:
 -- rambler up
 
 CREATE TABLE foo (
-id INTEGER UNSIGNED AUTO_INCREMENT,
-bar VARCHAR(60),
-PRIMARY KEY (id)
+	id INTEGER UNSIGNED AUTO_INCREMENT,
+	bar VARCHAR(60),
+	PRIMARY KEY (id)
 );
 
 -- rambler down
@@ -64,15 +66,16 @@ values of rambler:
 
 ```json
 {
-"driver": "mysql",
-"protocol": "tcp",
-"host": "localhost",
-"port": 3306,
-"user": "root",
-"password": "",
-"database": "",
-"directory": ".",
-"table": "migrations"
+	"driver": "mysql",
+	"protocol": "tcp",
+	"host": "localhost",
+	"port": 3306,
+	"user": "root",
+	"password": "",
+	"database": "",
+	"schema": "",
+	"directory": ".",
+	"table": "migrations"
 }
 ```
 
@@ -99,6 +102,7 @@ are prefixed with `RAMBLER_`.
 | RAMBLER_USER      | user      |
 | RAMBLER_PASSWORD  | password  |
 | RAMBLER_DATABASE  | database  |
+| RAMBLER_SCHEMA    | schema    |
 | RAMBLER_DIRECTORY | directory |
 | RAMBLER_TABLE     | table     |
 
@@ -112,6 +116,8 @@ Rambler supports actually 3 drivers:
 
 Don't hesitate to get in touch if you want to see another one supported,
 provided a golang `database/sql` driver exist for your database vendor.
+
+*Note that some configuration options only apply to some drivers.*
 
 ### Applying a migration
 
