@@ -1,17 +1,13 @@
 TARGETS="windows/amd64,windows/386,darwin/amd64,darwin/386,linux/amd64,linux/386"
-LDFLAGS="-X main.VERSION=`git describe --tags` -s -linkmode external -extldflags -static -w"
+LDFLAGS="-X main.VERSION=`git describe --tags` -s -linkmode external -static -w"
 PKG="github.com/elwinar/rambler"
 
 default: build
-all: fetch build test
+all: build test
 
 .PHONY: build
 build: ## Build the binary for the local architecture
 	go build --ldflags=$(LDFLAGS)
-
-.PHONY: fetch
-fetch: ## Fetch the dependencies
-	go get -d ./...
 
 .PHONY: help
 help: ## Get help
