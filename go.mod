@@ -8,6 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/google/go-cmp v0.3.0
 	github.com/imdario/mergo v0.3.7
+	github.com/karalabe/xgo v0.0.0-20190301120235-2d6d1848fb02 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lib/pq v1.1.1
 	github.com/mattn/go-sqlite3 v1.10.0
