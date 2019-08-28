@@ -48,6 +48,10 @@ func main() {
 			Name:  "debug",
 			Usage: "display debug messages",
 		},
+		cli.BoolFlag{
+			Name:  "dry-run",
+			Usage: "don't execute any statement, only display them",
+		},
 	}
 
 	app.Before = Bootstrap

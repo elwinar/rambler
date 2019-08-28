@@ -12,10 +12,10 @@ import (
 // Bootstrap do the initialization job, and finish by setting the
 // `service` global var that will be used by other commands.
 func Bootstrap(ctx *cli.Context) error {
-	return bootstrap(ctx.GlobalString("configuration"), ctx.GlobalString("environment"), ctx.GlobalBool("debug"))
+	return bootstrap(ctx.GlobalString("configuration"), ctx.GlobalString("environment"), ctx.GlobalBool("debug"), ctx.GlobalBool("dry-run"))
 }
 
-func bootstrap(configuration, environment string, debug bool) (err error) {
+func bootstrap(configuration, environment string, debug, dryRun bool) (err error) {
 	logger = log.NewLogger(func(l *log.Logger) {
 		l.PrintDebug = debug
 	})
@@ -42,7 +42,7 @@ func bootstrap(configuration, environment string, debug bool) (err error) {
 	}
 
 	logger.Debug("initializing service")
-	service, err = NewService(env)
+	service, err = NewService(env, dryRun)
 	if err != nil {
 		return fmt.Errorf("unable to initialize the migration service: %s", err)
 	}

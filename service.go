@@ -21,12 +21,13 @@ var (
 // Service is the struct that gather operations to manipulate the
 // database and migrations on disk
 type Service struct {
-	conn driver.Conn
-	env  Environment
+	conn   driver.Conn
+	env    Environment
+	dryRun bool
 }
 
 // NewService initialize a new service with the given environment
-func NewService(env Environment) (*Service, error) {
+func NewService(env Environment, dryRun bool) (*Service, error) {
 	fi, err := os.Stat(env.Directory)
 	if err != nil {
 		return nil, fmt.Errorf("directory %s unavailable: %s", env.Directory, err.Error())
@@ -47,8 +48,9 @@ func NewService(env Environment) (*Service, error) {
 	}
 
 	return &Service{
-		conn: conn,
-		env:  env,
+		conn:   conn,
+		env:    env,
+		dryRun: dryRun,
 	}, nil
 }
 
@@ -118,10 +120,19 @@ func (s Service) Apply(migration *Migration) error {
 	}
 
 	for _, statement := range migration.Up() {
+		if s.dryRun {
+			logger.Info("statement: %s", statement)
+			continue
+		}
+
 		err := s.conn.Execute(statement)
 		if err != nil {
 			return fmt.Errorf("unable to apply migration %s: %s\n%s", migration.Name, err, statement)
 		}
+	}
+
+	if s.dryRun {
+		return nil
 	}
 
 	err := s.conn.AddApplied(migration.Name)
@@ -140,10 +151,19 @@ func (s Service) Reverse(migration *Migration) error {
 	}
 
 	for _, statement := range migration.Down() {
+		if s.dryRun {
+			logger.Info("statement: %s", statement)
+			continue
+		}
+
 		err := s.conn.Execute(statement)
 		if err != nil {
 			return fmt.Errorf("unable to reverse migration %s: %s\n%s", migration.Name, err, statement)
 		}
+	}
+
+	if s.dryRun {
+		return nil
 	}
 
 	err := s.conn.RemoveApplied(migration.Name)

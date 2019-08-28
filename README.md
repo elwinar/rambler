@@ -200,6 +200,10 @@ Rambler will log a few important informations for monitoring what is happening
 on stdout. If you suspect something of being wrong, you can also use the debug
 mode by adding `--debug` to your command line.
 
+### Dry-run
+
+The `--dry-run` flag will print statements instead of executing them.
+
 ## CONTRIBUTORS
 
 - [cjhubert](https://github.com/cjhubert)

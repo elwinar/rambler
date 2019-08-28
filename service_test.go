@@ -43,7 +43,7 @@ func TestNewService(t *testing.T) {
 	}
 
 	for n, c := range cases {
-		_, err := NewService(c.input)
+		_, err := NewService(c.input, false)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 		}
