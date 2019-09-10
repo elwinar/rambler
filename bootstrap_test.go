@@ -41,7 +41,7 @@ func TestBootstrap(t *testing.T) {
 		service = nil
 		logger = nil
 
-		err := bootstrap(c.configuration, c.environment, false)
+		err := bootstrap(c.configuration, c.environment, false, false)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue
