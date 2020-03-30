@@ -146,9 +146,11 @@ execute all its `down` sections' statements in reverse order.
 ### Options
 
 - `--all, -a` repeat the command until there is no more migration to
-  apply/reverse.
+  apply/reverse. This flag is exclusive with `--migration`.
 - `--no-save` doesn't save the applied/reversed migration. This option is
   mainly destined to allow faster iteration when writing the migration.
+- `--migration` bypass the migration automatic discovery and apply the migration
+  whose path is given. This is exclusive with `--all`.
 
 ### Errors
 

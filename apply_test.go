@@ -23,6 +23,7 @@ func TestApply(t *testing.T) {
 		applyError       error
 		all              bool
 		save             bool
+		migration        string
 
 		err      bool
 		executed []*Migration
@@ -208,7 +209,7 @@ func TestApply(t *testing.T) {
 			l.Output = ioutil.Discard
 		})
 
-		err := apply(service, c.all, c.save, logger)
+		err := apply(service, c.all, c.save, c.migration, logger)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue

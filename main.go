@@ -63,11 +63,15 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "all, a",
-					Usage: "apply all migrations",
+					Usage: "apply all migrations (exclusive with --migration)",
 				},
 				cli.BoolFlag{
 					Name:  "no-save",
 					Usage: "don't save migrations",
+				},
+				cli.StringFlag{
+					Name:  "migration, m",
+					Usage: "path to the migration to apply (exclusive with --all)",
 				},
 			},
 			Action: Apply,
@@ -78,11 +82,15 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "all, a",
-					Usage: "reverse all migrations",
+					Usage: "reverse all migrations (exclusive with --migration)",
 				},
 				cli.BoolFlag{
 					Name:  "no-save",
 					Usage: "don't save migrations",
+				},
+				cli.StringFlag{
+					Name:  "migration, m",
+					Usage: "path to the migration to reverse (exclusive with --all)",
 				},
 			},
 			Action: Reverse,
