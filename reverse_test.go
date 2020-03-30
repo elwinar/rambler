@@ -26,256 +26,127 @@ func TestReverse(t *testing.T) {
 		reversed []*Migration
 	}{
 		{
-			initialized:      false,
-			initializedError: nil,
-			available:        nil,
-			availableError:   nil,
-			applied:          nil,
-			appliedError:     nil,
-			reverseError:     nil,
-			all:              true,
-
-			err:      true,
-			reversed: nil,
+			all: true,
+			err: true,
 		},
 		{
-			initialized:      false,
 			initializedError: e,
-			available:        nil,
-			availableError:   nil,
-			applied:          nil,
-			appliedError:     nil,
-			reverseError:     nil,
 			all:              true,
-
-			err:      true,
-			reversed: nil,
+			err:              true,
 		},
 		{
-			initialized:      true,
-			initializedError: nil,
-			available:        nil,
-			availableError:   nil,
-			applied:          nil,
-			appliedError:     nil,
-			reverseError:     nil,
-			all:              true,
-
-			err:      false,
-			reversed: nil,
+			initialized: true,
+			all:         true,
 		},
 		{
-			initialized:      true,
-			initializedError: nil,
-			available:        nil,
-			availableError:   e,
-			applied:          nil,
-			appliedError:     nil,
-			reverseError:     nil,
-			all:              true,
-
-			err:      true,
-			reversed: nil,
+			initialized:    true,
+			availableError: e,
+			all:            true,
+			err:            true,
 		},
 		{
-			initialized:      true,
-			initializedError: nil,
-			available:        nil,
-			availableError:   nil,
-			applied:          nil,
-			appliedError:     e,
-			reverseError:     nil,
-			all:              true,
-
-			err:      true,
-			reversed: nil,
+			initialized:  true,
+			appliedError: e,
+			all:          true,
+			err:          true,
 		},
 		{
-			initialized:      true,
-			initializedError: nil,
+			initialized: true,
 			available: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
+				{Name: "2.sql"},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
+				{Name: "2.sql"},
 			},
-			appliedError: nil,
-			reverseError: nil,
-			all:          true,
-
-			err: false,
+			all: true,
 			reversed: []*Migration{
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "2.sql"},
+				{Name: "1.sql"},
 			},
 		},
 		{
-			initialized:      true,
-			initializedError: nil,
+			initialized: true,
 			available: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
+				{Name: "2.sql"},
 			},
-			availableError: nil,
 			applied: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
+				{Name: "2.sql"},
 			},
-			appliedError: nil,
-			reverseError: nil,
-			all:          false,
-
-			err: false,
 			reversed: []*Migration{
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "2.sql"},
 			},
 		},
 		{
-			initialized:      true,
-			initializedError: nil,
+			initialized: true,
 			available: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
 			},
-			availableError: nil,
 			applied: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
+				{Name: "2.sql"},
 			},
-			appliedError: nil,
-			reverseError: nil,
-			all:          true,
-
-			err:      true,
-			reversed: nil,
+			all: true,
+			err: true,
 		},
 		{
-			initialized:      true,
-			initializedError: nil,
+			initialized: true,
 			available: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "3.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
+				{Name: "2.sql"},
+				{Name: "3.sql"},
 			},
-			availableError: nil,
 			applied: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "3.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
+				{Name: "3.sql"},
 			},
-			appliedError: nil,
-			reverseError: nil,
-			all:          true,
-
-			err:      true,
-			reversed: nil,
+			all: true,
+			err: true,
 		},
 		{
-			initialized:      true,
-			initializedError: nil,
+			initialized: true,
 			available: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "3.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
+				{Name: "2.sql"},
+				{Name: "3.sql"},
 			},
 			availableError: nil,
 			applied: []*Migration{
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "1.sql"},
+				{Name: "2.sql"},
 			},
-			appliedError: nil,
-			reverseError: nil,
-			all:          true,
-
-			err: false,
+			all: true,
 			reversed: []*Migration{
-				{
-					Name:   "2.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "1.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "2.sql"},
+				{Name: "1.sql"},
 			},
 		},
 	}
 
 	for n, c := range cases {
 		var reversed []*Migration
+
+		for i := range c.available {
+			if c.available[i].reader == nil {
+				c.available[i].reader = strings.NewReader("")
+			}
+		}
+
+		for i := range c.applied {
+			if c.applied[i].reader == nil {
+				c.applied[i].reader = strings.NewReader("")
+			}
+		}
+
+		for i := range c.reversed {
+			if c.reversed[i].reader == nil {
+				c.reversed[i].reader = strings.NewReader("")
+			}
+		}
 
 		service := MockService{
 			initialized: func() (bool, error) {

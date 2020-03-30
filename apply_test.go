@@ -27,360 +27,147 @@ func TestApply(t *testing.T) {
 		executed []*Migration
 	}{
 		{
-			initialized:      true,
-			initializedError: nil,
-			initializeError:  nil,
-			available:        nil,
-			availableError:   nil,
-			applied:          nil,
-			appliedError:     nil,
-			applyError:       nil,
-			all:              true,
-
-			err:      false,
-			executed: nil,
+			initialized: true,
+			all:         true,
 		},
 		{
-			initialized:      false,
 			initializedError: e,
-			initializeError:  nil,
-			available:        nil,
-			availableError:   nil,
-			applied:          nil,
-			appliedError:     nil,
-			applyError:       nil,
 			all:              true,
-
-			err:      true,
-			executed: nil,
+			err:              true,
 		},
 		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  e,
-			available:        nil,
-			availableError:   nil,
-			applied:          nil,
-			appliedError:     nil,
-			applyError:       nil,
-			all:              true,
-
-			err:      true,
-			executed: nil,
+			initializeError: e,
+			all:             true,
+			err:             true,
 		},
 		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
-			available:        nil,
-			availableError:   e,
-			applied:          nil,
-			appliedError:     nil,
-			applyError:       nil,
-			all:              true,
-
-			err:      true,
-			executed: nil,
-		},
-		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
-			available:        nil,
-			availableError:   nil,
-			applied:          nil,
-			appliedError:     e,
-			applyError:       nil,
-			all:              true,
-
-			err:      true,
-			executed: nil,
-		},
-		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
-			available: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-			availableError: nil,
-			applied:        nil,
-			appliedError:   nil,
-			applyError:     e,
+			availableError: e,
 			all:            true,
-
-			err: true,
-			executed: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-			},
+			err:            true,
 		},
 		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
-			available: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-			availableError: nil,
-			applied:        nil,
-			appliedError:   nil,
-			applyError:     nil,
-			all:            true,
-
-			err: false,
-			executed: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-		},
-		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
-			available: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-			availableError: nil,
-			applied:        nil,
-			appliedError:   nil,
-			applyError:     nil,
-			all:            false,
-
-			err: false,
-			executed: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-		},
-		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
-			available: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "zoo.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-			availableError: nil,
-			applied: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-			appliedError: nil,
-			applyError:   nil,
-			all:          false,
-
-			err: false,
-			executed: []*Migration{
-				{
-					Name:   "zoo.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-		},
-		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
-			available: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "zoo.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-			availableError: nil,
-			applied: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "zoo.sql",
-					reader: strings.NewReader(""),
-				},
-			},
-			appliedError: nil,
-			applyError:   nil,
+			appliedError: e,
 			all:          true,
-
-			err:      false,
-			executed: nil,
+			err:          true,
 		},
 		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
 			available: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "zoo.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
 			},
-			availableError: nil,
-			applied: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "wee.sql",
-					reader: strings.NewReader(""),
-				},
+			applyError: e,
+			all:        true,
+			err:        true,
+			executed: []*Migration{
+				{Name: "bar.sql"},
 			},
-			appliedError: nil,
-			applyError:   nil,
-			all:          false,
-
-			err:      true,
-			executed: nil,
 		},
 		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
 			available: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "zoo.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
 			},
-			availableError: nil,
-			applied: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "zoo.sql",
-					reader: strings.NewReader(""),
-				},
+			all: true,
+			executed: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
 			},
-			appliedError: nil,
-			applyError:   nil,
-			all:          false,
-
-			err:      true,
-			executed: nil,
 		},
 		{
-			initialized:      false,
-			initializedError: nil,
-			initializeError:  nil,
 			available: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
 			},
-			availableError: nil,
+			executed: []*Migration{
+				{Name: "bar.sql"},
+			},
+		},
+		{
+			available: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+				{Name: "zoo.sql"},
+			},
 			applied: []*Migration{
-				{
-					Name:   "bar.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "foo.sql",
-					reader: strings.NewReader(""),
-				},
-				{
-					Name:   "zoo.sql",
-					reader: strings.NewReader(""),
-				},
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
 			},
-			appliedError: nil,
-			applyError:   nil,
-			all:          false,
-
-			err:      true,
-			executed: nil,
+			executed: []*Migration{
+				{Name: "zoo.sql"},
+			},
+		},
+		{
+			available: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+				{Name: "zoo.sql"},
+			},
+			applied: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+				{Name: "zoo.sql"},
+			},
+			all: true,
+		},
+		{
+			available: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+				{Name: "zoo.sql"},
+			},
+			applied: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+				{Name: "wee.sql"},
+			},
+			err: true,
+		},
+		{
+			available: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+				{Name: "zoo.sql"},
+			},
+			applied: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "zoo.sql"},
+			},
+			err: true,
+		},
+		{
+			available: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+			},
+			applied: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+				{Name: "zoo.sql"},
+			},
+			err: true,
 		},
 	}
 
 	for n, c := range cases {
 		var executed []*Migration
+
+		for i := range c.available {
+			if c.available[i].reader == nil {
+				c.available[i].reader = strings.NewReader("")
+			}
+		}
+
+		for i := range c.applied {
+			if c.applied[i].reader == nil {
+				c.applied[i].reader = strings.NewReader("")
+			}
+		}
+
+		for i := range c.executed {
+			if c.executed[i].reader == nil {
+				c.executed[i].reader = strings.NewReader("")
+			}
+		}
 
 		service := MockService{
 			initialized: func() (bool, error) {
@@ -412,7 +199,7 @@ func TestApply(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(executed, c.executed) {
-			t.Error("case", n, "executed the wrong migrations")
+			t.Errorf("#%d: executed the wrong migrations: wanted %+v, got %+v", n, c.executed, executed)
 		}
 	}
 }
