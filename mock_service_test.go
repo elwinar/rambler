@@ -5,8 +5,8 @@ type MockService struct {
 	initialize  func() error
 	available   func() ([]*Migration, error)
 	applied     func() ([]*Migration, error)
-	apply       func(*Migration) error
-	reverse     func(*Migration) error
+	apply       func(*Migration, bool) error
+	reverse     func(*Migration, bool) error
 }
 
 func (s MockService) Initialized() (bool, error) {
@@ -25,10 +25,10 @@ func (s MockService) Applied() ([]*Migration, error) {
 	return s.applied()
 }
 
-func (s MockService) Apply(migration *Migration) error {
-	return s.apply(migration)
+func (s MockService) Apply(migration *Migration, save bool) error {
+	return s.apply(migration, save)
 }
 
-func (s MockService) Reverse(migration *Migration) error {
-	return s.reverse(migration)
+func (s MockService) Reverse(migration *Migration, save bool) error {
+	return s.reverse(migration, save)
 }

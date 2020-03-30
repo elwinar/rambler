@@ -6,6 +6,6 @@ type Servicer interface {
 	Initialize() error
 	Available() ([]*Migration, error)
 	Applied() ([]*Migration, error)
-	Apply(*Migration) error
-	Reverse(*Migration) error
+	Apply(*Migration, bool) error
+	Reverse(*Migration, bool) error
 }

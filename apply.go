@@ -9,10 +9,10 @@ import (
 
 // Apply available migrations based on the provided context.
 func Apply(ctx *cli.Context) error {
-	return apply(service, ctx.Bool("all"), logger)
+	return apply(service, ctx.Bool("all"), !ctx.Bool("no-save"), logger)
 }
 
-func apply(service Servicer, all bool, logger *log.Logger) error {
+func apply(service Servicer, all, save bool, logger *log.Logger) error {
 	logger.Debug("checking database state")
 	initialized, err := service.Initialized()
 	if err != nil {
@@ -72,7 +72,7 @@ func apply(service Servicer, all bool, logger *log.Logger) error {
 	logger.Info("%d migrations to apply", len(available[i:]))
 	for _, migration := range available[i:] {
 		logger.Info("applying %s", migration.Name)
-		err := service.Apply(migration)
+		err := service.Apply(migration, save)
 		if err != nil {
 			return err
 		}

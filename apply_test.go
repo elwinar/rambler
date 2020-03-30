@@ -22,6 +22,7 @@ func TestApply(t *testing.T) {
 		appliedError     error
 		applyError       error
 		all              bool
+		save             bool
 
 		err      bool
 		executed []*Migration
@@ -29,25 +30,30 @@ func TestApply(t *testing.T) {
 		{
 			initialized: true,
 			all:         true,
+			save:        true,
 		},
 		{
 			initializedError: e,
 			all:              true,
+			save:             true,
 			err:              true,
 		},
 		{
 			initializeError: e,
 			all:             true,
+			save:            true,
 			err:             true,
 		},
 		{
 			availableError: e,
 			all:            true,
+			save:           true,
 			err:            true,
 		},
 		{
 			appliedError: e,
 			all:          true,
+			save:         true,
 			err:          true,
 		},
 		{
@@ -57,6 +63,7 @@ func TestApply(t *testing.T) {
 			},
 			applyError: e,
 			all:        true,
+			save:       true,
 			err:        true,
 			executed: []*Migration{
 				{Name: "bar.sql"},
@@ -67,7 +74,8 @@ func TestApply(t *testing.T) {
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 			},
-			all: true,
+			all:  true,
+			save: true,
 			executed: []*Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
@@ -78,22 +86,9 @@ func TestApply(t *testing.T) {
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 			},
+			save: true,
 			executed: []*Migration{
 				{Name: "bar.sql"},
-			},
-		},
-		{
-			available: []*Migration{
-				{Name: "bar.sql"},
-				{Name: "foo.sql"},
-				{Name: "zoo.sql"},
-			},
-			applied: []*Migration{
-				{Name: "bar.sql"},
-				{Name: "foo.sql"},
-			},
-			executed: []*Migration{
-				{Name: "zoo.sql"},
 			},
 		},
 		{
@@ -105,9 +100,25 @@ func TestApply(t *testing.T) {
 			applied: []*Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
+			},
+			save: true,
+			executed: []*Migration{
 				{Name: "zoo.sql"},
 			},
-			all: true,
+		},
+		{
+			available: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+				{Name: "zoo.sql"},
+			},
+			applied: []*Migration{
+				{Name: "bar.sql"},
+				{Name: "foo.sql"},
+				{Name: "zoo.sql"},
+			},
+			all:  true,
+			save: true,
 		},
 		{
 			available: []*Migration{
@@ -120,7 +131,8 @@ func TestApply(t *testing.T) {
 				{Name: "foo.sql"},
 				{Name: "wee.sql"},
 			},
-			err: true,
+			save: true,
+			err:  true,
 		},
 		{
 			available: []*Migration{
@@ -132,7 +144,8 @@ func TestApply(t *testing.T) {
 				{Name: "bar.sql"},
 				{Name: "zoo.sql"},
 			},
-			err: true,
+			save: true,
+			err:  true,
 		},
 		{
 			available: []*Migration{
@@ -144,7 +157,8 @@ func TestApply(t *testing.T) {
 				{Name: "foo.sql"},
 				{Name: "zoo.sql"},
 			},
-			err: true,
+			save: true,
+			err:  true,
 		},
 	}
 
@@ -182,8 +196,10 @@ func TestApply(t *testing.T) {
 			applied: func() ([]*Migration, error) {
 				return c.applied, c.appliedError
 			},
-			apply: func(migration *Migration) error {
-				executed = append(executed, migration)
+			apply: func(migration *Migration, save bool) error {
+				if save {
+					executed = append(executed, migration)
+				}
 				return c.applyError
 			},
 		}
@@ -192,7 +208,7 @@ func TestApply(t *testing.T) {
 			l.Output = ioutil.Discard
 		})
 
-		err := apply(service, c.all, logger)
+		err := apply(service, c.all, c.save, logger)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue

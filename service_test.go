@@ -7,6 +7,18 @@ import (
 	"testing"
 )
 
+const DummyMigration = `-- rambler up
+first
+-- rambler up
+second
+-- rambler down
+third
+-- rambler up
+fourth
+-- rambler down
+fifth
+`
+
 func TestNewService(t *testing.T) {
 	var cases = []struct {
 		input Environment
@@ -38,7 +50,6 @@ func TestNewService(t *testing.T) {
 				Driver:    "mysql",
 				Directory: "testdata",
 			},
-			err: false,
 		},
 	}
 
@@ -57,52 +68,31 @@ func TestServiceAvailable(t *testing.T) {
 		err        bool
 	}{
 		{
-			directory:  "testdata/empty",
-			migrations: nil,
-			err:        false,
+			directory: "testdata/empty",
 		},
 		{
 			directory: "testdata/one",
 			migrations: []*Migration{
-				{
-					Name:   "1_one.sql",
-					reader: nil,
-				},
+				{Name: "1_one.sql"},
 			},
-			err: false,
 		},
 		{
 			directory: "testdata/two",
 			migrations: []*Migration{
-				{
-					Name:   "1_one.sql",
-					reader: nil,
-				},
-				{
-					Name:   "2_two.sql",
-					reader: nil,
-				},
+				{Name: "1_one.sql"},
+				{Name: "2_two.sql"},
 			},
-			err: false,
 		},
 		{
 			directory: "testdata/others",
 			migrations: []*Migration{
-				{
-					Name:   "1_one.sql",
-					reader: nil,
-				},
-				{
-					Name:   "2_two.sql",
-					reader: nil,
-				},
+				{Name: "1_one.sql"},
+				{Name: "2_two.sql"},
 			},
-			err: false,
 		},
 		{
-			directory:  "testdata/unreachable",
-			migrations: nil,
-			err:        true,
+			directory: "testdata/unreachable",
+			err:       true,
 		},
 	}
 
@@ -141,21 +131,15 @@ func TestServiceApplied(t *testing.T) {
 			table: []string{
 				"1_one.sql",
 			},
-			fail: nil,
 			migrations: []*Migration{
-				{
-					Name:   "1_one.sql",
-					reader: nil,
-				},
+				{Name: "1_one.sql"},
 			},
-			err: false,
 		},
 		{
-			directory:  "testdata/one",
-			table:      []string{},
-			fail:       errors.New("error"),
-			migrations: nil,
-			err:        true,
+			directory: "testdata/one",
+			table:     []string{},
+			fail:      errors.New("error"),
+			err:       true,
 		},
 		{
 			directory: "testdata/one",
@@ -163,9 +147,7 @@ func TestServiceApplied(t *testing.T) {
 				"1_one.sql",
 				"2_two.sql",
 			},
-			fail:       nil,
-			migrations: nil,
-			err:        true,
+			err: true,
 		},
 		{
 			directory: "testdata/two",
@@ -173,18 +155,10 @@ func TestServiceApplied(t *testing.T) {
 				"1_one.sql",
 				"2_two.sql",
 			},
-			fail: nil,
 			migrations: []*Migration{
-				{
-					Name:   "1_one.sql",
-					reader: nil,
-				},
-				{
-					Name:   "2_two.sql",
-					reader: nil,
-				},
+				{Name: "1_one.sql"},
+				{Name: "2_two.sql"},
 			},
-			err: false,
 		},
 	}
 
@@ -220,88 +194,53 @@ func TestServiceApply(t *testing.T) {
 		migration      *Migration
 		executeFail    error
 		addAppliedFail error
+		save           bool
 		err            bool
 		executed       []string
 		applied        []string
 	}{
 		{
 			migration: &Migration{
-				Name: "1_one.sql",
-				reader: strings.NewReader(`-- rambler up
-first
--- rambler up
-second
--- rambler down
-third
--- rambler up
-fourth
-`),
+				Name:   "1_one.sql",
+				reader: strings.NewReader(DummyMigration),
 			},
-			executeFail:    nil,
-			addAppliedFail: nil,
-			err:            false,
+			save: true,
 			executed: []string{
 				"first",
 				"second",
 				"fourth",
 			},
-			applied: []string{
-				"1_one.sql",
-			},
+			applied: []string{"1_one.sql"},
 		},
 		{
 			migration: &Migration{
-				Name: "1_one.sql",
-				reader: strings.NewReader(`-- rambler up
-first
--- rambler up
-second
--- rambler down
-third
--- rambler up
-fourth
-`),
+				Name:   "1_one.sql",
+				reader: strings.NewReader(DummyMigration),
 			},
-			executeFail:    errors.New("error"),
-			addAppliedFail: nil,
-			err:            true,
+			executeFail: errors.New("error"),
+			save:        true,
+			err:         true,
 			executed: []string{
 				"first",
 			},
-			applied: nil,
 		},
 		{
 			migration: &Migration{
-				Name: "1_one.sql",
-				reader: strings.NewReader(`-- rambler up
-first
--- rambler up
-second
--- rambler down
-third
--- rambler up
-fourth
-`),
+				Name:   "1_one.sql",
+				reader: strings.NewReader(DummyMigration),
 			},
-			executeFail:    nil,
 			addAppliedFail: errors.New("error"),
+			save:           true,
 			err:            true,
 			executed: []string{
 				"first",
 				"second",
 				"fourth",
 			},
-			applied: []string{
-				"1_one.sql",
-			},
+			applied: []string{"1_one.sql"},
 		},
 		{
-			migration:      nil,
-			executeFail:    nil,
-			addAppliedFail: nil,
-			err:            true,
-			executed:       nil,
-			applied:        nil,
+			err: true,
 		},
 	}
 
@@ -320,17 +259,17 @@ fourth
 			},
 		}
 
-		err := service.Apply(c.migration)
+		err := service.Apply(c.migration, c.save)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 		}
 
 		if !reflect.DeepEqual(executed, c.executed) {
-			t.Error("case", n, "got unexpected statements:", executed)
+			t.Errorf("case %d got unexpected statements: wanted %+v, got %+v", n, c.executed, executed)
 		}
 
 		if !reflect.DeepEqual(applied, c.applied) {
-			t.Error("case", n, "got unexpected applied:", applied)
+			t.Errorf("case %d got unexpected applied: wanted %+v, got %+v", n, c.applied, applied)
 		}
 	}
 }
@@ -340,86 +279,51 @@ func TestServiceReverse(t *testing.T) {
 		migration         *Migration
 		executeFail       error
 		removeAppliedFail error
+		save              bool
 		err               bool
 		executed          []string
 		reversed          []string
 	}{
 		{
 			migration: &Migration{
-				Name: "1_one.sql",
-				reader: strings.NewReader(`-- rambler up
-first
--- rambler up
-second
--- rambler down
-third
--- rambler down
-fourth
-`),
+				Name:   "1_one.sql",
+				reader: strings.NewReader(DummyMigration),
 			},
-			executeFail:       nil,
-			removeAppliedFail: nil,
-			err:               false,
+			save: true,
 			executed: []string{
-				"fourth",
+				"fifth",
 				"third",
 			},
-			reversed: []string{
-				"1_one.sql",
-			},
+			reversed: []string{"1_one.sql"},
 		},
 		{
 			migration: &Migration{
-				Name: "1_one.sql",
-				reader: strings.NewReader(`-- rambler up
-first
--- rambler up
-second
--- rambler down
-third
--- rambler down
-fourth
-`),
+				Name:   "1_one.sql",
+				reader: strings.NewReader(DummyMigration),
 			},
-			executeFail:       errors.New("error"),
-			removeAppliedFail: nil,
-			err:               true,
+			save:        true,
+			executeFail: errors.New("error"),
+			err:         true,
 			executed: []string{
-				"fourth",
+				"fifth",
 			},
-			reversed: nil,
 		},
 		{
 			migration: &Migration{
-				Name: "1_one.sql",
-				reader: strings.NewReader(`-- rambler up
-first
--- rambler up
-second
--- rambler down
-third
--- rambler down
-fourth
-`),
+				Name:   "1_one.sql",
+				reader: strings.NewReader(DummyMigration),
 			},
-			executeFail:       nil,
 			removeAppliedFail: errors.New("error"),
+			save:              true,
 			err:               true,
 			executed: []string{
-				"fourth",
+				"fifth",
 				"third",
 			},
-			reversed: []string{
-				"1_one.sql",
-			},
+			reversed: []string{"1_one.sql"},
 		},
 		{
-			migration:         nil,
-			executeFail:       nil,
-			removeAppliedFail: nil,
-			err:               true,
-			executed:          nil,
-			reversed:          nil,
+			err: true,
 		},
 	}
 
@@ -438,17 +342,17 @@ fourth
 			},
 		}
 
-		err := service.Reverse(c.migration)
+		err := service.Reverse(c.migration, c.save)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 		}
 
 		if !reflect.DeepEqual(executed, c.executed) {
-			t.Error("case", n, "got unexpected statements:", executed)
+			t.Errorf("case %d got unexpected statements: wanted %+v, got %+v", n, c.executed, executed)
 		}
 
 		if !reflect.DeepEqual(reversed, c.reversed) {
-			t.Error("case", n, "got unexpected reversed:", reversed)
+			t.Errorf("case %d got unexpected reversed: wanted %+v, got %+v", n, c.reversed, reversed)
 		}
 	}
 }

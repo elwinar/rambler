@@ -21,33 +21,39 @@ func TestReverse(t *testing.T) {
 		appliedError     error
 		reverseError     error
 		all              bool
+		save             bool
 
 		err      bool
 		reversed []*Migration
 	}{
 		{
-			all: true,
-			err: true,
+			all:  true,
+			save: true,
+			err:  true,
 		},
 		{
 			initializedError: e,
 			all:              true,
+			save:             true,
 			err:              true,
 		},
 		{
 			initialized: true,
 			all:         true,
+			save:        true,
 		},
 		{
 			initialized:    true,
 			availableError: e,
 			all:            true,
+			save:           true,
 			err:            true,
 		},
 		{
 			initialized:  true,
 			appliedError: e,
 			all:          true,
+			save:         true,
 			err:          true,
 		},
 		{
@@ -61,7 +67,8 @@ func TestReverse(t *testing.T) {
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
-			all: true,
+			all:  true,
+			save: true,
 			reversed: []*Migration{
 				{Name: "2.sql"},
 				{Name: "1.sql"},
@@ -77,6 +84,7 @@ func TestReverse(t *testing.T) {
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
+			save: true,
 			reversed: []*Migration{
 				{Name: "2.sql"},
 			},
@@ -90,8 +98,9 @@ func TestReverse(t *testing.T) {
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
-			all: true,
-			err: true,
+			all:  true,
+			save: true,
+			err:  true,
 		},
 		{
 			initialized: true,
@@ -104,8 +113,9 @@ func TestReverse(t *testing.T) {
 				{Name: "1.sql"},
 				{Name: "3.sql"},
 			},
-			all: true,
-			err: true,
+			all:  true,
+			save: true,
+			err:  true,
 		},
 		{
 			initialized: true,
@@ -119,7 +129,8 @@ func TestReverse(t *testing.T) {
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
-			all: true,
+			all:  true,
+			save: true,
 			reversed: []*Migration{
 				{Name: "2.sql"},
 				{Name: "1.sql"},
@@ -158,8 +169,10 @@ func TestReverse(t *testing.T) {
 			applied: func() ([]*Migration, error) {
 				return c.applied, c.appliedError
 			},
-			reverse: func(migration *Migration) error {
-				reversed = append(reversed, migration)
+			reverse: func(migration *Migration, save bool) error {
+				if save {
+					reversed = append(reversed, migration)
+				}
 				return c.reverseError
 			},
 		}
@@ -168,7 +181,7 @@ func TestReverse(t *testing.T) {
 			l.Output = ioutil.Discard
 		})
 
-		err := reverse(service, c.all, logger)
+		err := reverse(service, c.all, c.save, logger)
 		if (err != nil) != c.err {
 			t.Error("case", n, "got unexpected error:", err)
 			continue

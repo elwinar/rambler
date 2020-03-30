@@ -114,7 +114,7 @@ func (s Service) Applied() ([]*Migration, error) {
 
 // Apply execute the up statements of the given migration to the
 // database then mark the migration as applied
-func (s Service) Apply(migration *Migration) error {
+func (s Service) Apply(migration *Migration, save bool) error {
 	if migration == nil {
 		return ErrNilMigration
 	}
@@ -135,6 +135,10 @@ func (s Service) Apply(migration *Migration) error {
 		return nil
 	}
 
+	if !save {
+		return nil
+	}
+
 	err := s.conn.AddApplied(migration.Name)
 	if err != nil {
 		return fmt.Errorf("unable to mark migration %s as applied: %s", migration.Name, err)
@@ -145,7 +149,7 @@ func (s Service) Apply(migration *Migration) error {
 
 // Reverse execute the down statements of the given migration to the
 // database then mark the migration as not applied
-func (s Service) Reverse(migration *Migration) error {
+func (s Service) Reverse(migration *Migration, save bool) error {
 	if migration == nil {
 		return ErrNilMigration
 	}
@@ -163,6 +167,10 @@ func (s Service) Reverse(migration *Migration) error {
 	}
 
 	if s.dryRun {
+		return nil
+	}
+
+	if !save {
 		return nil
 	}
 

@@ -145,8 +145,10 @@ execute all its `down` sections' statements in reverse order.
 
 ### Options
 
-You can tell rambler to repeat the process while there is a migration to apply
-(or reverse) with the `all` flag (or its shorthand, `a`).
+- `--all, -a` repeat the command until there is no more migration to
+  apply/reverse.
+- `--no-save` doesn't save the applied/reversed migration. This option is
+  mainly destined to allow faster iteration when writing the migration.
 
 ### Errors
 
