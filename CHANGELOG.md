@@ -3,13 +3,15 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+
+## [5.2.0](https://github.com/elwinar/rambler/releases/tag/5.2.0) - 2019-08-28
 ### Added
 - `no-save` flag
 - `migration` flag
 
 ## [5.1.0](https://github.com/elwinar/rambler/releases/tag/5.1.0) - 2019-08-28
 ### Added
-- `dru-run` flag
+- `dry-run` flag
 
 ## [5.0.0](https://github.com/elwinar/rambler/releases/tag/5.0.0) - 2019-05-26
 ### Added
