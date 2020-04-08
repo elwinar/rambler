@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+        main:
+                image: golang:1.14-alpine
+                volumes:
+                        - .:/src
