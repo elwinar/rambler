@@ -21,9 +21,13 @@ func (d Driver) New(config driver.Config) (driver.Conn, error) {
 		config.Schema = "public"
 	}
 
+	if config.SSLMode == "" {
+		config.SSLMode = "disable"
+	}
+
 	db, err := sql.Open("postgres", fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s search_path=%s sslmode=disable",
-		config.Host, config.Port, config.User, config.Password, config.Database, config.Schema,
+		"host=%s port=%d user=%s password=%s dbname=%s search_path=%s sslmode=%s",
+		config.Host, config.Port, config.User, config.Password, config.Database, config.Schema, config.SSLMode,
 	))
 	if err != nil {
 		return nil, err

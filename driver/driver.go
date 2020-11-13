@@ -44,6 +44,7 @@ type Config struct {
 	Database string `json:"database"`
 	Schema   string `json:"schema"` // For PostgreSQL
 	Table    string `json:"table"`
+	SSLMode  string `json:"sslmode"` // For PostgreSQL
 }
 
 // Conn is the interface used by the program to manipulate the database.
