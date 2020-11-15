@@ -66,16 +66,17 @@ values of rambler:
 
 ```json
 {
-	"driver": "mysql",
-	"protocol": "tcp",
-	"host": "localhost",
-	"port": 3306,
-	"user": "root",
-	"password": "",
 	"database": "",
-	"schema": "",
 	"directory": ".",
-	"table": "migrations"
+	"driver": "mysql",
+	"host": "localhost",
+	"password": "",
+	"port": 3306,
+	"protocol": "tcp",
+	"schema": "public",
+	"sslmode": "disable"
+	"table": "migrations",
+	"user": "root",
 }
 ```
 
@@ -95,16 +96,17 @@ are prefixed with `RAMBLER_`.
 
 | Env Var           | Config    |
 |-------------------|-----------|
-| RAMBLER_DRIVER    | driver    |
-| RAMBLER_PROTOCOL  | protocol  |
-| RAMBLER_HOST      | host      |
-| RAMBLER_PORT      | port      |
-| RAMBLER_USER      | user      |
-| RAMBLER_PASSWORD  | password  |
 | RAMBLER_DATABASE  | database  |
-| RAMBLER_SCHEMA    | schema    |
 | RAMBLER_DIRECTORY | directory |
+| RAMBLER_DRIVER    | driver    |
+| RAMBLER_HOST      | host      |
+| RAMBLER_PASSWORD  | password  |
+| RAMBLER_PORT      | port      |
+| RAMBLER_PROTOCOL  | protocol  |
+| RAMBLER_SCHEMA    | schema    |
+| RAMBLER_SSLMODE   | sslmode   |
 | RAMBLER_TABLE     | table     |
+| RAMBLER_USER      | user      |
 
 #### Drivers
 
