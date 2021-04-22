@@ -4,8 +4,8 @@ package main
 type Servicer interface {
 	Initialized() (bool, error)
 	Initialize() error
-	Available() ([]*Migration, error)
-	Applied() ([]*Migration, error)
-	Apply(*Migration, bool) error
-	Reverse(*Migration, bool) error
+	Available() ([]Migration, error)
+	Applied() ([]Migration, error)
+	Apply(Migration, bool) error
+	Reverse(Migration, bool) error
 }

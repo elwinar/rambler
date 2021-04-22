@@ -24,7 +24,7 @@ func reverse(service Servicer, all, save bool, migration string, logger *log.Log
 		return fmt.Errorf("uninitialized database")
 	}
 
-	var targets []*Migration
+	var targets []Migration
 
 	if migration != "" {
 		logger.Debug("fetching migration")

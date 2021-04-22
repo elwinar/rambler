@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/elwinar/rambler/log"
@@ -16,9 +15,9 @@ func TestApply(t *testing.T) {
 		initialized      bool
 		initializedError error
 		initializeError  error
-		available        []*Migration
+		available        []Migration
 		availableError   error
-		applied          []*Migration
+		applied          []Migration
 		appliedError     error
 		applyError       error
 		all              bool
@@ -26,7 +25,7 @@ func TestApply(t *testing.T) {
 		migration        string
 
 		err      bool
-		executed []*Migration
+		executed []Migration
 	}{
 		{
 			initialized: true,
@@ -58,7 +57,7 @@ func TestApply(t *testing.T) {
 			err:          true,
 		},
 		{
-			available: []*Migration{
+			available: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 			},
@@ -66,54 +65,54 @@ func TestApply(t *testing.T) {
 			all:        true,
 			save:       true,
 			err:        true,
-			executed: []*Migration{
+			executed: []Migration{
 				{Name: "bar.sql"},
 			},
 		},
 		{
-			available: []*Migration{
+			available: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 			},
 			all:  true,
 			save: true,
-			executed: []*Migration{
+			executed: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 			},
 		},
 		{
-			available: []*Migration{
+			available: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 			},
 			save: true,
-			executed: []*Migration{
+			executed: []Migration{
 				{Name: "bar.sql"},
 			},
 		},
 		{
-			available: []*Migration{
+			available: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 				{Name: "zoo.sql"},
 			},
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 			},
 			save: true,
-			executed: []*Migration{
+			executed: []Migration{
 				{Name: "zoo.sql"},
 			},
 		},
 		{
-			available: []*Migration{
+			available: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 				{Name: "zoo.sql"},
 			},
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 				{Name: "zoo.sql"},
@@ -122,12 +121,12 @@ func TestApply(t *testing.T) {
 			save: true,
 		},
 		{
-			available: []*Migration{
+			available: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 				{Name: "zoo.sql"},
 			},
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 				{Name: "wee.sql"},
@@ -136,12 +135,12 @@ func TestApply(t *testing.T) {
 			err:  true,
 		},
 		{
-			available: []*Migration{
+			available: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 				{Name: "zoo.sql"},
 			},
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "bar.sql"},
 				{Name: "zoo.sql"},
 			},
@@ -149,11 +148,11 @@ func TestApply(t *testing.T) {
 			err:  true,
 		},
 		{
-			available: []*Migration{
+			available: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 			},
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "bar.sql"},
 				{Name: "foo.sql"},
 				{Name: "zoo.sql"},
@@ -164,25 +163,7 @@ func TestApply(t *testing.T) {
 	}
 
 	for n, c := range cases {
-		var executed []*Migration
-
-		for i := range c.available {
-			if c.available[i].reader == nil {
-				c.available[i].reader = strings.NewReader("")
-			}
-		}
-
-		for i := range c.applied {
-			if c.applied[i].reader == nil {
-				c.applied[i].reader = strings.NewReader("")
-			}
-		}
-
-		for i := range c.executed {
-			if c.executed[i].reader == nil {
-				c.executed[i].reader = strings.NewReader("")
-			}
-		}
+		var executed []Migration
 
 		service := MockService{
 			initialized: func() (bool, error) {
@@ -191,13 +172,13 @@ func TestApply(t *testing.T) {
 			initialize: func() error {
 				return c.initializeError
 			},
-			available: func() ([]*Migration, error) {
+			available: func() ([]Migration, error) {
 				return c.available, c.availableError
 			},
-			applied: func() ([]*Migration, error) {
+			applied: func() ([]Migration, error) {
 				return c.applied, c.appliedError
 			},
-			apply: func(migration *Migration, save bool) error {
+			apply: func(migration Migration, save bool) error {
 				if save {
 					executed = append(executed, migration)
 				}
