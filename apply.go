@@ -27,7 +27,7 @@ func apply(service Servicer, all, save bool, migration string, logger *log.Logge
 		}
 	}
 
-	var targets []*Migration
+	var targets []Migration
 	if migration != "" {
 		logger.Debug("fetching migration")
 		m, err := NewMigration(migration)
