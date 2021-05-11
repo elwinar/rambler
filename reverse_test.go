@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/elwinar/rambler/log"
@@ -15,9 +14,9 @@ func TestReverse(t *testing.T) {
 	var cases = []struct {
 		initialized      bool
 		initializedError error
-		available        []*Migration
+		available        []Migration
 		availableError   error
-		applied          []*Migration
+		applied          []Migration
 		appliedError     error
 		reverseError     error
 		all              bool
@@ -25,7 +24,7 @@ func TestReverse(t *testing.T) {
 		migration        string
 
 		err      bool
-		reversed []*Migration
+		reversed []Migration
 	}{
 		{
 			all:  true,
@@ -59,43 +58,43 @@ func TestReverse(t *testing.T) {
 		},
 		{
 			initialized: true,
-			available: []*Migration{
+			available: []Migration{
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
 			availableError: nil,
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
 			all:  true,
 			save: true,
-			reversed: []*Migration{
+			reversed: []Migration{
 				{Name: "2.sql"},
 				{Name: "1.sql"},
 			},
 		},
 		{
 			initialized: true,
-			available: []*Migration{
+			available: []Migration{
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
 			save: true,
-			reversed: []*Migration{
+			reversed: []Migration{
 				{Name: "2.sql"},
 			},
 		},
 		{
 			initialized: true,
-			available: []*Migration{
+			available: []Migration{
 				{Name: "1.sql"},
 			},
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
@@ -105,12 +104,12 @@ func TestReverse(t *testing.T) {
 		},
 		{
 			initialized: true,
-			available: []*Migration{
+			available: []Migration{
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 				{Name: "3.sql"},
 			},
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "1.sql"},
 				{Name: "3.sql"},
 			},
@@ -120,19 +119,19 @@ func TestReverse(t *testing.T) {
 		},
 		{
 			initialized: true,
-			available: []*Migration{
+			available: []Migration{
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 				{Name: "3.sql"},
 			},
 			availableError: nil,
-			applied: []*Migration{
+			applied: []Migration{
 				{Name: "1.sql"},
 				{Name: "2.sql"},
 			},
 			all:  true,
 			save: true,
-			reversed: []*Migration{
+			reversed: []Migration{
 				{Name: "2.sql"},
 				{Name: "1.sql"},
 			},
@@ -140,37 +139,19 @@ func TestReverse(t *testing.T) {
 	}
 
 	for n, c := range cases {
-		var reversed []*Migration
-
-		for i := range c.available {
-			if c.available[i].reader == nil {
-				c.available[i].reader = strings.NewReader("")
-			}
-		}
-
-		for i := range c.applied {
-			if c.applied[i].reader == nil {
-				c.applied[i].reader = strings.NewReader("")
-			}
-		}
-
-		for i := range c.reversed {
-			if c.reversed[i].reader == nil {
-				c.reversed[i].reader = strings.NewReader("")
-			}
-		}
+		var reversed []Migration
 
 		service := MockService{
 			initialized: func() (bool, error) {
 				return c.initialized, c.initializedError
 			},
-			available: func() ([]*Migration, error) {
+			available: func() ([]Migration, error) {
 				return c.available, c.availableError
 			},
-			applied: func() ([]*Migration, error) {
+			applied: func() ([]Migration, error) {
 				return c.applied, c.appliedError
 			},
-			reverse: func(migration *Migration, save bool) error {
+			reverse: func(migration Migration, save bool) error {
 				if save {
 					reversed = append(reversed, migration)
 				}

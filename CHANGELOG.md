@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## [5.3.0](https://github.com/elwinar/rambler/releases/tag/5.2.0) - 2021-05-11
+### Changed
+- Open files when scanning a migration to avoid unnecessary disk operations
+
 ## [5.2.0](https://github.com/elwinar/rambler/releases/tag/5.2.0) - 2019-08-28
 ### Added
 - `no-save` flag

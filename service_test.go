@@ -3,21 +3,8 @@ package main
 import (
 	"errors"
 	"reflect"
-	"strings"
 	"testing"
 )
-
-const DummyMigration = `-- rambler up
-first
--- rambler up
-second
--- rambler down
-third
--- rambler up
-fourth
--- rambler down
-fifth
-`
 
 func TestNewService(t *testing.T) {
 	var cases = []struct {
@@ -64,7 +51,7 @@ func TestNewService(t *testing.T) {
 func TestServiceAvailable(t *testing.T) {
 	var cases = []struct {
 		directory  string
-		migrations []*Migration
+		migrations []Migration
 		err        bool
 	}{
 		{
@@ -72,22 +59,37 @@ func TestServiceAvailable(t *testing.T) {
 		},
 		{
 			directory: "testdata/one",
-			migrations: []*Migration{
-				{Name: "1_one.sql"},
+			migrations: []Migration{
+				{
+					Path: "testdata/one/1_one.sql",
+					Name: "1_one.sql",
+				},
 			},
 		},
 		{
 			directory: "testdata/two",
-			migrations: []*Migration{
-				{Name: "1_one.sql"},
-				{Name: "2_two.sql"},
+			migrations: []Migration{
+				{
+					Path: "testdata/two/1_one.sql",
+					Name: "1_one.sql",
+				},
+				{
+					Path: "testdata/two/2_two.sql",
+					Name: "2_two.sql",
+				},
 			},
 		},
 		{
 			directory: "testdata/others",
-			migrations: []*Migration{
-				{Name: "1_one.sql"},
-				{Name: "2_two.sql"},
+			migrations: []Migration{
+				{
+					Path: "testdata/others/1_one.sql",
+					Name: "1_one.sql",
+				},
+				{
+					Path: "testdata/others/2_two.sql",
+					Name: "2_two.sql",
+				},
 			},
 		},
 		{
@@ -108,10 +110,6 @@ func TestServiceAvailable(t *testing.T) {
 			t.Error("case", n, "got unexpected error:", err)
 		}
 
-		for _, m := range migrations {
-			m.reader = nil
-		}
-
 		if !reflect.DeepEqual(migrations, c.migrations) {
 			t.Error("case", n, "got unexpected migrations:", migrations)
 		}
@@ -123,7 +121,7 @@ func TestServiceApplied(t *testing.T) {
 		directory  string
 		table      []string
 		fail       error
-		migrations []*Migration
+		migrations []Migration
 		err        bool
 	}{
 		{
@@ -131,8 +129,11 @@ func TestServiceApplied(t *testing.T) {
 			table: []string{
 				"1_one.sql",
 			},
-			migrations: []*Migration{
-				{Name: "1_one.sql"},
+			migrations: []Migration{
+				{
+					Path: "testdata/one/1_one.sql",
+					Name: "1_one.sql",
+				},
 			},
 		},
 		{
@@ -155,9 +156,15 @@ func TestServiceApplied(t *testing.T) {
 				"1_one.sql",
 				"2_two.sql",
 			},
-			migrations: []*Migration{
-				{Name: "1_one.sql"},
-				{Name: "2_two.sql"},
+			migrations: []Migration{
+				{
+					Path: "testdata/two/1_one.sql",
+					Name: "1_one.sql",
+				},
+				{
+					Path: "testdata/two/2_two.sql",
+					Name: "2_two.sql",
+				},
 			},
 		},
 	}
@@ -179,10 +186,6 @@ func TestServiceApplied(t *testing.T) {
 			t.Error("case", n, "got unexpected error:", err)
 		}
 
-		for _, m := range migrations {
-			m.reader = nil
-		}
-
 		if !reflect.DeepEqual(migrations, c.migrations) {
 			t.Error("case", n, "got unexpected migrations:", migrations)
 		}
@@ -191,7 +194,7 @@ func TestServiceApplied(t *testing.T) {
 
 func TestServiceApply(t *testing.T) {
 	var cases = []struct {
-		migration      *Migration
+		migration      Migration
 		executeFail    error
 		addAppliedFail error
 		save           bool
@@ -200,9 +203,9 @@ func TestServiceApply(t *testing.T) {
 		applied        []string
 	}{
 		{
-			migration: &Migration{
-				Name:   "1_one.sql",
-				reader: strings.NewReader(DummyMigration),
+			migration: Migration{
+				Path: "testdata/dummy.sql",
+				Name: "dummy.sql",
 			},
 			save: true,
 			executed: []string{
@@ -210,12 +213,12 @@ func TestServiceApply(t *testing.T) {
 				"second",
 				"fourth",
 			},
-			applied: []string{"1_one.sql"},
+			applied: []string{"dummy.sql"},
 		},
 		{
-			migration: &Migration{
-				Name:   "1_one.sql",
-				reader: strings.NewReader(DummyMigration),
+			migration: Migration{
+				Path: "testdata/dummy.sql",
+				Name: "dummy.sql",
 			},
 			executeFail: errors.New("error"),
 			save:        true,
@@ -225,9 +228,9 @@ func TestServiceApply(t *testing.T) {
 			},
 		},
 		{
-			migration: &Migration{
-				Name:   "1_one.sql",
-				reader: strings.NewReader(DummyMigration),
+			migration: Migration{
+				Path: "testdata/dummy.sql",
+				Name: "dummy.sql",
 			},
 			addAppliedFail: errors.New("error"),
 			save:           true,
@@ -237,7 +240,7 @@ func TestServiceApply(t *testing.T) {
 				"second",
 				"fourth",
 			},
-			applied: []string{"1_one.sql"},
+			applied: []string{"dummy.sql"},
 		},
 		{
 			err: true,
@@ -276,7 +279,7 @@ func TestServiceApply(t *testing.T) {
 
 func TestServiceReverse(t *testing.T) {
 	var cases = []struct {
-		migration         *Migration
+		migration         Migration
 		executeFail       error
 		removeAppliedFail error
 		save              bool
@@ -285,21 +288,21 @@ func TestServiceReverse(t *testing.T) {
 		reversed          []string
 	}{
 		{
-			migration: &Migration{
-				Name:   "1_one.sql",
-				reader: strings.NewReader(DummyMigration),
+			migration: Migration{
+				Path: "testdata/dummy.sql",
+				Name: "dummy.sql",
 			},
 			save: true,
 			executed: []string{
 				"fifth",
 				"third",
 			},
-			reversed: []string{"1_one.sql"},
+			reversed: []string{"dummy.sql"},
 		},
 		{
-			migration: &Migration{
-				Name:   "1_one.sql",
-				reader: strings.NewReader(DummyMigration),
+			migration: Migration{
+				Path: "testdata/dummy.sql",
+				Name: "dummy.sql",
 			},
 			save:        true,
 			executeFail: errors.New("error"),
@@ -309,9 +312,9 @@ func TestServiceReverse(t *testing.T) {
 			},
 		},
 		{
-			migration: &Migration{
-				Name:   "1_one.sql",
-				reader: strings.NewReader(DummyMigration),
+			migration: Migration{
+				Path: "testdata/dummy.sql",
+				Name: "dummy.sql",
 			},
 			removeAppliedFail: errors.New("error"),
 			save:              true,
@@ -320,7 +323,7 @@ func TestServiceReverse(t *testing.T) {
 				"fifth",
 				"third",
 			},
-			reversed: []string{"1_one.sql"},
+			reversed: []string{"dummy.sql"},
 		},
 		{
 			err: true,
