@@ -4,9 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-## [5.3.0](https://github.com/elwinar/rambler/releases/tag/5.2.0) - 2021-05-11
+## [5.4.0](https://github.com/elwinar/rambler/releases/tag/5.4.0) - 2021-05-11
 ### Changed
 - Open files when scanning a migration to avoid unnecessary disk operations
+
+## [5.3.0](https://github.com/elwinar/rambler/releases/tag/5.3.0) - 2020-11-15
+### Added
+- Better support for PostgreSQL's sslmode
 
 ## [5.2.0](https://github.com/elwinar/rambler/releases/tag/5.2.0) - 2019-08-28
 ### Added
