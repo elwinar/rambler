@@ -40,6 +40,7 @@ type Config struct {
 	Host     string `json:"host"`
 	Port     uint64 `json:"port"`
 	User     string `json:"user"`
+	Role     string `json:"role"` // For PostgreSQL
 	Password string `json:"password"`
 	Database string `json:"database"`
 	Schema   string `json:"schema"` // For PostgreSQL

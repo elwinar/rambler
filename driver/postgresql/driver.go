@@ -32,6 +32,12 @@ func (d Driver) New(config driver.Config) (driver.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
+	if config.Role != "" {
+		_, err := db.Exec(fmt.Sprintf("SET ROLE '%s';", config.Role))
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	c := &Conn{
 		db:      db,
