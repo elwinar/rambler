@@ -16,6 +16,24 @@ const prefix = `-- rambler`
 type Migration struct {
 	Name   string
 	reader io.Reader
+	path   string
+	file   *os.File
+}
+
+func (m Migration) Close() error {
+	if m.file != nil {
+		return m.file.Close()
+	}
+	return nil
+}
+
+func (m Migration) r() io.Reader {
+	if m.reader == nil {
+		file, _ := os.Open(m.path) // Assumes the path was verified via NewMigration.
+		m.reader = file
+	}
+
+	return m.reader
 }
 
 // NewMigration generate a migration from the given file
@@ -24,10 +42,13 @@ func NewMigration(path string) (*Migration, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to open file %s: %s", path, err.Error())
 	}
+	if err = file.Close(); err != nil {
+		return nil, fmt.Errorf("unable to close file %s: %s", path, err.Error())
+	}
 
 	m := &Migration{
-		Name:   filepath.Base(path),
-		reader: file,
+		Name: filepath.Base(path),
+		path: path,
 	}
 
 	return m, nil
@@ -35,7 +56,8 @@ func NewMigration(path string) (*Migration, error) {
 
 // Scan retrieve all sections of the file with the given section marker.
 func (m Migration) scan(section string) []string {
-	var scanner = bufio.NewScanner(m.reader)
+	defer m.Close()
+	var scanner = bufio.NewScanner(m.r())
 	var statements []string
 	var buffer string
 

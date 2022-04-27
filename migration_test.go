@@ -22,6 +22,7 @@ func TestNewMigration(t *testing.T) {
 			migration: &Migration{
 				Name:   "1_foo.sql",
 				reader: nil,
+				path: "testdata/1_foo.sql",
 			},
 			err: false,
 		},
