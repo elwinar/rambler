@@ -2,3 +2,4 @@
 .goxc.local.json
 
 *.iml
+.idea/
