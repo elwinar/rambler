@@ -85,7 +85,7 @@ directory and use its values to connect to the managed database.
 
 #### HJSON
 
-Rambler supports [HJSON](http://hjson.org/) configuration files, which is by
+Rambler supports [HJSON](https://hjson.github.io/) configuration files, which is by
 the way retrocompatible with JSON.
 
 #### Environment Variables
