@@ -2,8 +2,9 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
-	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,36 +15,14 @@ const prefix = `-- rambler`
 // Migration represent a migration file, composed of up and down sections containing
 // one or more statements each.
 type Migration struct {
-	Name   string
-	reader io.Reader
-	path   string
-	file   *os.File
-}
-
-func (m Migration) Close() error {
-	if m.file != nil {
-		return m.file.Close()
-	}
-	return nil
-}
-
-func (m Migration) r() io.Reader {
-	if m.reader == nil {
-		file, _ := os.Open(m.path) // Assumes the path was verified via NewMigration.
-		m.reader = file
-	}
-
-	return m.reader
+	Name string
+	path string
 }
 
 // NewMigration generate a migration from the given file
 func NewMigration(path string) (*Migration, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("unable to open file %s: %s", path, err.Error())
-	}
-	if err = file.Close(); err != nil {
-		return nil, fmt.Errorf("unable to close file %s: %s", path, err.Error())
+	if _, err := os.Stat(path); errors.Is(err, fs.ErrNotExist) {
+		return nil, fmt.Errorf("can't find migration %q: %w", path, err)
 	}
 
 	m := &Migration{
@@ -55,9 +34,14 @@ func NewMigration(path string) (*Migration, error) {
 }
 
 // Scan retrieve all sections of the file with the given section marker.
-func (m Migration) scan(section string) []string {
-	defer m.Close()
-	var scanner = bufio.NewScanner(m.r())
+func (m Migration) scan(section string) ([]string, error) {
+	file, err := os.Open(m.path)
+	if err != nil {
+		return nil, fmt.Errorf("opening migration %q: %w", m.path, err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
 	var statements []string
 	var buffer string
 
@@ -92,20 +76,23 @@ func (m Migration) scan(section string) []string {
 		statements = append(statements, strings.TrimSpace(buffer))
 	}
 
-	return statements
+	return statements, nil
 }
 
 // Up return the up statements of the migration
-func (m Migration) Up() []string {
+func (m Migration) Up() ([]string, error) {
 	return m.scan(`up`)
 }
 
 // Down return the down statements of the migration
-func (m Migration) Down() []string {
-	raw := m.scan(`down`)
+func (m Migration) Down() ([]string, error) {
+	raw, err := m.scan(`down`)
+	if err != nil {
+		return nil, err
+	}
 	var stmt []string
 	for i := len(raw) - 1; i >= 0; i-- {
 		stmt = append(stmt, raw[i])
 	}
-	return stmt
+	return stmt, nil
 }

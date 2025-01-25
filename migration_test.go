@@ -2,12 +2,11 @@ package main
 
 import (
 	"reflect"
-	"strings"
 	"testing"
 )
 
 func TestNewMigration(t *testing.T) {
-	var cases = []struct {
+	cases := []struct {
 		path      string
 		migration *Migration
 		err       bool
@@ -20,8 +19,7 @@ func TestNewMigration(t *testing.T) {
 		{
 			path: "testdata/1_foo.sql",
 			migration: &Migration{
-				Name:   "1_foo.sql",
-				reader: nil,
+				Name: "1_foo.sql",
 				path: "testdata/1_foo.sql",
 			},
 			err: false,
@@ -35,10 +33,6 @@ func TestNewMigration(t *testing.T) {
 			continue
 		}
 
-		if migration != nil {
-			migration.reader = nil
-		}
-
 		if !reflect.DeepEqual(migration, c.migration) {
 			t.Error("case", n, "got unexpected output:", migration)
 		}
@@ -46,30 +40,25 @@ func TestNewMigration(t *testing.T) {
 }
 
 func TestMigrationUp(t *testing.T) {
-	var cases = []struct {
-		reader *strings.Reader
+	cases := []struct {
+		path   string
 		output []string
 	}{
 		{
-			reader: strings.NewReader(`-- rambler up
-first
--- rambler up
-second
--- rambler down
-third
--- rambler up
-fourth
-`),
+			path:   "testdata/migrations/01_up.sql",
 			output: []string{"first", "second", "fourth"},
 		},
 	}
 
 	for n, c := range cases {
 		migration := &Migration{
-			reader: c.reader,
+			path: c.path,
 		}
 
-		statements := migration.Up()
+		statements, err := migration.Up()
+		if err != nil {
+			t.Error("case", n, "got unexpected error:", err)
+		}
 		if !reflect.DeepEqual(statements, c.output) {
 			t.Error("case", n, "got unexpected output:", statements)
 		}
@@ -77,42 +66,29 @@ fourth
 }
 
 func TestMigrationDown(t *testing.T) {
-	var cases = []struct {
-		reader *strings.Reader
+	cases := []struct {
+		path   string
 		output []string
 	}{
 		{
-			reader: strings.NewReader(`-- rambler up
-first
--- rambler up
-second
--- rambler down
-third
--- rambler up
-fourth
-`),
+			path:   "testdata/migrations/02_down1.sql",
 			output: []string{"third"},
 		},
 		{
-			reader: strings.NewReader(`-- rambler up
-first
--- rambler down
-second
--- rambler down
-third
--- rambler up
-fourth
-`),
+			path:   "testdata/migrations/02_down2.sql",
 			output: []string{"third", "second"},
 		},
 	}
 
 	for n, c := range cases {
 		migration := &Migration{
-			reader: c.reader,
+			path: c.path,
 		}
 
-		statements := migration.Down()
+		statements, err := migration.Down()
+		if err != nil {
+			t.Error("case", n, "got unexpected error:", err)
+		}
 		if !reflect.DeepEqual(statements, c.output) {
 			t.Error("case", n, "got unexpected output:", statements)
 		}

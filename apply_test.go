@@ -2,17 +2,16 @@ package main
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/elwinar/rambler/log"
 )
 
 func TestApply(t *testing.T) {
-	var e = errors.New("error")
-	var cases = []struct {
+	e := errors.New("error")
+	cases := []struct {
 		initialized      bool
 		initializedError error
 		initializeError  error
@@ -166,24 +165,6 @@ func TestApply(t *testing.T) {
 	for n, c := range cases {
 		var executed []*Migration
 
-		for i := range c.available {
-			if c.available[i].reader == nil {
-				c.available[i].reader = strings.NewReader("")
-			}
-		}
-
-		for i := range c.applied {
-			if c.applied[i].reader == nil {
-				c.applied[i].reader = strings.NewReader("")
-			}
-		}
-
-		for i := range c.executed {
-			if c.executed[i].reader == nil {
-				c.executed[i].reader = strings.NewReader("")
-			}
-		}
-
 		service := MockService{
 			initialized: func() (bool, error) {
 				return c.initialized, c.initializedError
@@ -206,7 +187,7 @@ func TestApply(t *testing.T) {
 		}
 
 		logger = log.NewLogger(func(l *log.Logger) {
-			l.Output = ioutil.Discard
+			l.Output = io.Discard
 		})
 
 		err := apply(service, c.all, c.save, c.migration, logger)

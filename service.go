@@ -5,18 +5,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
-	"github.com/bradfitz/slice"
 	"github.com/elwinar/rambler/driver"
 	_ "github.com/elwinar/rambler/driver/mysql"
 	_ "github.com/elwinar/rambler/driver/postgresql"
 	_ "github.com/elwinar/rambler/driver/sqlite"
 )
 
-var (
-	// ErrNilMigration is returned when the service is given a nil migration
-	ErrNilMigration = errors.New("nil migration")
-)
+// ErrNilMigration is returned when the service is given a nil migration
+var ErrNilMigration = errors.New("nil migration")
 
 // Service is the struct that gather operations to manipulate the
 // database and migrations on disk
@@ -80,8 +79,8 @@ func (s Service) Available() ([]*Migration, error) {
 		migrations = append(migrations, migration)
 	}
 
-	slice.Sort(migrations, func(i, j int) bool {
-		return migrations[i].Name < migrations[j].Name
+	slices.SortFunc(migrations, func(a, b *Migration) int {
+		return strings.Compare(a.Name, b.Name)
 	})
 
 	return migrations, nil
@@ -105,8 +104,8 @@ func (s Service) Applied() ([]*Migration, error) {
 		migrations = append(migrations, migration)
 	}
 
-	slice.Sort(migrations, func(i, j int) bool {
-		return migrations[i].Name < migrations[j].Name
+	slices.SortFunc(migrations, func(a, b *Migration) int {
+		return strings.Compare(a.Name, b.Name)
 	})
 
 	return migrations, nil
@@ -119,7 +118,12 @@ func (s Service) Apply(migration *Migration, save bool) error {
 		return ErrNilMigration
 	}
 
-	for _, statement := range migration.Up() {
+	statements, err := migration.Up()
+	if err != nil {
+		return fmt.Errorf("retrieving 'up' migrations: %w", err)
+	}
+
+	for _, statement := range statements {
 		if s.dryRun {
 			logger.Info("statement: %s", statement)
 			continue
@@ -139,7 +143,7 @@ func (s Service) Apply(migration *Migration, save bool) error {
 		return nil
 	}
 
-	err := s.conn.AddApplied(migration.Name)
+	err = s.conn.AddApplied(migration.Name)
 	if err != nil {
 		return fmt.Errorf("unable to mark migration %s as applied: %s", migration.Name, err)
 	}
@@ -154,7 +158,12 @@ func (s Service) Reverse(migration *Migration, save bool) error {
 		return ErrNilMigration
 	}
 
-	for _, statement := range migration.Down() {
+	statements, err := migration.Down()
+	if err != nil {
+		return fmt.Errorf("retrieving 'down' migrations: %w", err)
+	}
+
+	for _, statement := range statements {
 		if s.dryRun {
 			logger.Info("statement: %s", statement)
 			continue
@@ -174,7 +183,7 @@ func (s Service) Reverse(migration *Migration, save bool) error {
 		return nil
 	}
 
-	err := s.conn.RemoveApplied(migration.Name)
+	err = s.conn.RemoveApplied(migration.Name)
 	if err != nil {
 		return fmt.Errorf("unable to mark migration %s as not applied: %s", migration.Name, err)
 	}
