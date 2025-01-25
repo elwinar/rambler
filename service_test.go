@@ -73,21 +73,21 @@ func TestServiceAvailable(t *testing.T) {
 		{
 			directory: "testdata/one",
 			migrations: []*Migration{
-				{Name: "1_one.sql"},
+				{Name: "1_one.sql", path: "testdata/one/1_one.sql"},
 			},
 		},
 		{
 			directory: "testdata/two",
 			migrations: []*Migration{
-				{Name: "1_one.sql"},
-				{Name: "2_two.sql"},
+				{Name: "1_one.sql", path: "testdata/two/1_one.sql"},
+				{Name: "2_two.sql", path: "testdata/two/2_two.sql"},
 			},
 		},
 		{
 			directory: "testdata/others",
 			migrations: []*Migration{
-				{Name: "1_one.sql"},
-				{Name: "2_two.sql"},
+				{Name: "1_one.sql", path: "testdata/others/1_one.sql"},
+				{Name: "2_two.sql", path: "testdata/others/2_two.sql"},
 			},
 		},
 		{
@@ -132,7 +132,7 @@ func TestServiceApplied(t *testing.T) {
 				"1_one.sql",
 			},
 			migrations: []*Migration{
-				{Name: "1_one.sql"},
+				{Name: "1_one.sql", path: "testdata/one/1_one.sql"},
 			},
 		},
 		{
@@ -156,8 +156,8 @@ func TestServiceApplied(t *testing.T) {
 				"2_two.sql",
 			},
 			migrations: []*Migration{
-				{Name: "1_one.sql"},
-				{Name: "2_two.sql"},
+				{Name: "1_one.sql", path: "testdata/two/1_one.sql"},
+				{Name: "2_two.sql", path: "testdata/two/2_two.sql"},
 			},
 		},
 	}
