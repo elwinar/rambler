@@ -1,4 +1,4 @@
-targets="windows/amd64,windows/386,darwin/arm64,darwin/amd64,darwin/386,linux/amd64,linux/386"
+targets="windows/amd64,windows/386,darwin/arm64,darwin/amd64,darwin/386,linux/amd64,linux/arm64,linux/386"
 pkg="github.com/elwinar/rambler"
 version=$(shell git describe --tags)
 ldflags="-X main.VERSION=${version}"
