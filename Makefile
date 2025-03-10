@@ -16,7 +16,8 @@ help: ## Get help
 
 .PHONY: release
 release: ## Build the release files
-	xgo --dest release --targets=$(targets) --ldflags=$(ldflags) $(pkg)
+	mkdir -p release/github.com/elwinar
+	xgo --dest release --targets=$(targets) --ldflags=$(ldflags) .
 	docker-compose run -w /src main sh -c 'apk add build-base && go build -o release/rambler-alpine-amd64 --ldflags=${ldflags}'
 
 .PHONY: test
