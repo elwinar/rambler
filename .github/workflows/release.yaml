@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+    secrets: inherit
+  release:
+    needs: [test]
+    runs-on: ubuntu-latest
+    name: Compile & archive release binaries
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+    - name: Cache xgo-cache
+      uses: actions/cache@v4
+      with:
+        path: /home/runner/.xgo-cache
+        key: xgo-cache
+    - name: Install techknowlogick/xgo
+      run: go install src.techknowlogick.com/xgo@v1.8.0+1.23.2
+    - uses: docker/setup-buildx-action@v3
+    - name: Build rambler
+      run: PATH=/home/runner/.go/bin:$PATH make release
+    - name: Archive releases
+      uses: actions/upload-artifact@v4
+      with:
+        name: release
+        path: release/github.com/elwinar
+        retention-days: 90
+        if-no-files-found: error

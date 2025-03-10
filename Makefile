@@ -1,4 +1,4 @@
-targets="windows/amd64,windows/386,darwin/arm64,darwin/amd64,darwin/386,linux/amd64,linux/386"
+targets="windows/amd64,windows/386,darwin/arm64,darwin/amd64,darwin/386,linux/amd64,linux/arm64,linux/386"
 pkg="github.com/elwinar/rambler"
 version=$(shell git describe --tags)
 ldflags="-X main.VERSION=${version}"
@@ -16,8 +16,11 @@ help: ## Get help
 
 .PHONY: release
 release: ## Build the release files
-	xgo --dest release --targets=$(targets) --ldflags=$(ldflags) $(pkg)
-	docker-compose run -w /src main sh -c 'apk add build-base && go build -o release/rambler-alpine-amd64 --ldflags=${ldflags}'
+	mkdir -p release/github.com/elwinar
+	xgo --dest release --targets=$(targets) --ldflags=$(ldflags) .
+	docker buildx build --output type=tar --build-arg VERSION=${version} --platform linux/amd64 --file build.Dockerfile . | tar -xO rambler >release/github.com/elwinar/rambler-alpine-amd64
+	docker buildx build --output type=tar --build-arg VERSION=${version} --platform linux/arm64 --file build.Dockerfile . | tar -xO rambler >release/github.com/elwinar/rambler-alpine-arm64
+	chmod +x release/github.com/elwinar/rambler-alpine-amd64 release/github.com/elwinar/rambler-alpine-arm64
 
 .PHONY: test
 test: ## Test the project
