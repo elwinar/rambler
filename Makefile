@@ -18,7 +18,9 @@ help: ## Get help
 release: ## Build the release files
 	mkdir -p release/github.com/elwinar
 	xgo --dest release --targets=$(targets) --ldflags=$(ldflags) .
-	docker-compose run -w /src main sh -c 'apk add build-base && go build -o release/rambler-alpine-amd64 --ldflags=${ldflags}'
+	docker buildx build --output type=tar --build-arg VERSION=${version} --platform linux/amd64 --file build.Dockerfile . | tar -xO rambler >release/github.com/elwinar/rambler-alpine-amd64
+	docker buildx build --output type=tar --build-arg VERSION=${version} --platform linux/arm64 --file build.Dockerfile . | tar -xO rambler >release/github.com/elwinar/rambler-alpine-arm64
+	chmod +x release/github.com/elwinar/rambler-alpine-amd64 release/github.com/elwinar/rambler-alpine-arm64
 
 .PHONY: test
 test: ## Test the project
